@@ -1,0 +1,23 @@
+Package: bigtime
+Type: Package
+Title: Sparse estimation of large time series models
+Version: 0.1.0
+Authors@R: c(
+    person("Ines", "Wilms", email = "ines.wilms@kuleuven.be", role = c("cre","aut")),
+    person("David", "Matteson", email = "matteson@cornell.edu", role = "aut"),
+    person("Jacob", "Bien", email = "jbien@usc.edu", role = "aut"),
+    person("Sumanta", "Basu", email = "sumbose@cornell.edu", role = "aut"))
+Author: Ines Wilms [cre, aut],
+  David Matteson [aut],
+  Jacob Bien [aut],
+  Sumanta Basu [aut]
+Maintainer: Ines Wilms <ines.wilms@kuleuven.be>
+Description: Estimation of large VAR, VARX and VARMA models with structured lasso penalties.
+Depends: R (>= 3.1.0), methods
+License: GPL (>= 2)
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 6.0.1
+Imports: MASS, zoo, lattice, Rcpp, stats, utils, grDevices, graphics, corrplot
+SystemRequirements: C++11
+LinkingTo: Rcpp, RcppArmadillo, RcppEigen
