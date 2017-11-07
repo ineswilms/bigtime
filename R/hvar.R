@@ -19,6 +19,7 @@
 #' \item{phi0hat}{vector of VAR intercepts.}
 #' @references Nicholson William B., Bien Jacob and Matteson David S. (2017), "High Dimensional Forecasting via Interpretable Vector Autoregression"
 #' arXiv preprint arXiv:1412.5250v2.
+#' @seealso \link{lagmatrix} and \link{directforecast}
 #' @examples
 #' data(Y)
 #' varfit <- sparsevar(Y) # sparse VAR

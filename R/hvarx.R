@@ -29,6 +29,7 @@
 #' \item{phi0hat}{vector of VARX intercepts.}
 #' @references Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2017), "Interpretable Vector AutoRegressions with
 #' Exogenous Time Series" arXiv preprint.
+#' @seealso \link{lagmatrix} and \link{directforecast}
 #' @examples
 #' data(Y)
 #' data(X)

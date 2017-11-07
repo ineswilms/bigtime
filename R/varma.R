@@ -6,7 +6,7 @@
 #' how deep the grid should be constructed. Second element specifies how many values the grid should contain.
 #' @param VARlseq User-specified grid of values for regularization parameter in the PhaseI VAR. Typical usage is to have the program compute
 #' its own grid. Supplying a grid of values overrides this. WARNING: use with care.
-#' @param VARpen "HLag" (hierarchical sparse penalty) or "L1" (standard lasso penalty) penalization in PhaseI VAR. The default is zero.
+#' @param VARpen "HLag" (hierarchical sparse penalty) or "L1" (standard lasso penalty) penalization in PhaseI VAR.
 #' @param VARMAp User-specified maximum autoregressive lag order of the VARMA. Typical usage is to have the program compute its own maximum lag order based on the time series length.
 #' @param VARMAq User-specified maximum moving average lag order of the VARMA. Typical usage is to have the program compute its own maximum lag order based on the time series length.
 #' @param VARMAlPhiseq User-specified grid of values for regularization parameter corresponding to the autoregressive coefficients in the VARMA. Typical usage is to have the program compute
@@ -19,7 +19,7 @@
 #' how deep the grid should be constructed. Second element specifies how many values the grid should contain.
 #' @param VARMApen "HLag" (hierarchical sparse penalty) or "L1" (standard lasso penalty) penalization in the VARMA.
 #' @param VARMAalpha a small positive regularization parameter value corresponding to squared Frobenius penalty in  VARMA. The default is zero.
-#' @param VARalpha a small positive regularization parameter value corresponding to squared Frobenius penalty in PhaseI VAR.
+#' @param VARalpha a small positive regularization parameter value corresponding to squared Frobenius penalty in PhaseI VAR. The default is zero.
 #' @param eps a small positive numeric value giving the tolerance for convergence in the proximal gradient algorithms.
 #' @param h Desired forecast horizon in time-series cross-validation procedure.
 #' @param cvcut Proportion of observations used for model estimation in the time series cross-validation procedure. The remainder is used for forecast evaluation.
@@ -39,6 +39,7 @@
 #' \item{phi0hat}{Vector of VARMA intercepts.}
 #' @references Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2017), "Sparse Identification and Estimation of High-Dimensional Vector AutoRegressive Moving Averages"
 #' arXiv preprint arXiv:1707.09208.
+#' @seealso \link{lagmatrix} and \link{directforecast}
 #' @examples
 #' data(Y)
 #' varmafit <- sparsevarma(Y) # sparse VARMA
