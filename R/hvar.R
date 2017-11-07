@@ -23,8 +23,8 @@
 #' @examples
 #' data(Y)
 #' VARfit <- sparseVAR(Y) # sparse VAR
-#' Y1 <- matrix(Y[,1], ncol=1)
-#' ARfit <- sparseVAR(Y1) # sparse AR
+#' y <- matrix(Y[,1], ncol=1)
+#' ARfit <- sparseVAR(y) # sparse AR
 sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL, VARalpha=0,
                       cvcut=0.9, h=1,  eps=1e-3){
 

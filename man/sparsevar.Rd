@@ -2,7 +2,7 @@
 % Please edit documentation in R/hvar.R
 \name{sparseVAR}
 \alias{sparseVAR}
-\title{Sparse estimation of the Vector AutoRegressive (VAR) model}
+\title{Sparse Estimation of the Vector AutoRegressive (VAR) Model}
 \usage{
 sparseVAR(Y, p = NULL, VARpen = "HLag", VARlseq = NULL, VARgran = NULL,
   VARalpha = 0, cvcut = 0.9, h = 1, eps = 0.001)
@@ -37,13 +37,13 @@ A list with the following components
 \item{phi0hat}{vector of VAR intercepts.}
 }
 \description{
-Sparse estimation of the Vector AutoRegressive (VAR) model
+Sparse Estimation of the Vector AutoRegressive (VAR) Model
 }
 \examples{
 data(Y)
 VARfit <- sparseVAR(Y) # sparse VAR
-Y1 <- matrix(Y[,1], ncol=1)
-ARfit <- sparseVAR(Y1) # sparse AR
+y <- matrix(Y[,1], ncol=1)
+ARfit <- sparseVAR(y) # sparse AR
 }
 \references{
 Nicholson William B., Bien Jacob and Matteson David S. (2017), "High Dimensional Forecasting via Interpretable Vector Autoregression"
