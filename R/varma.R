@@ -77,7 +77,7 @@ sparsevarma <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARalpha=10^-5, VA
     stop("The regularization parameter VARlseq needs to be a vector of length>1 or NULL otherwise")
   }
 
-  if(any((VARgran<=0)==F)){
+  if(any((VARgran<=0)==T)){
     stop("The granularity parameters needs to be a strictly positive integers")
   }
 
@@ -102,7 +102,7 @@ sparsevarma <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARalpha=10^-5, VA
     stop("The regularization parameter grid VARMAlPhiseq needs to be a vector of length > 1 or NULL otherwise")
   }
 
-  if(any((VARMAPhigran<=0)==F)){
+  if(any((VARMAPhigran<=0)==T)){
     stop("The granularity parameters need to be a strictly positive integer")
   }
 

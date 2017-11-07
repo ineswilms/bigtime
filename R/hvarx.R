@@ -77,7 +77,7 @@ sparsevarx <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXalpha=0, VARXlP
     stop("The regularization parameter grid VARXlPhiseq needs to be a vector of length > 1 or NULL otherwise")
   }
 
-  if(any((VARXPhigran<=0)==F)){
+  if(any((VARXPhigran<=0)==T)){
     stop("The granularity parameters need to be a strictly positive integer")
   }
 
@@ -86,7 +86,7 @@ sparsevarx <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXalpha=0, VARXlP
     stop("The regularization parameter VARXlBseq needs to be a vector of length >1 or NULL otherwise")
   }
 
-  if(any((VARXBgran<=0)==F)){
+  if(any((VARXBgran<=0)==T)){
     stop("The granularity parameters need to be a strictly positive integer")
   }
 

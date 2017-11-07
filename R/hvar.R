@@ -46,7 +46,7 @@ sparsevar <- function(Y, p=NULL, VARpen="HLag", VARalpha=0, VARlseq=NULL, VARgra
     stop("The regularization parameter VARlseq needs to be a vector of length>1 or NULL otherwise")
   }
 
-  if(any((VARgran<=0)==F)){
+  if(any((VARgran<=0)==T)){
     stop("The granularity parameters needs to be a strictly positive integers")
   }
 
