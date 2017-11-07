@@ -82,7 +82,7 @@ sparsevarma <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARalpha=10^-5, VA
   }
 
 
-  if(!((cvcut<=1) & (cvcut>=0))){
+  if(!((cvcut<1) & (cvcut>0))){
     stop("cvcut needs to be a number between 0 and 1")
   }
 

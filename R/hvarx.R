@@ -56,7 +56,7 @@ sparsevarx <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXalpha=0, VARXlP
   }
 
 
-  if(!((cvcut<=1) & (cvcut>=0))){
+  if(!((cvcut<1) & (cvcut>0))){
     stop("cvcut needs to be a number between 0 and 1")
   }
 

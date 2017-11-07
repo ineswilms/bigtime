@@ -50,7 +50,7 @@ sparsevar <- function(Y, p=NULL, VARpen="HLag", VARalpha=0, VARlseq=NULL, VARgra
     stop("The granularity parameters needs to be a strictly positive integers")
   }
 
-  if(!((cvcut<=1) & (cvcut>=0))){
+  if(!((cvcut<1) & (cvcut>0))){
     stop("cvcut needs to be a number between 0 and 1")
   }
 
