@@ -42,11 +42,23 @@ sparsevarx <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, V
   # Check inputs
   # Check Inputs
   if(!is.matrix(Y)){
-    stop("Y needs to be a matrix of dimension T by k")
+
+    if(is.vector(Y) & length(Y)>1){
+      Y <- matrix(Y, ncol=1)
+    }else{
+      stop("Y needs to be a matrix of dimension T by k")
+    }
+
   }
 
   if(!is.matrix(X)){
-    stop("X needs to be a matrix of dimension T by m")
+
+    if(is.vector(X) & length(X)>1){
+      X <- matrix(X, ncol=1)
+    }else{
+      stop("X needs to be a matrix of dimension T by m")
+    }
+
   }
 
   if(nrow(X)!=nrow(Y)){

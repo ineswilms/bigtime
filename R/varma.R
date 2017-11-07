@@ -52,11 +52,23 @@ sparsevarma <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL, VARg
 
   # Check Inputs
   if(!is.matrix(Y)){
-    stop("Y needs to be a matrix of dimension T by k")
+
+    if(is.vector(Y) & length(Y)>1){
+      Y <- matrix(Y, ncol=1)
+    }else{
+      stop("Y needs to be a matrix of dimension T by k")
+    }
+
   }
 
   if(!is.matrix(U) & !is.null(U)){
-    stop("U needs to be a matrix of dimension T by k or NULL otherwise")
+
+    if(is.vector(U) & length(U)>1){
+      U <- matrix(U, ncol=1)
+    }else{
+      stop("U needs to be a matrix of dimension T by k or NULL otherwise.")
+    }
+
   }
 
   if(!is.null(U)){
