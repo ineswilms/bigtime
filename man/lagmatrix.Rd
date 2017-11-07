@@ -11,11 +11,10 @@ lagmatrix(fit, model, returnplot = F)
 
 \item{model}{Type of model that was estimated: var, varx or varma.}
 
-\item{returnplot}{True or False: return plot of Lhat or not.}
+\item{returnplot}{True or False: return plot of lag matrix or not.}
 }
 \value{
-A list with the following components
-\item{Lhat}{Estimated lag matrix in the VAR model, or lag matrices in the VARX or VARMA model. The rows contain the responses, the columns contain the predictors.}
+A list with estimated lag matrix of the VAR model, or lag matrices of the VARX or VARMA model. The rows contain the responses, the columns contain the predictors.
 }
 \description{
 Creates lagmatrix of estimated coefficients

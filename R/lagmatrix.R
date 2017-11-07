@@ -1,10 +1,9 @@
 #' Creates lagmatrix of estimated coefficients
 #' @param fit Fitted var, varx or varma model.
 #' @param model Type of model that was estimated: var, varx or varma.
-#' @param returnplot True or False: return plot of Lhat or not.
+#' @param returnplot True or False: return plot of lag matrix or not.
 #' @export
-#' @return A list with the following components
-#' \item{Lhat}{Estimated lag matrix in the VAR model, or lag matrices in the VARX or VARMA model. The rows contain the responses, the columns contain the predictors.}
+#' @return A list with estimated lag matrix of the VAR model, or lag matrices of the VARX or VARMA model. The rows contain the responses, the columns contain the predictors.
 #' @examples
 #' data(Y)
 #' data(X)
@@ -21,6 +20,9 @@ lagmatrix <- function(fit, model, returnplot=F){
     p <- fit$p
     coef <- fit$Phihat
 
+    if(is.null(coef)){
+      stop("Please provide a fitted var model")
+    }
     if(k==1){
       coef <- matrix(coef, nrow=1)
     }
@@ -63,6 +65,11 @@ lagmatrix <- function(fit, model, returnplot=F){
       s <- fit$s
       coef1 <- fit$Phihat
       coef2 <- fit$Bhat
+
+      if(is.null(coef1)|is.null(coef2)){
+        stop("Please provide a fitted varx model")
+      }
+
     }
 
     if(model=="varma"){
@@ -72,6 +79,10 @@ lagmatrix <- function(fit, model, returnplot=F){
       s <- fit$VARMAq
       coef1 <- fit$Phihat
       coef2 <- fit$Thetahat
+
+      if(is.null(coef1)|is.null(coef2)){
+        stop("Please provide a fitted varma model")
+      }
     }
 
 
