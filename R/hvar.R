@@ -30,7 +30,13 @@ sparsevar <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL, VARa
 
   # Check Inputs
   if(!is.matrix(Y)){
-    stop("Y needs to be a matrix of dimension T by k")
+
+    if(is.vector(Y)){
+      Y <- matrix(Y, ncol=1)
+    }else{
+      stop("Y needs to be a matrix of dimension T by k")
+    }
+
   }
 
   if(h<=0){
