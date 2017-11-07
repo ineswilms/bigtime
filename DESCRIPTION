@@ -1,6 +1,6 @@
 Package: bigtime
 Type: Package
-Title: Sparse estimation of large time series models
+Title: Sparse Estimation of Large Time Series Models
 Version: 0.1.0
 Authors@R: c(
     person("Ines", "Wilms", email = "ines.wilms@kuleuven.be", role = c("cre","aut")),
