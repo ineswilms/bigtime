@@ -51,6 +51,10 @@ sparsevarx <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, V
 
   }
 
+  if(nrow(Y)<10){
+    stop("The time series length is too small.")
+  }
+
   if(!is.matrix(X)){
 
     if(is.vector(X) & length(X)>1){

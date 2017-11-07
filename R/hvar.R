@@ -39,6 +39,12 @@ sparsevar <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL, VARa
 
   }
 
+
+  if(nrow(Y)<10){
+    stop("The time series length is too small.")
+  }
+
+
   if(h<=0){
     stop("The forecast horizon h needs to be a strictly positive integer")
   }

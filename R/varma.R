@@ -61,6 +61,10 @@ sparsevarma <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL, VARg
 
   }
 
+  if(nrow(Y)<10){
+    stop("The time series length is too small.")
+  }
+
   if(!is.matrix(U) & !is.null(U)){
 
     if(is.vector(U) & length(U)>1){
