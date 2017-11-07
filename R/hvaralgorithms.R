@@ -70,89 +70,13 @@
 .LambdaGridE<- function (gran1, gran2, jj = jj, Y, Z, group,p,k,MN,alpha,C)
 {
 
-  # if (group == "Lag") {
-  #   mat <- list()
-  #   for (i in 1:length(jj)) {
-  #     if(k>1){
-  #       mat[[i]] <- norm2(Z[jj[[i]], ]%*%Y)
-  #     }
-  #
-  #     else{
-  #       mat[[i]] <- norm2(t(Y)%*%Z[jj[[i]],])
-  #     }
-  #   }
-  #   gamstart <- max(unlist(mat))
-  # }
+
   if (group == "Basic"|group=="Tapered") {
 
     gamstart <- max(t(Y) %*% t(Z))
 
   }
-  #
-  # if (group == "SparseLag") {
-  #
-  #   mat <- list()
-  #
-  #   if(alpha>0){
-  #     for (i in 1:length(jj)) {
-  #
-  #       if(k>1){
-  #
-  #         mat[[i]] <- norm2(Z[jj[[i]], ]%*%Y)*(1/(alpha))
-  #
-  #       }
-  #
-  #       else{mat[[i]] <- norm2(t(Y)%*%Z[jj[[i]],])
-  #
-  #       }
-  #
-  #     }
-  #
-  #     gamstart <- max(unlist(mat))
-  #
-  #   }else{
-  #     gamstart <- max(t(Y) %*% t(Z))
-  #
-  #   }
-  # }
-  #
-  # if (group == "OwnOther") {
-  #
-  #   mat <- list()
-  #
-  #   ZZ <- kronecker(t(Z), diag(k))
-  #
-  #   for (i in 1:length(jj)) {
-  #
-  #     mat[[i]] <- norm(as.vector(t(Y)) %*% ZZ[, jj[[i]]]/sqrt(length(jj[[i]])),
-  #                      "F")
-  #
-  #   }
-  #
-  #   gamstart <- max(unlist(mat))
-  #
-  # }
-  # if (group == "SparseOO") {
-  #
-  #   mat <- list()
-  #
-  #   ZZ <- kronecker(t(Z), diag(k))
-  #
-  #   if(alpha>0){
-  #     for (i in 1:length(jj)) {
-  #
-  #       mat[[i]] <- norm(1/(k + 1) * as.vector(t(Y)) %*%
-  #                          ZZ[, jj[[i]]]/sqrt(length(jj[[i]])), "F")
-  #
-  #     }
-  #
-  #     gamstart <- max(unlist(mat))
-  #
-  #   }else{
-  #     gamstart <- max(t(Y) %*% t(Z))
-  #
-  #   }
-  # }
+
 
   if (group == "HVARC"|group=="HVAROO"|group=="HVARELEM"|group=="HVARELEMSQRTLAS"|group=="HVARELEMnucl") {
 
@@ -194,16 +118,7 @@ LGSearch <- function(gstart,Y,Z,BOLD,group,k,p,gs,MN,alpha,C)
   lambdal <- 0
   activeset <- list(rep(rep(list(0), length(gs))))
 
-  # if(group=="SparseOO")
-  # {
-  #   kk <- .lfunction3cpp(p, k)
-  #   activeset <- rep(list(rep(rep(list(0), length(kk)))),1)
-  #   q1a=list()
-  #   for (i in 1:(2*p)) {
-  #     q1a[[i]] <- matrix(runif(length(gs[[i]]), -1, 1), ncol = 1)
-  #   }
-  #
-  # }
+
 
   while(max(abs(lambdah-lambdal))>.00001)
   {
@@ -213,85 +128,13 @@ LGSearch <- function(gstart,Y,Z,BOLD,group,k,p,gs,MN,alpha,C)
       param <- .lassoVARFist(BOLD,Z,Y,lambda,1e-04,p,MN,C)[,2:(k*p+1),]
     }
 
-    # if(group=="Tapered"){
-    #
-    #   param <- .lassoVARTL(BOLD,Z,Y,lambda,1e-04,p,MN,rev(seq(0,1,length=10)),C)[,2:(k*p+1),]
-    #
-    #   param <- param[,,1]
-    # }
-    #
-    # if(group=="Lag"){
-    #
-    #   jj <- .groupfuncpp(p, k)
-    #   jjcomp <- .groupfuncomp(p,k)
-    #   BB <- .GroupLassoVAR1(BOLD,jj,jjcomp,Y,Z,lambda,activeset,1e-4,p,MN,k,k,p,C)
-    #   BOLD <- BB$beta
-    #   param <- BB$beta[,2:(k*p+1),]
-    #   activeset <- BB$active
-    # }
-    #
-    # if(group=="SparseLag"){
-    #
-    #   jj <- .groupfuncpp(p, k)
-    #   jjcomp <- .groupfuncomp(p,k)
-    #   q1a=list()
-    #   for (i in 1:p) {
-    #     q1a[[i]] <- matrix(runif(k, -1, 1), ncol = 1)
-    #   }
-    #   BB <- .SparseGroupLassoVAR(BOLD,jj,Y,Z,lambda,alpha,activeset,1e-4,q1a,p,MN,C)
-    #   param <- BB$beta[,2:(k*p+1),]
-    #   BOLD <- BB$beta
-    #   activeset <- BB$active
-    # }
-    #
-    #
-    # if(group=="OwnOther")
-    # {
-    #   kk <- .lfunction3cpp(p, k)
-    #   BB <- .GroupLassoOO(BOLD, kk, Y, Z, lambda,activeset, 1e-04,p,MN,C)
-    #   param <- BB$beta[,2:(k*p+1),]
-    #   BOLD <- BB$beta
-    #   activeset <- BB$active
-    #
-    # }
-    #
-    #
-    # if(group=="SparseOO")
-    # {
-    #   BB <- .SparseGroupLassoVAROO(BOLD, kk, Y, Z, lambda,alpha,activeset, 1e-04,q1a,p,MN,FALSE,C)
-    #   param <- BB$beta[,2:(k*p+1),]
-    #   BOLD <- BB$beta
-    #   activeset <- BB$active
-    # }
-    #
-    # if(group=="HVARC")
-    # {
-    #   BOLD <- .HVARCAlg(BOLD,Y,Z,lambda,1e-4,p,MN,C)
-    #   param <- BOLD[,2:(k*p+1),]
-    # }
-    # if(group=="HVAROO")
-    # {
-    #   BOLD <- .HVAROOAlg(BOLD,Y,Z,lambda,1e-4,p,MN,C)
-    #   param <- BOLD[,2:(k*p+1),]
-    # }
+
 
     if(group=="HVARELEM")
     {
       BOLD <- .HVARElemAlg(BOLD,Y,Z,lambda,1e-4,p,MN,C)
       param <- BOLD[,2:(k*p+1),]
     }
-
-    # if(group=="HVARELEMnucl")
-    # {
-    #   BOLD <- .HVARElemAlgnucl(BOLD,Y,Z,lambda,1e-4,p,MN,C)
-    #   param <- BOLD[,2:(k*p+1),]
-    # }
-
-    # if(group=="HVARELEMSQRTLAS")
-    # {
-    #   BOLD <- .HVARElemAlgSqrtLas(BOLD,Y,Z,lambda,1e-4,p,MN,C)
-    #   param <- BOLD[,2:(k*p+1),]
-    # }
 
 
     if(MN){
