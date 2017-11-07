@@ -7,8 +7,8 @@
 #' @examples
 #' data(Y)
 #' data(X)
-#' varxfit <- sparsevarx(Y=Y, X=X) # sparse varx
-#' lhats <- lagmatrix(fit=varxfit, model="varx")
+#' VARXfit <- sparseVARX(Y=Y, X=X) # sparse varx
+#' Lhats <- lagmatrix(fit=VARXfit, model="varx")
 lagmatrix <- function(fit, model, returnplot=F){
 
   if(!is.element(model, c("var", "varx", "varma"))){

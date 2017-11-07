@@ -1,4 +1,4 @@
-#' Sparse estimation of the Vector AutoRegressive Moving Average (VARMA) model
+#' Sparse Estimation of the Vector AutoRegressive Moving Average (VARMA) Model
 #' @param Y A \eqn{T} by \eqn{k} matrix of time series. If k=1, a univariate autoregressive moving average model is estimated.
 #' @param U A \eqn{T} by \eqn{k} matrix of (approximated) error terms. Typical usage is to have the program estimate a high-order VAR model (Phase I) to get approximated error terms U.
 #' @param VARp User-specified maximum  autoregressive lag order of the PhaseI VAR. Typical usage is to have the program compute its own maximum lag order based on the time series length.
@@ -42,10 +42,10 @@
 #' @seealso \link{lagmatrix} and \link{directforecast}
 #' @examples
 #' data(Y)
-#' varmafit <- sparsevarma(Y) # sparse VARMA
-#' Y1 <- matrix(Y[,1], ncol=1)
-#' armafit <- sparsevarma(Y1) # sparse ARMA
-sparsevarma <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL, VARalpha=0,
+#' VARMAfit <- sparseVARMA(Y) # sparse VARMA
+#' y <- matrix(Y[,1], ncol=1)
+#' ARMAfit <- sparseVARMA(y) # sparse ARMA
+sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL, VARalpha=0,
                      VARMAp=NULL, VARMAq=NULL, VARMApen="HLag",VARMAlPhiseq=NULL, VARMAPhigran=NULL,
                      VARMAlThetaseq=NULL, VARMAThetagran=NULL, VARMAalpha=0,
                      h=1, cvcut=0.9, eps=10^-3){

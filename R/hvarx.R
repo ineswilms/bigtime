@@ -1,4 +1,4 @@
-#' Sparse estimation of the Vector AutoRegressive  with exogenous variables X (VARX) model
+#' Sparse Estimation of the Vector AutoRegressive  with Exogenous Variables X (VARX) Model
 #' @param Y A \eqn{T} by \eqn{k} matrix of time series. If k=1, a univariate autoregressive model is estimated.
 #' @param X A \eqn{T} by \eqn{m} matrix of time series.
 #' @param p User-specified maximum endogenous autoregressive lag order. Typical usage is to have the program compute its own maximum lag order based on the time series length.
@@ -33,10 +33,10 @@
 #' @examples
 #' data(Y)
 #' data(X)
-#' varxfit <- sparsevarx(Y=Y, X=X) # sparse VARX
-#' Y1 <- matrix(Y[,1], ncol=1)
-#' arxfit <- sparsevarx(Y=Y1, X=X) # sparse ARX
-sparsevarx <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, VARXPhigran=NULL,
+#' VARXfit <- sparseVARX(Y=Y, X=X) # sparse VARX
+#' y <- matrix(Y[,1], ncol=1)
+#' ARXfit <- sparseVARX(Y=y, X=X) # sparse ARX
+sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, VARXPhigran=NULL,
                         VARXlBseq=NULL,  VARXBgran=NULL, VARXalpha=0, h=1, cvcut=0.9, eps=10^-3){
 
   # Check inputs
