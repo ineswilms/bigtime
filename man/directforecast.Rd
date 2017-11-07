@@ -7,15 +7,15 @@
 directforecast(fit, model, h = 1)
 }
 \arguments{
-\item{fit}{Fitted var, varx or varma model.}
+\item{fit}{Fitted sparse var, varx or varma model.}
 
 \item{model}{Type of model that was estimated: var, varx or varma.}
 
-\item{h}{Desired forecast horizon in time-series cross-validation procedure.}
+\item{h}{Desired forecast horizon.}
 }
 \value{
 A list with the following components
-\item{Yhat}{h-step ahead forecast for the k time series}
+\item{Yhat}{Vector h-step ahead forecasts for the k time series}
 }
 \description{
 Function to obtain h-step ahead direct forecast based on estimated VAR, VARX or VARMA model
