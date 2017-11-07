@@ -4,8 +4,7 @@
 #' @param model Type of model that was estimated: var, varx or varma.
 #' @param h Desired forecast horizon.
 #' @export
-#' @return A list with the following components
-#' \item{Yhat}{h-step ahead forecasts for the k time series}
+#' @return Vector of length k containing the h-step ahead forecasts for the k time series
 #' @examples
 #' data(Y)
 #' varfit <- sparsevar(Y) # sparse VAR
@@ -111,7 +110,7 @@ directforecast <- function(fit, model, h=1){
   }
 
 
-  return("Yhat"=Yhat)
+  return("Yhat"=c(Yhat))
 }
 
 HVARXmodelFORECAST<-function(Y, X, p, s, h=1){
