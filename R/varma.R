@@ -1,36 +1,37 @@
 #' Sparse estimation of the Vector AutoRegressive Moving Average (VARMA) model
 #' @param Y A \eqn{T} by \eqn{k} matrix of time series. If k=1, a univariate autoregressive moving average model is estimated.
-#' @param U A \eqn{T} by \eqn{k} matrix of (approximated) error terms. If \eqn{NULL}, a high-order VAR model will be estimated (Phase I) to get approximated error terms.
-#' @param VARp User-specified maximum  autoregressive lag order of the PhaseI VAR.
+#' @param U A \eqn{T} by \eqn{k} matrix of (approximated) error terms. Typical usage is to have the program estimate a high-order VAR model (Phase I) to get approximated error terms U.
+#' @param VARp User-specified maximum  autoregressive lag order of the PhaseI VAR. Typical usage is to have the program compute its own maximum lag order based on the time series length.
 #' @param VARgran User-specified vector of granularity specifications for the penalty parameter grid of the PhaseI VAR:  First element specifies
 #' how deep the grid should be constructed. Second element specifies how many values the grid should contain.
 #' @param VARlseq User-specified grid of values for regularization parameter in the PhaseI VAR. Typical usage is to have the program compute
-#' its own grid based on VARgran. Supplying a grid of values overrides this. WARNING: use with care.
-#' @param VARpen "HLag" (hierarchical sparse penalty) or "L1" (standard l1 penalty) penalization in PhaseI VAR.
-#' @param VARMAp User-specified maximum autoregressive lag order of the VARMA.
-#' @param VARMAq User-specified maximum moving average lag order of the VARMA.
+#' its own grid. Supplying a grid of values overrides this. WARNING: use with care.
+#' @param VARpen "HLag" (hierarchical sparse penalty) or "L1" (standard lasso penalty) penalization in PhaseI VAR. The default is zero.
+#' @param VARMAp User-specified maximum autoregressive lag order of the VARMA. Typical usage is to have the program compute its own maximum lag order based on the time series length.
+#' @param VARMAq User-specified maximum moving average lag order of the VARMA. Typical usage is to have the program compute its own maximum lag order based on the time series length.
 #' @param VARMAlPhiseq User-specified grid of values for regularization parameter corresponding to the autoregressive coefficients in the VARMA. Typical usage is to have the program compute
-#' its own grid based on VARMAPhigran. Supplying a grid of values overrides this. WARNING: use with care.
+#' its own grid. Supplying a grid of values overrides this. WARNING: use with care.
 #' @param VARMAPhigran User-specified vector of granularity specifications for the penalty parameter grid corresponding to the autoregressive coefficients in the VARMA:  First element specifies
 #' how deep the grid should be constructed. Second element specifies how many values the grid should contain.
 #' @param VARMAlThetaseq User-specified grid of values for regularization parameter corresponding to the moving average coefficients in the VARMA. Typical usage is to have the program compute
-#' its own grid based on VARMAPhigran. Supplying a grid of values overrides this. WARNING: use with care.
+#' its own grid. Supplying a grid of values overrides this. WARNING: use with care.
 #' @param VARMAThetagran User-specified vector of granularity specifications for the penalty parameter grid corresponding to the moving average coefficients in the VARMA:  First element specifies
 #' how deep the grid should be constructed. Second element specifies how many values the grid should contain.
-#' @param VARMApen "HLag" (hierarchical sparse penalty) or "L1" (l1 penalty) penalization in the VARMA.
-#' @param VARMAalpha a small positive regularization parameter value corresponding to squared Frobenius penalty in  VARMA.
+#' @param VARMApen "HLag" (hierarchical sparse penalty) or "L1" (standard lasso penalty) penalization in the VARMA.
+#' @param VARMAalpha a small positive regularization parameter value corresponding to squared Frobenius penalty in  VARMA. The default is zero.
 #' @param VARalpha a small positive regularization parameter value corresponding to squared Frobenius penalty in PhaseI VAR.
 #' @param eps a small positive numeric value giving the tolerance for convergence in the proximal gradient algorithms.
 #' @param h Desired forecast horizon in time-series cross-validation procedure.
 #' @param cvcut Proportion of observations used for model estimation in the time series cross-validation procedure. The remainder is used for forecast evaluation.
 #' @export
 #' @return A list with the following components
-#' \item{k}{Number of time series.}
+
 #' \item{Y}{\eqn{T} by \eqn{k} matrix of time series.}
+#' \item{U}{Matrix of (approximated) error terms.}
+#' \item{k}{Number of time series.}
 #' \item{VARp}{Maximum autoregressive lag order of the PhaseI VAR.}
 #' \item{VARPhihat}{Matrix of estimated autoregressive coefficients of the Phase I VAR.}
 #' \item{VARphi0hat}{Vector of Phase I VAR intercepts.}
-#' \item{U}{Matrix of (approximated) error terms.}
 #' \item{VARMAp}{Maximum autoregressive lag order of the VARMA.}
 #' \item{VARMAq}{Maximum moving average lag order of the VARMA.}
 #' \item{Phihat}{Matrix of estimated autoregressive coefficients of the VARMA.}
@@ -43,9 +44,9 @@
 #' varmafit <- sparsevarma(Y) # sparse VARMA
 #' Y1 <- matrix(Y[,1], ncol=1)
 #' armafit <- sparsevarma(Y1) # sparse ARMA
-sparsevarma <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARalpha=10^-5, VARlseq=NULL, VARgran=NULL,
-                     VARMAp=NULL, VARMAq=NULL, VARMApen="HLag", VARMAalpha=10^-5,
-                     VARMAlPhiseq=NULL, VARMAPhigran=NULL, VARMAlThetaseq=NULL, VARMAThetagran=NULL,
+sparsevarma <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL, VARalpha=0,
+                     VARMAp=NULL, VARMAq=NULL, VARMApen="HLag",VARMAlPhiseq=NULL, VARMAPhigran=NULL,
+                     VARMAlThetaseq=NULL, VARMAThetagran=NULL, VARMAalpha=0,
                      h=1, cvcut=0.9, eps=10^-3){
 
   # Check Inputs
@@ -111,7 +112,7 @@ sparsevarma <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARalpha=10^-5, VA
     stop("The regularization parameter VARMAlThetaseq needs to be a vector of length >1 or NULL otherwise")
   }
 
-  if(any((VARMAThetagran<=0)==F)){
+  if(any((VARMAThetagran<=0)==T)){
     stop("The granularity parameters need to be a strictly positive integer")
   }
 
@@ -148,7 +149,7 @@ sparsevarma <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARalpha=10^-5, VA
       VARMAq <- floor(1.5*sqrt(nrow(Y))/2)
     }
 
-    if(VARMApen=="HLag" & (VARMAq<=1 |VARMAq<=1)){
+    if(VARMApen=="HLag" & (VARMAp<=1 |VARMAq<=1)){
       stop("HLag penalization in VARMA is only supported for p and q larger than 1. Use L1 as VARMApen instead")
     }
   }

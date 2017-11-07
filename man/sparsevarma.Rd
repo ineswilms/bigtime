@@ -4,48 +4,48 @@
 \alias{sparsevarma}
 \title{Sparse estimation of the Vector AutoRegressive Moving Average (VARMA) model}
 \usage{
-sparsevarma(Y, U = NULL, VARp = NULL, VARpen = "HLag", VARalpha = 10^-5,
-  VARlseq = NULL, VARgran = NULL, VARMAp = NULL, VARMAq = NULL,
-  VARMApen = "HLag", VARMAalpha = 10^-5, VARMAlPhiseq = NULL,
-  VARMAPhigran = NULL, VARMAlThetaseq = NULL, VARMAThetagran = NULL,
-  h = 1, cvcut = 0.9, eps = 10^-3)
+sparsevarma(Y, U = NULL, VARp = NULL, VARpen = "HLag", VARlseq = NULL,
+  VARgran = NULL, VARalpha = 0, VARMAp = NULL, VARMAq = NULL,
+  VARMApen = "HLag", VARMAlPhiseq = NULL, VARMAPhigran = NULL,
+  VARMAlThetaseq = NULL, VARMAThetagran = NULL, VARMAalpha = 0, h = 1,
+  cvcut = 0.9, eps = 10^-3)
 }
 \arguments{
 \item{Y}{A \eqn{T} by \eqn{k} matrix of time series. If k=1, a univariate autoregressive moving average model is estimated.}
 
-\item{U}{A \eqn{T} by \eqn{k} matrix of (approximated) error terms. If \eqn{NULL}, a high-order VAR model will be estimated (Phase I) to get approximated error terms.}
+\item{U}{A \eqn{T} by \eqn{k} matrix of (approximated) error terms. Typical usage is to have the program estimate a high-order VAR model (Phase I) to get approximated error terms U.}
 
-\item{VARp}{User-specified maximum  autoregressive lag order of the PhaseI VAR.}
+\item{VARp}{User-specified maximum  autoregressive lag order of the PhaseI VAR. Typical usage is to have the program compute its own maximum lag order based on the time series length.}
 
-\item{VARpen}{"HLag" (hierarchical sparse penalty) or "L1" (standard l1 penalty) penalization in PhaseI VAR.}
-
-\item{VARalpha}{a small positive regularization parameter value corresponding to squared Frobenius penalty in PhaseI VAR.}
+\item{VARpen}{"HLag" (hierarchical sparse penalty) or "L1" (standard lasso penalty) penalization in PhaseI VAR. The default is zero.}
 
 \item{VARlseq}{User-specified grid of values for regularization parameter in the PhaseI VAR. Typical usage is to have the program compute
-its own grid based on VARgran. Supplying a grid of values overrides this. WARNING: use with care.}
+its own grid. Supplying a grid of values overrides this. WARNING: use with care.}
 
 \item{VARgran}{User-specified vector of granularity specifications for the penalty parameter grid of the PhaseI VAR:  First element specifies
 how deep the grid should be constructed. Second element specifies how many values the grid should contain.}
 
-\item{VARMAp}{User-specified maximum autoregressive lag order of the VARMA.}
+\item{VARalpha}{a small positive regularization parameter value corresponding to squared Frobenius penalty in PhaseI VAR.}
 
-\item{VARMAq}{User-specified maximum moving average lag order of the VARMA.}
+\item{VARMAp}{User-specified maximum autoregressive lag order of the VARMA. Typical usage is to have the program compute its own maximum lag order based on the time series length.}
 
-\item{VARMApen}{"HLag" (hierarchical sparse penalty) or "L1" (l1 penalty) penalization in the VARMA.}
+\item{VARMAq}{User-specified maximum moving average lag order of the VARMA. Typical usage is to have the program compute its own maximum lag order based on the time series length.}
 
-\item{VARMAalpha}{a small positive regularization parameter value corresponding to squared Frobenius penalty in  VARMA.}
+\item{VARMApen}{"HLag" (hierarchical sparse penalty) or "L1" (standard lasso penalty) penalization in the VARMA.}
 
 \item{VARMAlPhiseq}{User-specified grid of values for regularization parameter corresponding to the autoregressive coefficients in the VARMA. Typical usage is to have the program compute
-its own grid based on VARMAPhigran. Supplying a grid of values overrides this. WARNING: use with care.}
+its own grid. Supplying a grid of values overrides this. WARNING: use with care.}
 
 \item{VARMAPhigran}{User-specified vector of granularity specifications for the penalty parameter grid corresponding to the autoregressive coefficients in the VARMA:  First element specifies
 how deep the grid should be constructed. Second element specifies how many values the grid should contain.}
 
 \item{VARMAlThetaseq}{User-specified grid of values for regularization parameter corresponding to the moving average coefficients in the VARMA. Typical usage is to have the program compute
-its own grid based on VARMAPhigran. Supplying a grid of values overrides this. WARNING: use with care.}
+its own grid. Supplying a grid of values overrides this. WARNING: use with care.}
 
 \item{VARMAThetagran}{User-specified vector of granularity specifications for the penalty parameter grid corresponding to the moving average coefficients in the VARMA:  First element specifies
 how deep the grid should be constructed. Second element specifies how many values the grid should contain.}
+
+\item{VARMAalpha}{a small positive regularization parameter value corresponding to squared Frobenius penalty in  VARMA. The default is zero.}
 
 \item{h}{Desired forecast horizon in time-series cross-validation procedure.}
 
@@ -55,12 +55,12 @@ how deep the grid should be constructed. Second element specifies how many value
 }
 \value{
 A list with the following components
-\item{k}{Number of time series.}
 \item{Y}{\eqn{T} by \eqn{k} matrix of time series.}
+\item{U}{Matrix of (approximated) error terms.}
+\item{k}{Number of time series.}
 \item{VARp}{Maximum autoregressive lag order of the PhaseI VAR.}
 \item{VARPhihat}{Matrix of estimated autoregressive coefficients of the Phase I VAR.}
 \item{VARphi0hat}{Vector of Phase I VAR intercepts.}
-\item{U}{Matrix of (approximated) error terms.}
 \item{VARMAp}{Maximum autoregressive lag order of the VARMA.}
 \item{VARMAq}{Maximum moving average lag order of the VARMA.}
 \item{Phihat}{Matrix of estimated autoregressive coefficients of the VARMA.}

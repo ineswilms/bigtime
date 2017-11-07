@@ -61,3 +61,7 @@ varxfit <- sparsevarx(Y=Y, X=X) # sparse VARX
 Y1 <- matrix(Y[,1], ncol=1)
 arxfit <- sparsevarx(Y=Y1, X=X) # sparse ARX
 }
+\references{
+Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2017), "Interpretable Vector AutoRegressions with
+Exogenous Time Series" arXiv preprint.
+}
