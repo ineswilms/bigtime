@@ -114,7 +114,8 @@ lagmatrix <- function(fit, model, returnplot=F){
     if(returnplot){
 
       if(k==1){
-        stop("Plot only supported for multivariate time series case (k>1).")
+        warning("Plot only supported for multivariate time series case (k>1).")
+        return(Lhat)
       }
 
       if(model=="varx"){

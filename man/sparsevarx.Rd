@@ -4,46 +4,46 @@
 \alias{sparsevarx}
 \title{Sparse estimation of the Vector AutoRegressive  with exogenous variables X (VARX) model}
 \usage{
-sparsevarx(Y, X, p = NULL, s = NULL, VARXpen = "HLag", VARXalpha = 0,
+sparsevarx(Y, X, p = NULL, s = NULL, VARXpen = "HLag",
   VARXlPhiseq = NULL, VARXPhigran = NULL, VARXlBseq = NULL,
-  VARXBgran = NULL, h = 1, cvcut = 0.9, eps = 10^-3)
+  VARXBgran = NULL, VARXalpha = 0, h = 1, cvcut = 0.9, eps = 10^-3)
 }
 \arguments{
 \item{Y}{A \eqn{T} by \eqn{k} matrix of time series. If k=1, a univariate autoregressive model is estimated.}
 
 \item{X}{A \eqn{T} by \eqn{m} matrix of time series.}
 
-\item{p}{User-specified maximum endogenous autoregressive lag order.}
+\item{p}{User-specified maximum endogenous autoregressive lag order. Typical usage is to have the program compute its own maximum lag order based on the time series length.}
 
-\item{s}{User-specified maximum exogenous autoregressive lag order.}
+\item{s}{User-specified maximum exogenous autoregressive lag order. Typical usage is to have the program compute its own maximum lag order based on the time series length.}
 
-\item{VARXpen}{"HLag" (hierarchical sparse penalty) or "L1" (standard l1 penalty) penalization in VARX.}
-
-\item{VARXalpha}{a small positive regularization parameter value corresponding to squared Frobenius penalty in the VARX.}
+\item{VARXpen}{"HLag" (hierarchical sparse penalty) or "L1" (standard lasso penalty) penalization in VARX.}
 
 \item{VARXlPhiseq}{User-specified grid of values for regularization parameter corresponding to the endogenous autoregressive coefficients in the VARX. Typical usage is to have the program compute
-its own grid based on VARXPhigran. Supplying a grid of values overrides this. WARNING: use with care.}
+its own grid. Supplying a grid of values overrides this. WARNING: use with care.}
 
 \item{VARXPhigran}{User-specified vector of granularity specifications for the penalty parameter grid corresponding to the endogenous autoregressive coefficients in the VARX:  First element specifies
 how deep the grid should be constructed. Second element specifies how many values the grid should contain.}
 
 \item{VARXlBseq}{User-specified grid of values for regularization parameter corresponding to the exogenous autoregressive coefficients in the VARX. Typical usage is to have the program compute
-its own grid based on VARXPhigran. Supplying a grid of values overrides this. WARNING: use with care.}
+its own grid. Supplying a grid of values overrides this. WARNING: use with care.}
 
 \item{VARXBgran}{User-specified vector of granularity specifications for the penalty parameter grid corresponding to the exogenous autoregressive coefficients in the VARX:  First element specifies
 how deep the grid should be constructed. Second element specifies how many values the grid should contain.}
+
+\item{VARXalpha}{a small positive regularization parameter value corresponding to squared Frobenius penalty. The default is zero.}
 
 \item{h}{Desired forecast horizon in time-series cross-validation procedure.}
 
 \item{cvcut}{Proportion of observations used for model estimation in the time series cross-validation procedure. The remainder is used for forecast evaluation.}
 
-\item{eps}{a small positive numeric value giving the tolerance for convergence in the proximal gradient algorithms.}
+\item{eps}{a small positive numeric value giving the tolerance for convergence in the proximal gradient algorithm.}
 }
 \value{
 A list with the following components
+\item{Y}{\eqn{T} by \eqn{k} matrix of endogenous time series.}
+\item{X}{\eqn{T} by \eqn{m} matrix of exogenous time series.}
 \item{k}{Number of endogenous time series.}
-\item{Y}{\eqn{T} by \eqn{k} matrix of time series.}
-\item{X}{\eqn{T} by \eqn{m} matrix of time series.}
 \item{m}{Number of exogenous time series.}
 \item{p}{Maximum endogenous autoregressive lag order of the VARX.}
 \item{s}{Maximum exogenouss autoregressive lag order of the VARX.}

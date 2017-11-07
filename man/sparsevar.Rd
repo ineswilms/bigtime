@@ -30,8 +30,8 @@ how deep the grid should be constructed. Second element specifies how many value
 }
 \value{
 A list with the following components
-\item{k}{Number of time series.}
 \item{Y}{\eqn{T} by \eqn{k} matrix of time series.}
+\item{k}{Number of time series.}
 \item{p}{Maximum autoregressive lag order of the VAR.}
 \item{Phihat}{Matrix of estimated autoregressive coefficients of the VAR.}
 \item{phi0hat}{vector of VAR intercepts.}

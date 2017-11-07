@@ -1,26 +1,26 @@
 #' Sparse estimation of the Vector AutoRegressive  with exogenous variables X (VARX) model
 #' @param Y A \eqn{T} by \eqn{k} matrix of time series. If k=1, a univariate autoregressive model is estimated.
 #' @param X A \eqn{T} by \eqn{m} matrix of time series.
-#' @param p User-specified maximum endogenous autoregressive lag order.
-#' @param s User-specified maximum exogenous autoregressive lag order.
+#' @param p User-specified maximum endogenous autoregressive lag order. Typical usage is to have the program compute its own maximum lag order based on the time series length.
+#' @param s User-specified maximum exogenous autoregressive lag order. Typical usage is to have the program compute its own maximum lag order based on the time series length.
 #' @param h Desired forecast horizon in time-series cross-validation procedure.
 #' @param VARXlPhiseq User-specified grid of values for regularization parameter corresponding to the endogenous autoregressive coefficients in the VARX. Typical usage is to have the program compute
-#' its own grid based on VARXPhigran. Supplying a grid of values overrides this. WARNING: use with care.
+#' its own grid. Supplying a grid of values overrides this. WARNING: use with care.
 #' @param VARXPhigran User-specified vector of granularity specifications for the penalty parameter grid corresponding to the endogenous autoregressive coefficients in the VARX:  First element specifies
 #' how deep the grid should be constructed. Second element specifies how many values the grid should contain.
 #' @param VARXlBseq User-specified grid of values for regularization parameter corresponding to the exogenous autoregressive coefficients in the VARX. Typical usage is to have the program compute
-#' its own grid based on VARXPhigran. Supplying a grid of values overrides this. WARNING: use with care.
+#' its own grid. Supplying a grid of values overrides this. WARNING: use with care.
 #' @param VARXBgran User-specified vector of granularity specifications for the penalty parameter grid corresponding to the exogenous autoregressive coefficients in the VARX:  First element specifies
 #' how deep the grid should be constructed. Second element specifies how many values the grid should contain.
-#' @param eps a small positive numeric value giving the tolerance for convergence in the proximal gradient algorithms.
+#' @param eps a small positive numeric value giving the tolerance for convergence in the proximal gradient algorithm.
 #' @param cvcut Proportion of observations used for model estimation in the time series cross-validation procedure. The remainder is used for forecast evaluation.
-#' @param VARXalpha a small positive regularization parameter value corresponding to squared Frobenius penalty in the VARX.
-#' @param VARXpen "HLag" (hierarchical sparse penalty) or "L1" (standard l1 penalty) penalization in VARX.
+#' @param VARXalpha a small positive regularization parameter value corresponding to squared Frobenius penalty. The default is zero.
+#' @param VARXpen "HLag" (hierarchical sparse penalty) or "L1" (standard lasso penalty) penalization in VARX.
 #' @export
 #' @return A list with the following components
+#' \item{Y}{\eqn{T} by \eqn{k} matrix of endogenous time series.}
+#' \item{X}{\eqn{T} by \eqn{m} matrix of exogenous time series.}
 #' \item{k}{Number of endogenous time series.}
-#' \item{Y}{\eqn{T} by \eqn{k} matrix of time series.}
-#' \item{X}{\eqn{T} by \eqn{m} matrix of time series.}
 #' \item{m}{Number of exogenous time series.}
 #' \item{p}{Maximum endogenous autoregressive lag order of the VARX.}
 #' \item{s}{Maximum exogenouss autoregressive lag order of the VARX.}
@@ -33,8 +33,8 @@
 #' varxfit <- sparsevarx(Y=Y, X=X) # sparse VARX
 #' Y1 <- matrix(Y[,1], ncol=1)
 #' arxfit <- sparsevarx(Y=Y1, X=X) # sparse ARX
-sparsevarx <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXalpha=0, VARXlPhiseq=NULL,
-                       VARXPhigran=NULL, VARXlBseq=NULL,  VARXBgran=NULL, h=1, cvcut=0.9, eps=10^-3){
+sparsevarx <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, VARXPhigran=NULL,
+                        VARXlBseq=NULL,  VARXBgran=NULL, VARXalpha=0, h=1, cvcut=0.9, eps=10^-3){
 
   # Check inputs
   # Check Inputs
@@ -46,19 +46,10 @@ sparsevarx <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXalpha=0, VARXlP
     stop("X needs to be a matrix of dimension T by m")
   }
 
-
   if(nrow(X)!=nrow(Y)){
       stop("Y and X need to have the same number of rows (observations).")
   }
 
-  if(h<=0){
-    stop("The forecast horizon h needs to be a strictly positive integer")
-  }
-
-
-  if(!((cvcut<1) & (cvcut>0))){
-    stop("cvcut needs to be a number between 0 and 1")
-  }
 
   if(!is.null(p)){
     if(p<=0){
@@ -72,6 +63,15 @@ sparsevarx <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXalpha=0, VARXlP
     }
   }
 
+
+  if(h<=0){
+    stop("The forecast horizon h needs to be a strictly positive integer")
+  }
+
+
+  if(!((cvcut<1) & (cvcut>0))){
+    stop("cvcut needs to be a number between 0 and 1")
+  }
 
   if( (!is.vector(VARXlPhiseq) & !is.null(VARXlPhiseq)) | length(VARXlPhiseq)==1){
     stop("The regularization parameter grid VARXlPhiseq needs to be a vector of length > 1 or NULL otherwise")
@@ -446,10 +446,10 @@ HVARX_cv<-function(Y, X, p, s, h=1, lambdaPhiseq=NULL, gran1Phi=20, gran2Phi=10,
   flagPhi_oneSE <- lPhi_oneSE==min(lambdaPhiseq)
   flagB_oneSE <- lB_oneSE==min(lambdaBseq)
   if(lPhi_oneSE==min(lambdaPhiseq)){
-    warning("PHASE II: Lower bound of lambdaPhi grid is selected: higher value of HVARXgran1Phi is recommended as an input")
+    warning("Lower bound of lambdaPhi grid is selected: higher value of first granularity parameter is recommended as an input")
   }
   if(lB_oneSE==min(lambdaBseq)){
-    warning("PHASE II: Lower bound of lambdaTheta grid is selected: higher value of HVARXgran1B is recommended as an input")
+    warning("Lower bound of lambdaTheta/lambdaB grid is selected: higher value of first granularity parameter is recommended as an input")
   }
 
   out<-list("l1"=l1, "MSFEmatrix"=MSFEmatrix, "MSFE_avg"=MSFE_avg, "lPhi_oneSE"=lPhi_oneSE,

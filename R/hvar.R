@@ -12,8 +12,8 @@
 #' @param VARpen "HLag" (hierarchical sparse penalty) or "L1" (standard lasso penalty) penalization.
 #' @export
 #' @return A list with the following components
-#' \item{k}{Number of time series.}
 #' \item{Y}{\eqn{T} by \eqn{k} matrix of time series.}
+#' \item{k}{Number of time series.}
 #' \item{p}{Maximum autoregressive lag order of the VAR.}
 #' \item{Phihat}{Matrix of estimated autoregressive coefficients of the VAR.}
 #' \item{phi0hat}{vector of VAR intercepts.}
@@ -235,7 +235,7 @@ HVAR_cv<-function(Y, p, h=1, lambdaPhiseq=NULL, gran1=20, gran2=10, T1.cutoff=0.
 
   gridflag_oneSE <- lambda_opt_oneSE==min(lambdaPhiseq)
   if(lambda_opt_oneSE==min(lambdaPhiseq)){
-    warning("PHASE I: Lower bound of lambda grid is selected: higher value of first granularity parameter is recommended as an input")
+    warning("Lower bound of lambda grid is selected: higher value of first granularity parameter is recommended as an input")
   }
 
   # Output
