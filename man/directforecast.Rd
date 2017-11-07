@@ -7,20 +7,20 @@
 directforecast(fit, model, h = 1)
 }
 \arguments{
-\item{fit}{Fitted sparse var, varx or varma model.}
+\item{fit}{Fitted sparse VAR, VARX or VARMA model.}
 
-\item{model}{Type of model that was estimated: var, varx or varma.}
+\item{model}{Type of model that was estimated: VAR, VARX or VARMA.}
 
 \item{h}{Desired forecast horizon.}
 }
 \value{
-Vector of length k containing the h-step ahead forecasts for the k time series
+Vector of length k containing the h-step ahead forecasts for the k time series.
 }
 \description{
 Function to obtain h-step ahead direct forecast based on estimated VAR, VARX or VARMA model
 }
 \examples{
 data(Y)
-varfit <- sparsevar(Y) # sparse VAR
-forecasts <- directforecast(fit=varfit, model="var", h=1)
+VARfit <- sparsevar(Y) # sparse VAR
+VARforecast <- directforecast(fit=VARfit, model="VAR", h=1)
 }

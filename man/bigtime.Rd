@@ -20,9 +20,9 @@ The function \link{directforecast} gives h-step ahead forecasts based on the est
 \examples{
 # Fit a sparse VAR model
 data(Y)
-varfit <- sparsevar(Y) # sparse VAR
-Lhat <- lagmatrix(fit=varfit, model="var") # get estimated lagmatrix
-VARforecast <- directforecast(fit=varfit, model="var", h=1) # get one-step ahead forecasts
+VARfit <- sparsevar(Y) # sparse VAR
+Lhat <- lagmatrix(fit=VARfit, model="var") # get estimated lagmatrix
+VARforecast <- directforecast(fit=VARfit, model="VAR", h=1) # get one-step ahead forecasts
 }
 \references{
 Nicholson William B., Bien Jacob and Matteson David S. (2017), "High Dimensional Forecasting via Interpretable Vector Autoregression"

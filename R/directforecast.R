@@ -1,28 +1,36 @@
 
 #' Function to obtain h-step ahead direct forecast based on estimated VAR, VARX or VARMA model
-#' @param fit Fitted sparse var, varx or varma model.
-#' @param model Type of model that was estimated: var, varx or varma.
+#' @param fit Fitted sparse VAR, VARX or VARMA model.
+#' @param model Type of model that was estimated: VAR, VARX or VARMA.
 #' @param h Desired forecast horizon.
 #' @export
-#' @return Vector of length k containing the h-step ahead forecasts for the k time series
+#' @return Vector of length k containing the h-step ahead forecasts for the k time series.
 #' @examples
 #' data(Y)
-#' varfit <- sparsevar(Y) # sparse VAR
-#' forecasts <- directforecast(fit=varfit, model="var", h=1)
+#' VARfit <- sparsevar(Y) # sparse VAR
+#' VARforecast <- directforecast(fit=VARfit, model="VAR", h=1)
 directforecast <- function(fit, model, h=1){
 
   if(h<=0){
     stop("Forecast horizon h must be a strictly positive integer.")
   }
 
+  if(!is.element(model, c("VAR", "VARX", "VARMA"))){
+    stop("The model needs to be either VAR, VARX or VARMA")
+  }
+
   # Preliminaries
   k <- ncol(fit$Y)
 
-  if(model=="var"){
+  if(model=="VAR"){
     Y <- fit$Y
     p <- fit$p
     Phi <- fit$Phihat
     phi0 <- fit$phi0hat
+
+    if(is.null(Phi) | is.null(phi0)){
+      stop("Please provide a fitted VAR model")
+    }
 
     VARFIT <- HVARmodel(Y=Y, p=p, h=h)
 
@@ -47,10 +55,10 @@ directforecast <- function(fit, model, h=1){
     }
   }
 
-  if(model=="varx"| model=="varma"){
+  if(model=="VARX"| model=="VARMA"){
 
 
-    if(model=="varx"){
+    if(model=="VARX"){
       m <- ncol(fit$X)
       Y <- fit$Y
       U <- fit$X
@@ -59,9 +67,13 @@ directforecast <- function(fit, model, h=1){
       Phi <- fit$Phihat
       Theta <- fit$Bhat
       phi0 <- fit$phi0hat
+
+      if(is.null(Phi) | is.null(Theta) | is.null(phi0)){
+        stop("Please provide a fitted VARX model")
+      }
     }
 
-    if(model=="varma"){
+    if(model=="VARMA"){
       m <- ncol(fit$U)
       Y <- fit$Y
       U <- fit$U
@@ -70,6 +82,11 @@ directforecast <- function(fit, model, h=1){
       Phi <- fit$Phihat
       Theta <- fit$Thetahat
       phi0 <- fit$phi0hat
+
+      if(is.null(Phi) | is.null(Theta) | is.null(phi0)){
+        stop("Please provide a fitted VARMA model")
+      }
+
     }
     VARXFIT <- HVARXmodelFORECAST(Y=Y, X=U, p=p, s=q, h=h)
 
