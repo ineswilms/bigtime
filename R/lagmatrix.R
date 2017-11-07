@@ -130,12 +130,12 @@ lagmatrix <- function(fit, model, returnplot=F){
       rownames(Lhat1) <- paste0("Resp.", 1:nrow(Lhat1))
       rownames(Lhat2) <- paste0("Resp.", 1:nrow(Lhat2))
 
-      par(mfrow=c(1,2))
+      # par(mfrow=c(1,2))
       plotlaghat(datamatrix=Lhat1, cl.lim=c(0, p),
-                 title="Lhat", mar=c(0, 0, 0, 0))
+                 title="Lhat", mar=c(0.5, 0.1, 2, 0.1))
 
       plotlaghat(datamatrix=Lhat2, cl.lim=c(0, s),
-                 title="Lhat", mar=c(0, 0, 0, 0))
+                 title="Lhat", mar=c(0.5, 0.1, 2, 0.1))
     }
   }
 
@@ -143,6 +143,138 @@ lagmatrix <- function(fit, model, returnplot=F){
   return(Lhat)
 }
 
+# lagmatrix <- function(fit, model, returnplot=F){
+#
+#   if(!is.element(model, c("var", "varx", "varma"))){
+#     stop("The model needs to be either var, varx or varma")
+#   }
+#
+#   if(model=="var"){
+#     k <- fit$k
+#     p <- fit$p
+#     coef <- fit$Phihat
+#
+#     if(k==1){
+#       coef <- matrix(coef, nrow=1)
+#     }
+#
+#     Lhat <- matrix(NA, ncol=k, nrow=k)
+#
+#     for(i.row in 1:k){ # responses
+#       for(j.col in 1:k){ # predictors
+#         if( length( which(coef[i.row, seq(from=j.col, length=p, by=k)]!=0) )==0 ){
+#           Lhat[i.row, j.col] <- 0
+#         }else{
+#           Lhat[i.row, j.col] <- max( which(coef[i.row, seq(from=j.col, length=p, by=k)]!=0) )
+#         }
+#       }
+#     }
+#
+#
+#
+#     if(returnplot){
+#
+#       if(k==1){
+#         stop("Plot only supported for multivariate time series case (k>1).")
+#       }
+#       colnames(Lhat) <- paste0("Pred.", 1:ncol(Lhat))
+#       rownames(Lhat) <- paste0("Resp.", 1:nrow(Lhat))
+#       par(mfrow=c(1,1))
+#       plotlaghat(datamatrix=Lhat, cl.lim=c(0, p),
+#                  title="Lhat", mar=c(0.5, 0.1, 2, 0.1))
+#     }
+#
+#     Lhat <- list("LPhi"=Lhat)
+#   }
+#
+#   if(model=="varx"| model=="varma"){
+#
+#     if(model=="varx"){
+#       k <- fit$k
+#       m <- fit$m
+#       p <- fit$p
+#       s <- fit$s
+#       coef1 <- fit$Phihat
+#       coef2 <- fit$Bhat
+#     }
+#
+#     if(model=="varma"){
+#       k <- fit$k
+#       m <- fit$k
+#       p <- fit$VARMAp
+#       s <- fit$VARMAq
+#       coef1 <- fit$Phihat
+#       coef2 <- fit$Thetahat
+#     }
+#
+#
+#     if(k==1){
+#       coef1 <- matrix(coef1, nrow=1)
+#       coef2 <- matrix(coef2, nrow=1)
+#     }
+#
+#     Lhat1 <- matrix(NA, ncol=k, nrow=k)
+#     Lhat2 <- matrix(NA, ncol=m, nrow=k)
+#
+#     for(i.row in 1:k){ # responses
+#       for(j.col in 1:k){ # predictors
+#         if( length( which(coef1[i.row, seq(from=j.col, length=p, by=k)]!=0) )==0 ){
+#           Lhat1[i.row, j.col] <- 0
+#         }else{
+#           Lhat1[i.row, j.col] <- max( which(coef1[i.row, seq(from=j.col, length=p, by=k)]!=0) )
+#         }
+#       }
+#     }
+#
+#     for(i.row in 1:k){ # responses
+#       for(j.col in 1:m){ # predictors
+#         if( length( which(coef2[i.row, seq(from=j.col, length=s, by=m)]!=0) )==0 ){
+#           Lhat2[i.row, j.col] <- 0
+#         }else{
+#           Lhat2[i.row, j.col] <- max( which(coef2[i.row, seq(from=j.col, length=s, by=m)]!=0) )
+#         }
+#       }
+#     }
+#
+#     if(model=="varx"){
+#       Lhat <- list("LPhi"=Lhat1, "LB"= Lhat2)
+#     }
+#
+#     if(model=="varma"){
+#       Lhat <- list("LPhi"=Lhat1, "LTheta"=Lhat2)
+#     }
+#
+#     if(returnplot){
+#
+#       if(k==1){
+#         stop("Plot only supported for multivariate time series case (k>1).")
+#       }
+#
+#       if(model=="varx"){
+#         colnames(Lhat1) <- paste0("Endog.", 1:ncol(Lhat1))
+#         colnames(Lhat2) <- paste0("Exog.", 1:ncol(Lhat2))
+#       }
+#
+#       if(model=="varma"){
+#         colnames(Lhat1) <- paste0("AR.", 1:ncol(Lhat1))
+#         colnames(Lhat2) <- paste0("MA.", 1:ncol(Lhat2))
+#       }
+#
+#       rownames(Lhat1) <- paste0("Resp.", 1:nrow(Lhat1))
+#       rownames(Lhat2) <- paste0("Resp.", 1:nrow(Lhat2))
+#
+#       par(mfrow=c(1,2))
+#       plotlaghat(datamatrix=Lhat1, cl.lim=c(0, p),
+#                  title="Lhat", mar=c(0, 0, 0, 0))
+#
+#       plotlaghat(datamatrix=Lhat2, cl.lim=c(0, s),
+#                  title="Lhat", mar=c(0, 0, 0, 0))
+#     }
+#   }
+#
+#
+#   return(Lhat)
+# }
 
 plotlaghat <- function (datamatrix, title = "", mar = c(0, 0, 0, 0), cl.lim, addlegend=T,
                             norowname=F, nocolname=F)
