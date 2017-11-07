@@ -1,27 +1,27 @@
-#' Creates lagmatrix of estimated coefficients
-#' @param fit Fitted var, varx or varma model.
-#' @param model Type of model that was estimated: var, varx or varma.
-#' @param returnplot True or False: return plot of lag matrix or not.
+#' Creates Lagmatrix of Estimated Coefficients
+#' @param fit Fitted VAR, VARX or VARMA model.
+#' @param model Type of model that was estimated: VAR, VARX or VARMA.
+#' @param returnplot TRUE or FALSE: return plot of lag matrix or not.
 #' @export
 #' @return A list with estimated lag matrix of the VAR model, or lag matrices of the VARX or VARMA model. The rows contain the responses, the columns contain the predictors.
 #' @examples
 #' data(Y)
 #' data(X)
-#' VARXfit <- sparseVARX(Y=Y, X=X) # sparse varx
-#' Lhats <- lagmatrix(fit=VARXfit, model="varx")
+#' VARXfit <- sparseVARX(Y=Y, X=X) # sparse VARX
+#' Lhats <- lagmatrix(fit=VARXfit, model="VARX")
 lagmatrix <- function(fit, model, returnplot=F){
 
-  if(!is.element(model, c("var", "varx", "varma"))){
-    stop("The model needs to be either var, varx or varma")
+  if(!is.element(model, c("VAR", "VARX", "VARMA"))){
+    stop("The model needs to be either VAR, VARX or VARMA")
   }
 
-  if(model=="var"){
+  if(model=="VAR"){
     k <- fit$k
     p <- fit$p
     coef <- fit$Phihat
 
     if(is.null(coef)){
-      stop("Please provide a fitted var model")
+      stop("Please provide a fitted VAR model")
     }
     if(k==1){
       coef <- matrix(coef, nrow=1)
@@ -56,9 +56,9 @@ lagmatrix <- function(fit, model, returnplot=F){
     Lhat <- list("LPhi"=Lhat)
   }
 
-  if(model=="varx"| model=="varma"){
+  if(model=="VARX"| model=="VARMA"){
 
-    if(model=="varx"){
+    if(model=="VARX"){
       k <- fit$k
       m <- fit$m
       p <- fit$p
@@ -67,12 +67,12 @@ lagmatrix <- function(fit, model, returnplot=F){
       coef2 <- fit$Bhat
 
       if(is.null(coef1)|is.null(coef2)){
-        stop("Please provide a fitted varx model")
+        stop("Please provide a fitted VARX model")
       }
 
     }
 
-    if(model=="varma"){
+    if(model=="VARMA"){
       k <- fit$k
       m <- fit$k
       p <- fit$VARMAp
@@ -81,7 +81,7 @@ lagmatrix <- function(fit, model, returnplot=F){
       coef2 <- fit$Thetahat
 
       if(is.null(coef1)|is.null(coef2)){
-        stop("Please provide a fitted varma model")
+        stop("Please provide a fitted VARMA model")
       }
     }
 
@@ -114,11 +114,11 @@ lagmatrix <- function(fit, model, returnplot=F){
       }
     }
 
-    if(model=="varx"){
+    if(model=="VARX"){
       Lhat <- list("LPhi"=Lhat1, "LB"= Lhat2)
     }
 
-    if(model=="varma"){
+    if(model=="VARMA"){
       Lhat <- list("LPhi"=Lhat1, "LTheta"=Lhat2)
     }
 
@@ -129,12 +129,12 @@ lagmatrix <- function(fit, model, returnplot=F){
         return(Lhat)
       }
 
-      if(model=="varx"){
+      if(model=="VARX"){
         colnames(Lhat1) <- paste0("Endog.", 1:ncol(Lhat1))
         colnames(Lhat2) <- paste0("Exog.", 1:ncol(Lhat2))
       }
 
-      if(model=="varma"){
+      if(model=="VARMA"){
         colnames(Lhat1) <- paste0("AR.", 1:ncol(Lhat1))
         colnames(Lhat2) <- paste0("MA.", 1:ncol(Lhat2))
       }

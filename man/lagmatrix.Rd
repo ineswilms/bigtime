@@ -2,26 +2,26 @@
 % Please edit documentation in R/lagmatrix.R
 \name{lagmatrix}
 \alias{lagmatrix}
-\title{Creates lagmatrix of estimated coefficients}
+\title{Creates Lagmatrix of Estimated Coefficients}
 \usage{
 lagmatrix(fit, model, returnplot = F)
 }
 \arguments{
-\item{fit}{Fitted var, varx or varma model.}
+\item{fit}{Fitted VAR, VARX or VARMA model.}
 
-\item{model}{Type of model that was estimated: var, varx or varma.}
+\item{model}{Type of model that was estimated: VAR, VARX or VARMA.}
 
-\item{returnplot}{True or False: return plot of lag matrix or not.}
+\item{returnplot}{TRUE or FALSE: return plot of lag matrix or not.}
 }
 \value{
 A list with estimated lag matrix of the VAR model, or lag matrices of the VARX or VARMA model. The rows contain the responses, the columns contain the predictors.
 }
 \description{
-Creates lagmatrix of estimated coefficients
+Creates Lagmatrix of Estimated Coefficients
 }
 \examples{
 data(Y)
 data(X)
-VARXfit <- sparseVARX(Y=Y, X=X) # sparse varx
-Lhats <- lagmatrix(fit=VARXfit, model="varx")
+VARXfit <- sparseVARX(Y=Y, X=X) # sparse VARX
+Lhats <- lagmatrix(fit=VARXfit, model="VARX")
 }

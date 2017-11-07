@@ -24,6 +24,6 @@
 #' # Fit a sparse VAR model
 #' data(Y)
 #' VARfit <- sparseVAR(Y) # sparse VAR
-#' Lhat <- lagmatrix(fit=VARfit, model="var") # get estimated lagmatrix
+#' Lhat <- lagmatrix(fit=VARfit, model="VAR") # get estimated lagmatrix
 #' VARforecast <- directforecast(fit=VARfit, model="VAR", h=1) # get one-step ahead forecasts
 NULL
