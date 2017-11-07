@@ -49,3 +49,6 @@ arfit <- sparsevar(Y1) # sparse AR
 Nicholson William B., Bien Jacob and Matteson David S. (2017), "High Dimensional Forecasting via Interpretable Vector Autoregression"
 arXiv preprint arXiv:1412.5250v2.
 }
+\seealso{
+\link{lagmatrix} and \link{directforecast}
+}

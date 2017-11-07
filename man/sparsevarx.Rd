@@ -65,3 +65,6 @@ arxfit <- sparsevarx(Y=Y1, X=X) # sparse ARX
 Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2017), "Interpretable Vector AutoRegressions with
 Exogenous Time Series" arXiv preprint.
 }
+\seealso{
+\link{lagmatrix} and \link{directforecast}
+}

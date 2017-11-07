@@ -17,7 +17,7 @@ sparsevarma(Y, U = NULL, VARp = NULL, VARpen = "HLag", VARlseq = NULL,
 
 \item{VARp}{User-specified maximum  autoregressive lag order of the PhaseI VAR. Typical usage is to have the program compute its own maximum lag order based on the time series length.}
 
-\item{VARpen}{"HLag" (hierarchical sparse penalty) or "L1" (standard lasso penalty) penalization in PhaseI VAR. The default is zero.}
+\item{VARpen}{"HLag" (hierarchical sparse penalty) or "L1" (standard lasso penalty) penalization in PhaseI VAR.}
 
 \item{VARlseq}{User-specified grid of values for regularization parameter in the PhaseI VAR. Typical usage is to have the program compute
 its own grid. Supplying a grid of values overrides this. WARNING: use with care.}
@@ -25,7 +25,7 @@ its own grid. Supplying a grid of values overrides this. WARNING: use with care.
 \item{VARgran}{User-specified vector of granularity specifications for the penalty parameter grid of the PhaseI VAR:  First element specifies
 how deep the grid should be constructed. Second element specifies how many values the grid should contain.}
 
-\item{VARalpha}{a small positive regularization parameter value corresponding to squared Frobenius penalty in PhaseI VAR.}
+\item{VARalpha}{a small positive regularization parameter value corresponding to squared Frobenius penalty in PhaseI VAR. The default is zero.}
 
 \item{VARMAp}{User-specified maximum autoregressive lag order of the VARMA. Typical usage is to have the program compute its own maximum lag order based on the time series length.}
 
@@ -79,4 +79,7 @@ armafit <- sparsevarma(Y1) # sparse ARMA
 \references{
 Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2017), "Sparse Identification and Estimation of High-Dimensional Vector AutoRegressive Moving Averages"
 arXiv preprint arXiv:1707.09208.
+}
+\seealso{
+\link{lagmatrix} and \link{directforecast}
 }
