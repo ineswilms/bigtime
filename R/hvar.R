@@ -1,21 +1,21 @@
 #' Sparse estimation of the Vector AutoRegressive (VAR) model
 #' @param Y A \eqn{T} by \eqn{k} matrix of time series. If k=1, a univariate autoregressive model is estimated.
-#' @param p User-specified maximum autoregressive lag order of the VAR.
+#' @param p User-specified maximum autoregressive lag order of the VAR. Typical usage is to have the program compute its own maximum lag order based on the time series length.
 #' @param h Desired forecast horizon in time-series cross-validation procedure.
-#' @param VARlseq User-specified grid of values for regularization parameter. Typical usage is to have the program compute
-#' its own grid based on Phigran. Supplying a grid of values overrides this. WARNING: use with care.
+#' @param VARlseq User-specified grid of values for regularization parameter corresponding to sparse penalty. Typical usage is to have the program compute
+#' its own grid. Supplying a grid of values overrides this. WARNING: use with care.
 #' @param VARgran User-specified vector of granularity specifications for the penalty parameter grid:  First element specifies
 #' how deep the grid should be constructed. Second element specifies how many values the grid should contain.
 #' @param cvcut Proportion of observations used for model estimation in the time series cross-validation procedure. The remainder is used for forecast evaluation.
-#' @param eps a small positive numeric value giving the tolerance for convergence in the proximal gradient algorithms.
-#' @param VARalpha a small positive regularization parameter value corresponding to squared Frobenius penalty in PhaseI VAR.
-#' @param VARpen "HLag" (hierarchical sparse penalty) or "L1" (standard l1 penalty) penalization.
+#' @param eps a small positive numeric value giving the tolerance for convergence in the proximal gradient algorithm.
+#' @param VARalpha a small positive regularization parameter value corresponding to squared Frobenius penalty. The default is zero.
+#' @param VARpen "HLag" (hierarchical sparse penalty) or "L1" (standard lasso penalty) penalization.
 #' @export
 #' @return A list with the following components
 #' \item{k}{Number of time series.}
 #' \item{Y}{\eqn{T} by \eqn{k} matrix of time series.}
 #' \item{p}{Maximum autoregressive lag order of the VAR.}
-#' \item{Phihat}{Matrix of estimated autoregressive coefficients of the VAR}
+#' \item{Phihat}{Matrix of estimated autoregressive coefficients of the VAR.}
 #' \item{phi0hat}{vector of VAR intercepts.}
 #' @references Nicholson William B., Bien Jacob and Matteson David S. (2017), "High Dimensional Forecasting via Interpretable Vector Autoregression"
 #' arXiv preprint arXiv:1412.5250v2.
@@ -24,7 +24,7 @@
 #' varfit <- sparsevar(Y) # sparse VAR
 #' Y1 <- matrix(Y[,1], ncol=1)
 #' arfit <- sparsevar(Y1) # sparse AR
-sparsevar <- function(Y, p=NULL, VARpen="HLag", VARalpha=0, VARlseq=NULL, VARgran=NULL,
+sparsevar <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL, VARalpha=0,
                       cvcut=0.9, h=1,  eps=1e-3){
 
   # Check Inputs
@@ -53,7 +53,6 @@ sparsevar <- function(Y, p=NULL, VARpen="HLag", VARalpha=0, VARlseq=NULL, VARgra
   if(!((cvcut<1) & (cvcut>0))){
     stop("cvcut needs to be a number between 0 and 1")
   }
-
 
   if(VARalpha<0){
     stop("The regularization paramter VARalpha needs to be a equal to zero or a small positive number")
