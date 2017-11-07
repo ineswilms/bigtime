@@ -5,7 +5,7 @@
 #' @param h Desired forecast horizon.
 #' @export
 #' @return A list with the following components
-#' \item{Yhat}{Vector h-step ahead forecasts for the k time series}
+#' \item{Yhat}{h-step ahead forecasts for the k time series}
 #' @examples
 #' data(Y)
 #' varfit <- sparsevar(Y) # sparse VAR
