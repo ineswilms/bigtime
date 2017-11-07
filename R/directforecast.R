@@ -1,11 +1,11 @@
 
 #' Function to obtain h-step ahead direct forecast based on estimated VAR, VARX or VARMA model
-#' @param fit Fitted var, varx or varma model.
+#' @param fit Fitted sparse var, varx or varma model.
 #' @param model Type of model that was estimated: var, varx or varma.
-#' @param h Desired forecast horizon in time-series cross-validation procedure.
+#' @param h Desired forecast horizon.
 #' @export
 #' @return A list with the following components
-#' \item{Yhat}{h-step ahead forecast for the k time series}
+#' \item{Yhat}{Vector h-step ahead forecasts for the k time series}
 #' @examples
 #' data(Y)
 #' varfit <- sparsevar(Y) # sparse VAR
