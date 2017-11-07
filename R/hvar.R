@@ -1,4 +1,4 @@
-#' Sparse estimation of the Vector AutoRegressive (VAR) model
+#' Sparse Estimation of the Vector AutoRegressive (VAR) Model
 #' @param Y A \eqn{T} by \eqn{k} matrix of time series. If k=1, a univariate autoregressive model is estimated.
 #' @param p User-specified maximum autoregressive lag order of the VAR. Typical usage is to have the program compute its own maximum lag order based on the time series length.
 #' @param h Desired forecast horizon in time-series cross-validation procedure.
@@ -22,10 +22,10 @@
 #' @seealso \link{lagmatrix} and \link{directforecast}
 #' @examples
 #' data(Y)
-#' varfit <- sparsevar(Y) # sparse VAR
+#' VARfit <- sparseVAR(Y) # sparse VAR
 #' Y1 <- matrix(Y[,1], ncol=1)
-#' arfit <- sparsevar(Y1) # sparse AR
-sparsevar <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL, VARalpha=0,
+#' ARfit <- sparseVAR(Y1) # sparse AR
+sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL, VARalpha=0,
                       cvcut=0.9, h=1,  eps=1e-3){
 
   # Check Inputs

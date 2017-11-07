@@ -13,14 +13,14 @@ and Vector AutoRegressive Moving Average Models. The univariate cases are also s
 }
 \details{
 To use the facilities of this package, start with a T by k time series matrix Y (for the VAR and VARMA), and an exogenous time series matrix X (for the VARX).
-Run \link{sparsevar}, \link{sparsevarx} or \link{sparsevarma} to get the estimated model.
+Run \link{sparseVAR}, \link{sparsevarx} or \link{sparsevarma} to get the estimated model.
 The function \link{lagmatrix} returns the lag matrix of estimated coefficients of the estimated model.
 The function \link{directforecast} gives h-step ahead forecasts based on the estimated model.
 }
 \examples{
 # Fit a sparse VAR model
 data(Y)
-VARfit <- sparsevar(Y) # sparse VAR
+VARfit <- sparseVAR(Y) # sparse VAR
 Lhat <- lagmatrix(fit=VARfit, model="var") # get estimated lagmatrix
 VARforecast <- directforecast(fit=VARfit, model="VAR", h=1) # get one-step ahead forecasts
 }

@@ -2,7 +2,7 @@
 
 export(directforecast)
 export(lagmatrix)
-export(sparsevar)
+export(sparseVAR)
 export(sparsevarma)
 export(sparsevarx)
 import(Rcpp)

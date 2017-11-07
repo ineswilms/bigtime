@@ -21,6 +21,6 @@ Function to obtain h-step ahead direct forecast based on estimated VAR, VARX or 
 }
 \examples{
 data(Y)
-VARfit <- sparsevar(Y) # sparse VAR
+VARfit <- sparseVAR(Y) # sparse VAR
 VARforecast <- directforecast(fit=VARfit, model="VAR", h=1)
 }
