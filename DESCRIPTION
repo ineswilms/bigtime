@@ -21,3 +21,4 @@ RoxygenNote: 6.0.1
 Imports: MASS, zoo, lattice, Rcpp, stats, utils, grDevices, graphics, corrplot
 SystemRequirements: C++11
 LinkingTo: Rcpp, RcppArmadillo, RcppEigen
+URL: http://github.com/ineswilms/bigtime
