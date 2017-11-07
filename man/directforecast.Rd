@@ -15,7 +15,7 @@ directforecast(fit, model, h = 1)
 }
 \value{
 A list with the following components
-\item{Yhat}{Vector h-step ahead forecasts for the k time series}
+\item{Yhat}{h-step ahead forecasts for the k time series}
 }
 \description{
 Function to obtain h-step ahead direct forecast based on estimated VAR, VARX or VARMA model

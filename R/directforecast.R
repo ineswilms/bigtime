@@ -11,6 +11,11 @@
 #' varfit <- sparsevar(Y) # sparse VAR
 #' forecasts <- directforecast(fit=varfit, model="var", h=1)
 directforecast <- function(fit, model, h=1){
+
+  if(h<=0){
+    stop("Forecast horizon h must be a strictly positive integer.")
+  }
+
   # Preliminaries
   k <- ncol(fit$Y)
 
