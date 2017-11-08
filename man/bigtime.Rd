@@ -30,9 +30,6 @@ arXiv preprint arXiv:1412.5250v2.
 
 Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2017), "Sparse Identification and Estimation of High-Dimensional Vector AutoRegressive Moving Averages"
 arXiv preprint arXiv:1707.09208.
-
-Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2017), "Interpretable Vector AutoRegressions with
-Exogenous Time Series" arXiv preprint.
 }
 \author{
 Ines Wilms <ines.wilms@kuleuven.be>, Jacob Bien, David Matteson, Sumanta Basu
