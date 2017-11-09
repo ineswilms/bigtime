@@ -12,7 +12,7 @@ Author: Ines Wilms [cre, aut],
   Jacob Bien [aut],
   Sumanta Basu [aut]
 Maintainer: Ines Wilms <ines.wilms@kuleuven.be>
-Description: Estimation of large VAR, VARX and VARMA models with structured lasso penalties.
+Description: Estimation of large Vector AutoRegressive (VAR), Vector AutoRegressive with Exogenous Variables X (VARX) and Vector AutoRegressive Moving Average (VARMA) Models with Structured Lasso Penalties, see Nicholson, Bien and Matteson (2017) <arXiv:1412.5250v2> and Wilms, Basu, Bien and Matteson (2017) <arXiv:1707.09208>.
 Depends: R (>= 3.1.0), methods
 License: GPL (>= 2)
 Encoding: UTF-8
