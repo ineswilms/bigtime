@@ -32,5 +32,5 @@ Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2017), "Sparse Ident
 arXiv preprint arXiv:1707.09208.
 }
 \author{
-Ines Wilms <ines.wilms@kuleuven.be>, Jacob Bien, David Matteson, Sumanta Basu
+Ines Wilms <ines.wilms@kuleuven.be>, Jacob Bien, David S. Matteson, Sumanta Basu
 }
