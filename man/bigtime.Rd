@@ -26,10 +26,10 @@ VARforecast <- directforecast(fit=VARfit, model="VAR", h=1) # get one-step ahead
 }
 \references{
 Nicholson William B., Bien Jacob and Matteson David S. (2017), "High Dimensional Forecasting via Interpretable Vector Autoregression"
-arXiv preprint arXiv:1412.5250v2.
+arXiv preprint <arXiv:1412.5250v2>.
 
 Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2017), "Sparse Identification and Estimation of High-Dimensional Vector AutoRegressive Moving Averages"
-arXiv preprint arXiv:1707.09208.
+arXiv preprint <arXiv:1707.09208>.
 }
 \author{
 Ines Wilms <ines.wilms@kuleuven.be>, Jacob Bien, David S. Matteson, Sumanta Basu
