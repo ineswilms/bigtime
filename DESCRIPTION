@@ -4,11 +4,11 @@ Title: Sparse Estimation of Large Time Series Models
 Version: 0.1.0
 Authors@R: c(
     person("Ines", "Wilms", email = "ines.wilms@kuleuven.be", role = c("cre","aut")),
-    person("David", "Matteson", email = "matteson@cornell.edu", role = "aut"),
+    person("David S.", "Matteson", email = "matteson@cornell.edu", role = "aut"),
     person("Jacob", "Bien", email = "jbien@usc.edu", role = "aut"),
     person("Sumanta", "Basu", email = "sumbose@cornell.edu", role = "aut"))
 Author: Ines Wilms [cre, aut],
-  David Matteson [aut],
+  David S. Matteson [aut],
   Jacob Bien [aut],
   Sumanta Basu [aut]
 Maintainer: Ines Wilms <ines.wilms@kuleuven.be>
