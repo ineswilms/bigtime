@@ -3,7 +3,7 @@
 bigtime
 =======
 
-The goal of bigtime is to sparsely estimate large time series models such as the Vector AutoRegressive Model, the Vector AutoRegressive Model with Exogenous Variables, and the Vector AutoRegressive Moving Average Model.
+The goal of `bigtime` is to sparsely estimate large time series models such as the Vector AutoRegressive Model, the Vector AutoRegressive Model with Exogenous Variables, and the Vector AutoRegressive Moving Average Model. The univariate cases are also supported.
 
 Installation
 ------------
