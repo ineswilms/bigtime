@@ -172,7 +172,7 @@ lagmatrix(fit=ARXfit, model="VARX")
 #> 
 #> $LB
 #>      [,1]
-#> [1,]    4
+#> [1,]    1
 ```
 
 ### AutoRegressive Moving Average (ARMA) Models
