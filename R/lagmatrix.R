@@ -46,8 +46,14 @@ lagmatrix <- function(fit, model, returnplot=F){
       if(k==1){
         stop("Plot only supported for multivariate time series case (k>1).")
       }
-      colnames(Lhat) <- paste0("Pred.", 1:ncol(Lhat))
-      rownames(Lhat) <- paste0("Resp.", 1:nrow(Lhat))
+      if (is.null(fit$series_names))
+        colnames(Lhat) <- paste0("Pred.", 1:ncol(Lhat))
+      else
+        colnames(Lhat) <- fit$series_names
+      if (is.null(fit$series_names))
+        rownames(Lhat) <- paste0("Resp.", 1:nrow(Lhat))
+      else
+        rownames(Lhat) <- fit$series_names
       par(mfrow=c(1,1))
       plotlaghat(datamatrix=Lhat, cl.lim=c(0, p),
                  title="Lhat", mar=c(0.5, 0.1, 2, 0.1))
