@@ -44,6 +44,11 @@ sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL, VARa
     stop("The time series length is too small.")
   }
 
+  if(!is.null(colnames(Y))){
+    series_names <- colnames(Y)
+  } else {
+    series_names <- NULL
+  }
 
   if(h<=0){
     stop("The forecast horizon h needs to be a strictly positive integer")
@@ -116,7 +121,8 @@ sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL, VARa
 
   k <- ncol(Y)
 
-  out <- list("k"=k, "Y"=Y, "p"=p, "Phihat"=VARmodel$Phi, "phi0hat"=VARmodel$phi)
+  out <- list("k"=k, "Y"=Y, "p"=p, "Phihat"=VARmodel$Phi, "phi0hat"=VARmodel$phi,
+              "series_names"=series_names)
 }
 
 
