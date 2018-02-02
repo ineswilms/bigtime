@@ -44,7 +44,7 @@ sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL, VARa
     stop("The time series length is too small.")
   }
 
-  if(!is.null(colnames(Y))){
+  if(!is.null(colnames(Y))){ # time series names
     series_names <- colnames(Y)
   } else {
     series_names <- NULL
