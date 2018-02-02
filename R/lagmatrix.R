@@ -46,6 +46,7 @@ lagmatrix <- function(fit, model, returnplot=F){
       if(k==1){
         stop("Plot only supported for multivariate time series case (k>1).")
       }
+      # Check time series names
       if (is.null(fit$series_names))
         colnames(Lhat) <- paste0("Pred.", 1:ncol(Lhat))
       else
