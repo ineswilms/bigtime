@@ -122,8 +122,10 @@ sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL, VARa
   k <- ncol(Y)
 
   out <- list("k"=k, "Y"=Y, "p"=p, "Phihat"=VARmodel$Phi, "phi0hat"=VARmodel$phi,
-              "series_names"=series_names)
+              "series_names"=series_names, "lambdaseq"=VARcv$lambda, "MSFEcv"=VARcv$MSFE_avg,
+              "lambda_SEopt"=VARcv$lambda_opt_oneSE,"lambda_opt"=VARcv$lambda_opt)
 }
+
 
 
 HVARmodel<-function(Y, p, h=1){
@@ -226,10 +228,10 @@ HVAR_cv<-function(Y, p, h=1, lambdaPhiseq=NULL, gran1=20, gran2=10, T1.cutoff=0.
   lambda_opt <- lambdaPhiseq[which.min(MSFE_avg)]
 
   if(length(lambda_opt)==0){
-    lambda_opt <- median(lambdaPhiseq)
+    lambda_opt <- lambdaPhiseq[round(median(1:length(lambdaPhiseq)))]
   }else{
     if(is.na(lambda_opt)){
-      lambda_opt <- median(lambdaPhiseq)
+      lambda_opt <- lambdaPhiseq[round(median(1:length(lambdaPhiseq)))]
     }
   }
   # One-standard error rule to determine optimal lambda values
@@ -259,7 +261,8 @@ HVAR_cv<-function(Y, p, h=1, lambdaPhiseq=NULL, gran1=20, gran2=10, T1.cutoff=0.
 
   # Output
   out <- list("lambda"=lambdaPhiseq, "lambda_opt_oneSE"=lambda_opt_oneSE,
-            "MSFE_all"=MSFEmatrix, "MSFE_avg"=MSFE_avg, "flag_oneSE"=gridflag_oneSE)
+            "MSFE_all"=MSFEmatrix, "MSFE_avg"=MSFE_avg, "flag_oneSE"=gridflag_oneSE,
+            "lambda_opt"=lambda_opt)
 }
 
 
