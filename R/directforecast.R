@@ -15,6 +15,10 @@ directforecast <- function(fit, model, h=1){
     stop("Forecast horizon h must be a strictly positive integer.")
   }
 
+  if(fit$h!=h){
+    stop("Specify the same forecast horizon h as argument in the sparseVAR, sparseVARX, or sparseVARMA function and the directforecast function")
+  }
+
   if(!is.element(model, c("VAR", "VARX", "VARMA"))){
     stop("The model needs to be either VAR, VARX or VARMA")
   }

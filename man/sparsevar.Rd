@@ -39,6 +39,7 @@ A list with the following components
 \item{MSFEcv}{MSFE cross-validation scores for each value of the sparsity parameter in the considered grid}
 \item{lambda_opt}{Optimal value of the sparsity parameter as selected by the time-series cross-validation procedure}
 \item{lambda_SEopt}{Optimal value of the sparsity parameter as selected by the time-series cross-validation procedure and after applying the one-standard-error rule}
+\item{h}{Forecast horizon h}
 }
 \description{
 Sparse Estimation of the Vector AutoRegressive (VAR) Model

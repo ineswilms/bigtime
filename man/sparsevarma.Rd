@@ -66,6 +66,18 @@ A list with the following components
 \item{Phihat}{Matrix of estimated autoregressive coefficients of the VARMA.}
 \item{Thetahat}{Matrix of estimated moving average coefficients of the VARMA.}
 \item{phi0hat}{Vector of VARMA intercepts.}
+\item{PhaseI_lambas}{Phase I sparsity parameter grid}
+\item{PhaseI_MSFEcv}{MSFE cross-validation scores for each value of the sparsity parameter in the considered grid}
+\item{PhaseI_lambda_opt}{Phase I Optimal value of the sparsity parameter as selected by the time-series cross-validation procedure}
+\item{PhaseI_lambda_SEopt}{Phase I Optimal value of the sparsity parameter as selected by the time-series cross-validation procedure and after applying the one-standard-error rule}
+\item{PhaseII_lambdaPhi}{Phase II sparsity parameter grid corresponding to Phi parameters}
+\item{PhaseII_lambdaTheta}{Phase II sparsity parameter grid corresponding to Theta parameters}
+\item{PhaseII_lambdaPhi_opt}{Phase II Optimal value of the sparsity parameter (corresponding to Phi parameters) as selected by the time-series cross-validation procedure}
+\item{PhaseII_lambdaPhi_SEopt}{Phase II Optimal value of the sparsity parameter (corresponding to Theta parameters) as selected by the time-series cross-validation procedure and after applying the one-standard-error rule}
+\item{PhaseII_lambdaTheta_opt}{Phase II Optimal value of the sparsity parameter (corresponding to Phi parameters) as selected by the time-series cross-validation procedure}
+\item{PhaseII_lambdaTheta_SEopt}{Phase II Optimal value of the sparsity parameter (corresponding to Theta parameters) as selected by the time-series cross-validation procedure and after applying the one-standard-error rule}
+\item{PhaseII_MSFEcv}{Phase II MSFE cross-validation scores for each value in the two-dimensional sparsity grid}
+\item{h}{Forecast horizon h}
 }
 \description{
 Sparse Estimation of the Vector AutoRegressive Moving Average (VARMA) Model

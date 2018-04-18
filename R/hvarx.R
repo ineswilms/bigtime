@@ -34,6 +34,7 @@
 #' \item{lambdaB_opt}{Optimal value of the sparsity parameter (corresponding to the exogenous autoregressive parameters) as selected by the time-series cross-validation procedure}
 #' \item{lambdaB_SEopt}{Optimal value of the sparsity parameter (corresponding to the exogenous autoregressive parameters) as selected by the time-series cross-validation procedure and after applying the one-standard-error rule}
 #' \item{MSFEcv}{MSFE cross-validation scores for each value in the two-dimensional sparsity grid}
+#' \item{h}{Forecast horizon h}
 #' @seealso \link{lagmatrix} and \link{directforecast}
 #' @examples
 #' data(Y)
@@ -196,7 +197,7 @@ sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, V
               "lambdaPhi"=VARXcv$l1$lPhiseq, "lambdaB"=VARXcv$l1$lBseq,
               "lambdaPhi_opt"=VARXcv$lPhi_opt, "lambdaPhi_SEopt"=VARXcv$lPhi_oneSE,
               "lambdaB_opt"=VARXcv$lB_opt, "lambdaB_SEopt"=VARXcv$lB_oneSE,
-              "MSFEcv"=VARXcv$MSFE_avg)
+              "MSFEcv"=VARXcv$MSFE_avg, "h"=h)
 
 }
 

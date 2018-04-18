@@ -37,6 +37,18 @@
 #' \item{Phihat}{Matrix of estimated autoregressive coefficients of the VARMA.}
 #' \item{Thetahat}{Matrix of estimated moving average coefficients of the VARMA.}
 #' \item{phi0hat}{Vector of VARMA intercepts.}
+#' \item{PhaseI_lambas}{Phase I sparsity parameter grid}
+#' \item{PhaseI_MSFEcv}{MSFE cross-validation scores for each value of the sparsity parameter in the considered grid}
+#' \item{PhaseI_lambda_opt}{Phase I Optimal value of the sparsity parameter as selected by the time-series cross-validation procedure}
+#' \item{PhaseI_lambda_SEopt}{Phase I Optimal value of the sparsity parameter as selected by the time-series cross-validation procedure and after applying the one-standard-error rule}
+#' \item{PhaseII_lambdaPhi}{Phase II sparsity parameter grid corresponding to Phi parameters}
+#' \item{PhaseII_lambdaTheta}{Phase II sparsity parameter grid corresponding to Theta parameters}
+#' \item{PhaseII_lambdaPhi_opt}{Phase II Optimal value of the sparsity parameter (corresponding to Phi parameters) as selected by the time-series cross-validation procedure}
+#' \item{PhaseII_lambdaPhi_SEopt}{Phase II Optimal value of the sparsity parameter (corresponding to Theta parameters) as selected by the time-series cross-validation procedure and after applying the one-standard-error rule}
+#' \item{PhaseII_lambdaTheta_opt}{Phase II Optimal value of the sparsity parameter (corresponding to Phi parameters) as selected by the time-series cross-validation procedure}
+#' \item{PhaseII_lambdaTheta_SEopt}{Phase II Optimal value of the sparsity parameter (corresponding to Theta parameters) as selected by the time-series cross-validation procedure and after applying the one-standard-error rule}
+#' \item{PhaseII_MSFEcv}{Phase II MSFE cross-validation scores for each value in the two-dimensional sparsity grid}
+#' \item{h}{Forecast horizon h}
 #' @references Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2017), "Sparse Identification and Estimation of High-Dimensional Vector AutoRegressive Moving Averages"
 #' arXiv preprint <arXiv:1707.09208>.
 #' @seealso \link{lagmatrix} and \link{directforecast}
@@ -204,6 +216,14 @@ sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL, VARg
     VARgran2 <- length(VARlseq)
   }
 
+  if(!is.null(U)){
+    HVARcvFIT <- list()
+    HVARcvFIT$lambda <- NA
+    HVARcvFIT$MSFE_avg<- NA
+    HVARcvFIT$lambda_opt_oneSE <- NA
+    HVARcvFIT$lambda_opt <- NA
+  }
+
   # Fit a VAR(VARp) using HLag penalty to approximate the residuals
   if(is.null(U)){
     ### HVAR ESTIMATION
@@ -296,5 +316,11 @@ sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL, VARg
   # Output
   out<-list("k"=k, "Y"=Y, "VARp"=VARp, "VARPhihat"=VARPhi, "VARphi0hat"=VARphi0, "U"=U,
             "VARMAp"=VARMAp, "VARMAq"=VARMAq,
-            "Phihat"=Phi, "Thetahat"=Theta, "phi0hat"=phi0)
+            "Phihat"=Phi, "Thetahat"=Theta, "phi0hat"=phi0,
+            "PhaseI_lambdas"=HVARcvFIT$lambda, "PhaseI_MSFEcv"=HVARcvFIT$MSFE_avg,
+            "PhaseI_lambda_SEopt"=HVARcvFIT$lambda_opt_oneSE,"PhaseI_lambda_opt"=HVARcvFIT$lambda_opt,
+            "PhaseII_lambdaPhi"=HVARXcvFIT$l1$lPhiseq, "PhaseII_lambdaTheta"=HVARXcvFIT$l1$lBseq,
+            "PhaseII_lambdaPhi_opt"=HVARXcvFIT$lPhi_opt, "PhaseII_lambdaPhi_SEopt"=HVARXcvFIT$lPhi_oneSE,
+            "PhaseII_lambdaTheta_opt"=HVARXcvFIT$lB_opt, "PhaseII_lambdaTheta_SEopt"=HVARXcvFIT$lB_oneSE,
+            "PhaseII_MSFEcv"=HVARXcvFIT$MSFE_avg, "h"=h)
 }

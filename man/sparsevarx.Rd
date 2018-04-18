@@ -57,6 +57,7 @@ A list with the following components
 \item{lambdaB_opt}{Optimal value of the sparsity parameter (corresponding to the exogenous autoregressive parameters) as selected by the time-series cross-validation procedure}
 \item{lambdaB_SEopt}{Optimal value of the sparsity parameter (corresponding to the exogenous autoregressive parameters) as selected by the time-series cross-validation procedure and after applying the one-standard-error rule}
 \item{MSFEcv}{MSFE cross-validation scores for each value in the two-dimensional sparsity grid}
+\item{h}{Forecast horizon h}
 }
 \description{
 Sparse Estimation of the Vector AutoRegressive  with Exogenous Variables X (VARX) Model

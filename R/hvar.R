@@ -21,6 +21,7 @@
 #' \item{MSFEcv}{MSFE cross-validation scores for each value of the sparsity parameter in the considered grid}
 #' \item{lambda_opt}{Optimal value of the sparsity parameter as selected by the time-series cross-validation procedure}
 #' \item{lambda_SEopt}{Optimal value of the sparsity parameter as selected by the time-series cross-validation procedure and after applying the one-standard-error rule}
+#' \item{h}{Forecast horizon h}
 #' @references Nicholson William B., Bien Jacob and Matteson David S. (2017), "High Dimensional Forecasting via Interpretable Vector Autoregression"
 #' arXiv preprint <arXiv:1412.5250v2>.
 #' @seealso \link{lagmatrix} and \link{directforecast}
@@ -127,7 +128,7 @@ sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL, VARa
 
   out <- list("k"=k, "Y"=Y, "p"=p, "Phihat"=VARmodel$Phi, "phi0hat"=VARmodel$phi,
               "series_names"=series_names, "lambdas"=VARcv$lambda, "MSFEcv"=VARcv$MSFE_avg,
-              "lambda_SEopt"=VARcv$lambda_opt_oneSE,"lambda_opt"=VARcv$lambda_opt)
+              "lambda_SEopt"=VARcv$lambda_opt_oneSE,"lambda_opt"=VARcv$lambda_opt, "h"=h)
 }
 
 
