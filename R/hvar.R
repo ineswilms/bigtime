@@ -17,6 +17,10 @@
 #' \item{p}{Maximum autoregressive lag order of the VAR.}
 #' \item{Phihat}{Matrix of estimated autoregressive coefficients of the VAR.}
 #' \item{phi0hat}{vector of VAR intercepts.}
+#' \item{lambdas}{sparsity parameter grid}
+#' \item{MSFEcv}{MSFE cross-validation scores for each value of the sparsity parameter in the considered grid}
+#' \item{lambda_opt}{Optimal value of the sparsity parameter as selected by the time-series cross-validation procedure}
+#' \item{lambda_SEopt}{Optimal value of the sparsity parameter as selected by the time-series cross-validation procedure and after applying the one-standard-error rule}
 #' @references Nicholson William B., Bien Jacob and Matteson David S. (2017), "High Dimensional Forecasting via Interpretable Vector Autoregression"
 #' arXiv preprint <arXiv:1412.5250v2>.
 #' @seealso \link{lagmatrix} and \link{directforecast}
@@ -122,7 +126,7 @@ sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL, VARa
   k <- ncol(Y)
 
   out <- list("k"=k, "Y"=Y, "p"=p, "Phihat"=VARmodel$Phi, "phi0hat"=VARmodel$phi,
-              "series_names"=series_names, "lambdaseq"=VARcv$lambda, "MSFEcv"=VARcv$MSFE_avg,
+              "series_names"=series_names, "lambdas"=VARcv$lambda, "MSFEcv"=VARcv$MSFE_avg,
               "lambda_SEopt"=VARcv$lambda_opt_oneSE,"lambda_opt"=VARcv$lambda_opt)
 }
 
@@ -312,8 +316,8 @@ HVAR_cvaux<-function(Y, Z, t, gamm, eps, p, MN, C, estim="HVARELEM", VAR.alpha){
   if(!(k==1 & p==1)){
     CHECK_ALLZERO <- apply(Phi, 3, function(U){ length(which((abs(U[,-1]))!=0)) < dim(U)[1]})
     ALLZERO <- CHECK_ALLZERO
-    sparsity[ALLZERO] <- NA
-    MSFEs[ALLZERO] <- NA
+    # sparsity[ALLZERO] <- NA
+    # MSFEs[ALLZERO] <- NA
   }
 
 

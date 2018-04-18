@@ -27,6 +27,13 @@
 #' \item{Phihat}{Matrix of estimated endogenous autoregressive coefficients.}
 #' \item{Bhat}{Matrix of estimated exogenous autoregressive coefficients.}
 #' \item{phi0hat}{vector of VARX intercepts.}
+#' \item{lambdaPhi}{sparsity parameter grid corresponding to endogenous autoregressive parameters}
+#' \item{lambdaB}{sparsity parameter grid corresponding to exogenous autoregressive parameters}
+#' \item{lambdaPhi_opt}{Optimal value of the sparsity parameter (corresponding to the endogenous autoregressive parameters) as selected by the time-series cross-validation procedure}
+#' \item{lambdaPhi_SEopt}{Optimal value of the sparsity parameter (corresponding to the endogenous autoregressive parameters) as selected by the time-series cross-validation procedure and after applying the one-standard-error rule}
+#' \item{lambdaB_opt}{Optimal value of the sparsity parameter (corresponding to the exogenous autoregressive parameters) as selected by the time-series cross-validation procedure}
+#' \item{lambdaB_SEopt}{Optimal value of the sparsity parameter (corresponding to the exogenous autoregressive parameters) as selected by the time-series cross-validation procedure and after applying the one-standard-error rule}
+#' \item{MSFEcv}{MSFE cross-validation scores for each value in the two-dimensional sparsity grid}
 #' @seealso \link{lagmatrix} and \link{directforecast}
 #' @examples
 #' data(Y)
@@ -185,7 +192,11 @@ sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, V
   k <- ncol(Y)
   m <- ncol(X)
   out <- list("k"=k, "Y"=Y, "X"=X, "m"=m,"p"=p, "s"=s ,
-              "Phihat"=VARXmodel$Phi, "Bhat"=VARXmodel$B, "phi0hat"=VARXmodel$phi0)
+              "Phihat"=VARXmodel$Phi, "Bhat"=VARXmodel$B, "phi0hat"=VARXmodel$phi0,
+              "lambdaPhi"=VARXcv$l1$lPhiseq, "lambdaB"=VARXcv$l1$lBseq,
+              "lambdaPhi_opt"=VARXcv$lPhi_opt, "lambdaPhi_SEopt"=VARXcv$lPhi_oneSE,
+              "lambdaB_opt"=VARXcv$lB_opt, "lambdaB_SEopt"=VARXcv$lB_oneSE,
+              "MSFEcv"=VARXcv$MSFE_avg)
 
 }
 
@@ -413,17 +424,17 @@ HVARX_cv<-function(Y, X, p, s, h=1, lambdaPhiseq=NULL, gran1Phi=20, gran2Phi=10,
   lBopt <- l1$lBseq[which.min(MSFE_avg)]
 
   if(length(lPhiopt)==0){
-    lPhiopt <- median(l1$lPhiseq)
+    lPhiopt <- l1$lPhiseq[round(median(1:length(l1$lPhiseq)))]
   }else{
     if(is.na(lPhiopt)){
-      lPhiopt <- median(l1$lPhiseq)
+      lPhiopt <- l1$lPhiseq[round(median(1:length(l1$lPhiseq)))]
     }
   }
   if(length(lBopt)==0){
-    lBopt <- median(l1$lBseq)
+    lBopt <- l1$lBseq[round(median(1:length(l1$lBseq)))]
   }else{
     if(is.na(lBopt)){
-      lBopt <- median(l1$lBseq)
+      lBopt <- l1$lBseq[round(median(1:length(l1$lBseq)))]
     }
   }
 
@@ -470,7 +481,8 @@ HVARX_cv<-function(Y, X, p, s, h=1, lambdaPhiseq=NULL, gran1Phi=20, gran2Phi=10,
   }
 
   out<-list("l1"=l1, "MSFEmatrix"=MSFEmatrix, "MSFE_avg"=MSFE_avg, "lPhi_oneSE"=lPhi_oneSE,
-            "lB_oneSE"=lB_oneSE, "flag_oneSE"=c(flagPhi_oneSE,flagB_oneSE))
+            "lB_oneSE"=lB_oneSE, "flag_oneSE"=c(flagPhi_oneSE,flagB_oneSE),
+            "lPhi_opt"=lPhiopt, "lB_opt"=lBopt)
 }
 
 HVARX_cvaux<-function(t, fullY, fullX, fullZ, eps, max.iter, k, kX, p, s, l1, lambdaPhiseq, lambdaBseq,
@@ -529,10 +541,10 @@ HVARX_MSFE<-function(Ytrain, Xtrain, Ztrain, Ytest, Xtest, Ztest, lamPhi, lamB,
 
   MSFErelax <- NA
   sparsity <- length(which(Phi_FIT!=0)) + length(which(B_FIT!=0))
-  if(all(B_FIT==0)|all(Phi_FIT==0)){ # Check all zero solution -> exclude from options
-    MSFE <- NA
-    sparsity <- NA
-  }else{
+  # if(all(B_FIT==0)|all(Phi_FIT==0)){ # Check all zero solution -> exclude from options
+  #   # MSFE <- NA
+  #   # sparsity <- NA
+  # }else{
 
     if(k==1){
       MSFE <- mean(t( t(Ytest)- c(Phi0_FIT, Phi_FIT)%*%rbind(rep(1, ncol(Ztest)), Ztest) - B_FIT%*%Xtest)^2)
@@ -541,7 +553,7 @@ HVARX_MSFE<-function(Ytrain, Xtrain, Ztrain, Ytest, Xtest, Ztest, lamPhi, lamB,
     }
 
     MSFErelax <- NA
-  }
+  # }
 
   out<-list("MSFE"=MSFE, "sparsity"=sparsity, "MSFErelax"=MSFErelax)
 }

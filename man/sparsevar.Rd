@@ -35,6 +35,10 @@ A list with the following components
 \item{p}{Maximum autoregressive lag order of the VAR.}
 \item{Phihat}{Matrix of estimated autoregressive coefficients of the VAR.}
 \item{phi0hat}{vector of VAR intercepts.}
+\item{lambdas}{sparsity parameter grid}
+\item{MSFEcv}{MSFE cross-validation scores for each value of the sparsity parameter in the considered grid}
+\item{lambda_opt}{Optimal value of the sparsity parameter as selected by the time-series cross-validation procedure}
+\item{lambda_SEopt}{Optimal value of the sparsity parameter as selected by the time-series cross-validation procedure and after applying the one-standard-error rule}
 }
 \description{
 Sparse Estimation of the Vector AutoRegressive (VAR) Model
