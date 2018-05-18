@@ -160,9 +160,9 @@ sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, V
     VARXPhigran2 <- VARXPhigran[2]
   }
 
-  if(!is.null(VARXPhigran)){
-    VARXPhigran1 <- max(VARXPhigran)/min(VARXPhigran)
-    VARXPhigran2 <- length(VARXPhigran)
+  if(!is.null(VARXlPhiseq)){
+    VARXPhigran1 <- max(VARXlPhiseq)/min(VARXlPhiseq)
+    VARXPhigran2 <- length(VARXlPhiseq)
   }
 
   if(is.null(VARXBgran)){
@@ -173,9 +173,9 @@ sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, V
     VARXBgran2 <- VARXBgran[2]
   }
 
-  if(!is.null(VARXBgran)){
-    VARXBgran1 <- max(VARXBgran)/min(VARXBgran)
-    VARXBgran2 <- length(VARXBgran)
+  if(!is.null(VARXlBseq)){
+    VARXBgran1 <- max(VARXlBseq)/min(VARXlBseq)
+    VARXBgran2 <- length(VARXlBseq)
   }
 
   # Get optimal sparsity parameter via time series cross-validation
