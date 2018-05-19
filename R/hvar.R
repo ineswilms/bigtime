@@ -17,6 +17,7 @@
 #' \item{p}{Maximum autoregressive lag order of the VAR.}
 #' \item{Phihat}{Matrix of estimated autoregressive coefficients of the VAR.}
 #' \item{phi0hat}{vector of VAR intercepts.}
+#' \item{series_names}{names of time series}
 #' \item{lambdas}{sparsity parameter grid}
 #' \item{MSFEcv}{MSFE cross-validation scores for each value of the sparsity parameter in the considered grid}
 #' \item{MSFEcv_all}{MSFE cross-validation full output}

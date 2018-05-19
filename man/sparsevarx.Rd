@@ -50,6 +50,8 @@ A list with the following components
 \item{Phihat}{Matrix of estimated endogenous autoregressive coefficients.}
 \item{Bhat}{Matrix of estimated exogenous autoregressive coefficients.}
 \item{phi0hat}{vector of VARX intercepts.}
+\item{exogenous_series_names}{names of the exogenous time series}
+\item{endogenous_series_names}{names of the endogenous time series}
 \item{lambdaPhi}{sparsity parameter grid corresponding to endogenous autoregressive parameters}
 \item{lambdaB}{sparsity parameter grid corresponding to exogenous autoregressive parameters}
 \item{lambdaPhi_opt}{Optimal value of the sparsity parameter (corresponding to the endogenous autoregressive parameters) as selected by the time-series cross-validation procedure}
