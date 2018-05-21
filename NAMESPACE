@@ -2,6 +2,7 @@
 
 export(directforecast)
 export(lagmatrix)
+export(plot_cv)
 export(sparseVAR)
 export(sparseVARMA)
 export(sparseVARX)

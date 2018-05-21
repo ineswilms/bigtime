@@ -66,6 +66,7 @@ A list with the following components
 \item{Phihat}{Matrix of estimated autoregressive coefficients of the VARMA.}
 \item{Thetahat}{Matrix of estimated moving average coefficients of the VARMA.}
 \item{phi0hat}{Vector of VARMA intercepts.}
+\item{series_names}{names of time series}
 \item{PhaseI_lambas}{Phase I sparsity parameter grid}
 \item{PhaseI_MSFEcv}{MSFE cross-validation scores for each value of the sparsity parameter in the considered grid}
 \item{PhaseI_lambda_opt}{Phase I Optimal value of the sparsity parameter as selected by the time-series cross-validation procedure}

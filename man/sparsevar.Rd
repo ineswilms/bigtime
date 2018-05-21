@@ -35,10 +35,13 @@ A list with the following components
 \item{p}{Maximum autoregressive lag order of the VAR.}
 \item{Phihat}{Matrix of estimated autoregressive coefficients of the VAR.}
 \item{phi0hat}{vector of VAR intercepts.}
+\item{series_names}{names of time series}
 \item{lambdas}{sparsity parameter grid}
 \item{MSFEcv}{MSFE cross-validation scores for each value of the sparsity parameter in the considered grid}
+\item{MSFEcv_all}{MSFE cross-validation full output}
 \item{lambda_opt}{Optimal value of the sparsity parameter as selected by the time-series cross-validation procedure}
-\item{lambda_SEopt}{Optimal value of the sparsity parameter as selected by the time-series cross-validation procedure and after applying the one-standard-error rule}
+\item{lambda_SEopt}{Optimal value of the sparsity parameter as selected by the time-series cross-validation
+      procedure and after applying the one-standard-error rule.  This is the value used.}
 \item{h}{Forecast horizon h}
 }
 \description{
@@ -47,8 +50,7 @@ Sparse Estimation of the Vector AutoRegressive (VAR) Model
 \examples{
 data(Y)
 VARfit <- sparseVAR(Y) # sparse VAR
-y <- matrix(Y[,1], ncol=1)
-ARfit <- sparseVAR(y) # sparse AR
+ARfit <- sparseVAR(Y[,2]) # sparse AR
 }
 \references{
 Nicholson William B., Bien Jacob and Matteson David S. (2017), "High Dimensional Forecasting via Interpretable Vector Autoregression"

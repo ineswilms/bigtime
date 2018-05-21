@@ -137,17 +137,33 @@ lagmatrix <- function(fit, model, returnplot=F){
       }
 
       if(model=="VARX"){
-        colnames(Lhat1) <- paste0("Endog.", 1:ncol(Lhat1))
-        colnames(Lhat2) <- paste0("Exog.", 1:ncol(Lhat2))
+        if (is.null(fit$endogenous_series_names))
+          endog_names <- paste0("Endog.", 1:ncol(Lhat1))
+        else
+          endog_names <- fit$endogenous_series_names
+        colnames(Lhat1) <- endog_names
+        rownames(Lhat1) <- endog_names
+        rownames(Lhat2) <- endog_names
+        if (is.null(fit$exogenous_series_names))
+          colnames(Lhat2) <- paste0("Exog.", 1:ncol(Lhat2))
+        else
+          colnames(Lhat2) <- fit$exogenous_series_names
       }
 
       if(model=="VARMA"){
-        colnames(Lhat1) <- paste0("AR.", 1:ncol(Lhat1))
-        colnames(Lhat2) <- paste0("MA.", 1:ncol(Lhat2))
+        if (is.null(fit$series_names)) {
+          colnames(Lhat1) <- paste0("AR.", 1:ncol(Lhat1))
+          colnames(Lhat2) <- paste0("MA.", 1:ncol(Lhat2))
+          rownames(Lhat1) <- paste0("Resp.", 1:nrow(Lhat1))
+          rownames(Lhat2) <- paste0("Resp.", 1:nrow(Lhat2))
+        }
+        else {
+          colnames(Lhat1) <- fit$series_names
+          colnames(Lhat2) <- fit$series_names
+          rownames(Lhat1) <- fit$series_names
+          rownames(Lhat2) <- fit$series_names
+        }
       }
-
-      rownames(Lhat1) <- paste0("Resp.", 1:nrow(Lhat1))
-      rownames(Lhat2) <- paste0("Resp.", 1:nrow(Lhat2))
 
       plotlaghat(datamatrix=Lhat1, cl.lim=c(0, p),
                  title="Lhat", mar=c(0.5, 0.1, 2, 0.1))
