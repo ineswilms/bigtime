@@ -29,6 +29,7 @@
 #' \item{phi0hat}{vector of VARX intercepts.}
 #' \item{exogenous_series_names}{names of the exogenous time series}
 #' \item{endogenous_series_names}{names of the endogenous time series}
+#' \item{resids}{residuals}
 #' \item{lambdaPhi}{sparsity parameter grid corresponding to endogenous autoregressive parameters}
 #' \item{lambdaB}{sparsity parameter grid corresponding to exogenous autoregressive parameters}
 #' \item{lambdaPhi_opt}{Optimal value of the sparsity parameter (corresponding to the endogenous autoregressive parameters) as selected by the time-series cross-validation procedure}
@@ -207,6 +208,7 @@ sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, V
   m <- ncol(X)
   out <- list("k"=k, "Y"=Y, "X"=X, "m"=m,"p"=p, "s"=s ,
               "Phihat"=VARXmodel$Phi, "Bhat"=VARXmodel$B, "phi0hat"=VARXmodel$phi0,
+              "resids" = VARXmodel$resids,
               "exogenous_series_names"=exogenous_series_names,
               "endogenous_series_names"=endogenous_series_names,
               "lambdaPhi"=VARXcv$l1$lPhiseq, "lambdaB"=VARXcv$l1$lBseq,

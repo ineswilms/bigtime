@@ -17,6 +17,7 @@
 #' \item{p}{Maximum autoregressive lag order of the VAR.}
 #' \item{Phihat}{Matrix of estimated autoregressive coefficients of the VAR.}
 #' \item{phi0hat}{vector of VAR intercepts.}
+#' \item{resids}{residuals}
 #' \item{series_names}{names of time series}
 #' \item{lambdas}{sparsity parameter grid}
 #' \item{MSFEcv}{MSFE cross-validation scores for each value of the sparsity parameter in the considered grid}
@@ -129,6 +130,7 @@ sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL, VARa
   k <- ncol(Y)
 
   out <- list("k"=k, "Y"=Y, "p"=p, "Phihat"=VARmodel$Phi, "phi0hat"=VARmodel$phi,
+              "resids" = VARmodel$resids,
               "series_names"=series_names, "lambdas"=VARcv$lambda,
               "MSFEcv"=VARcv$MSFE_avg, "MSFE_all"=VARcv$MSFE_all,
               "lambda_SEopt"=VARcv$lambda_opt_oneSE,"lambda_opt"=VARcv$lambda_opt, "h"=h)
