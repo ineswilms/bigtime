@@ -278,8 +278,8 @@ sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL, VARg
   }
 
   if(!is.null(VARMAlPhiseq)){
-    VARMAPhigran1 <- max(VARMAPhigran)/min(VARMAPhigran)
-    VARMAPhigran2 <- length(VARMAPhigran)
+    VARMAPhigran1 <- max(VARMAlPhiseq)/min(VARMAlPhiseq)
+    VARMAPhigran2 <- length(VARMAlPhiseq)
   }
 
   if(is.null(VARMAThetagran)){
@@ -291,8 +291,8 @@ sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL, VARg
   }
 
   if(!is.null(VARMAlThetaseq)){
-    VARMAThetagran1 <- max(VARMAThetagran)/min(VARMAThetagran)
-    VARMAThetagran2 <- length(VARMAThetagran)
+    VARMAThetagran1 <- max(VARMAlThetaseq)/min(VARMAlThetaseq)
+    VARMAThetagran2 <- length(VARMAlThetaseq)
   }
 
 
