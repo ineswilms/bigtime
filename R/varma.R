@@ -37,6 +37,7 @@
 #' \item{Phihat}{Matrix of estimated autoregressive coefficients of the VARMA.}
 #' \item{Thetahat}{Matrix of estimated moving average coefficients of the VARMA.}
 #' \item{phi0hat}{Vector of VARMA intercepts.}
+#' \item{series_names}{names of time series}
 #' \item{PhaseI_lambas}{Phase I sparsity parameter grid}
 #' \item{PhaseI_MSFEcv}{MSFE cross-validation scores for each value of the sparsity parameter in the considered grid}
 #' \item{PhaseI_lambda_opt}{Phase I Optimal value of the sparsity parameter as selected by the time-series cross-validation procedure}
@@ -91,6 +92,12 @@ sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL, VARg
     if(nrow(U)!=nrow(Y)){
       stop("U and Y need to have the same number of rows (observations). Otherwise leave U NULL.")
     }
+  }
+
+  if(!is.null(colnames(Y))){ # time series names
+    series_names <- colnames(Y)
+  } else {
+    series_names <- NULL
   }
 
   if(h<=0){
@@ -317,6 +324,7 @@ sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL, VARg
   out<-list("k"=k, "Y"=Y, "VARp"=VARp, "VARPhihat"=VARPhi, "VARphi0hat"=VARphi0, "U"=U,
             "VARMAp"=VARMAp, "VARMAq"=VARMAq,
             "Phihat"=Phi, "Thetahat"=Theta, "phi0hat"=phi0,
+            "series_names"=series_names,
             "PhaseI_lambdas"=HVARcvFIT$lambda, "PhaseI_MSFEcv"=HVARcvFIT$MSFE_avg,
             "PhaseI_lambda_SEopt"=HVARcvFIT$lambda_opt_oneSE,"PhaseI_lambda_opt"=HVARcvFIT$lambda_opt,
             "PhaseII_lambdaPhi"=HVARXcvFIT$l1$lPhiseq, "PhaseII_lambdaTheta"=HVARXcvFIT$l1$lBseq,

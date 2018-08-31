@@ -17,10 +17,13 @@
 #' \item{p}{Maximum autoregressive lag order of the VAR.}
 #' \item{Phihat}{Matrix of estimated autoregressive coefficients of the VAR.}
 #' \item{phi0hat}{vector of VAR intercepts.}
+#' \item{series_names}{names of time series}
 #' \item{lambdas}{sparsity parameter grid}
 #' \item{MSFEcv}{MSFE cross-validation scores for each value of the sparsity parameter in the considered grid}
+#' \item{MSFEcv_all}{MSFE cross-validation full output}
 #' \item{lambda_opt}{Optimal value of the sparsity parameter as selected by the time-series cross-validation procedure}
-#' \item{lambda_SEopt}{Optimal value of the sparsity parameter as selected by the time-series cross-validation procedure and after applying the one-standard-error rule}
+#' \item{lambda_SEopt}{Optimal value of the sparsity parameter as selected by the time-series cross-validation
+#'       procedure and after applying the one-standard-error rule.  This is the value used.}
 #' \item{h}{Forecast horizon h}
 #' @references Nicholson William B., Bien Jacob and Matteson David S. (2017), "High Dimensional Forecasting via Interpretable Vector Autoregression"
 #' arXiv preprint <arXiv:1412.5250v2>.
@@ -28,8 +31,7 @@
 #' @examples
 #' data(Y)
 #' VARfit <- sparseVAR(Y) # sparse VAR
-#' y <- matrix(Y[,1], ncol=1)
-#' ARfit <- sparseVAR(y) # sparse AR
+#' ARfit <- sparseVAR(Y[,2]) # sparse AR
 sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL, VARalpha=0,
                       cvcut=0.9, h=1,  eps=1e-3){
 
@@ -127,7 +129,8 @@ sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL, VARa
   k <- ncol(Y)
 
   out <- list("k"=k, "Y"=Y, "p"=p, "Phihat"=VARmodel$Phi, "phi0hat"=VARmodel$phi,
-              "series_names"=series_names, "lambdas"=VARcv$lambda, "MSFEcv"=VARcv$MSFE_avg,
+              "series_names"=series_names, "lambdas"=VARcv$lambda,
+              "MSFEcv"=VARcv$MSFE_avg, "MSFE_all"=VARcv$MSFE_all,
               "lambda_SEopt"=VARcv$lambda_opt_oneSE,"lambda_opt"=VARcv$lambda_opt, "h"=h)
 }
 

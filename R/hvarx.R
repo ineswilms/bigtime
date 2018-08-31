@@ -27,6 +27,8 @@
 #' \item{Phihat}{Matrix of estimated endogenous autoregressive coefficients.}
 #' \item{Bhat}{Matrix of estimated exogenous autoregressive coefficients.}
 #' \item{phi0hat}{vector of VARX intercepts.}
+#' \item{exogenous_series_names}{names of the exogenous time series}
+#' \item{endogenous_series_names}{names of the endogenous time series}
 #' \item{lambdaPhi}{sparsity parameter grid corresponding to endogenous autoregressive parameters}
 #' \item{lambdaB}{sparsity parameter grid corresponding to exogenous autoregressive parameters}
 #' \item{lambdaPhi_opt}{Optimal value of the sparsity parameter (corresponding to the endogenous autoregressive parameters) as selected by the time-series cross-validation procedure}
@@ -75,6 +77,17 @@ sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, V
       stop("Y and X need to have the same number of rows (observations).")
   }
 
+  if(!is.null(colnames(Y))){ # time series names
+    endogenous_series_names <- colnames(Y)
+  } else {
+    endogenous_series_names <- NULL
+  }
+
+  if(!is.null(colnames(X))){ # time series names
+    exogenous_series_names <- colnames(X)
+  } else {
+    exogenous_series_names <- NULL
+  }
 
   if(!is.null(p)){
     if(p<=0){
@@ -194,6 +207,8 @@ sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, V
   m <- ncol(X)
   out <- list("k"=k, "Y"=Y, "X"=X, "m"=m,"p"=p, "s"=s ,
               "Phihat"=VARXmodel$Phi, "Bhat"=VARXmodel$B, "phi0hat"=VARXmodel$phi0,
+              "exogenous_series_names"=exogenous_series_names,
+              "endogenous_series_names"=endogenous_series_names,
               "lambdaPhi"=VARXcv$l1$lPhiseq, "lambdaB"=VARXcv$l1$lBseq,
               "lambdaPhi_opt"=VARXcv$lPhi_opt, "lambdaPhi_SEopt"=VARXcv$lPhi_oneSE,
               "lambdaB_opt"=VARXcv$lB_opt, "lambdaB_SEopt"=VARXcv$lB_oneSE,
