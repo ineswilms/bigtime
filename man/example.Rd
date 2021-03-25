@@ -4,7 +4,9 @@
 \name{example}
 \alias{example}
 \title{Multivariate Time Series Example}
-\format{A matrix with 100 rows and 15 columns}
+\format{
+A matrix with 100 rows and 15 columns
+}
 \usage{
 example
 }

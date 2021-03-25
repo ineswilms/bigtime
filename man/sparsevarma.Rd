@@ -4,11 +4,26 @@
 \alias{sparseVARMA}
 \title{Sparse Estimation of the Vector AutoRegressive Moving Average (VARMA) Model}
 \usage{
-sparseVARMA(Y, U = NULL, VARp = NULL, VARpen = "HLag", VARlseq = NULL,
-  VARgran = NULL, VARalpha = 0, VARMAp = NULL, VARMAq = NULL,
-  VARMApen = "HLag", VARMAlPhiseq = NULL, VARMAPhigran = NULL,
-  VARMAlThetaseq = NULL, VARMAThetagran = NULL, VARMAalpha = 0, h = 1,
-  cvcut = 0.9, eps = 10^-3)
+sparseVARMA(
+  Y,
+  U = NULL,
+  VARp = NULL,
+  VARpen = "HLag",
+  VARlseq = NULL,
+  VARgran = NULL,
+  VARalpha = 0,
+  VARMAp = NULL,
+  VARMAq = NULL,
+  VARMApen = "HLag",
+  VARMAlPhiseq = NULL,
+  VARMAPhigran = NULL,
+  VARMAlThetaseq = NULL,
+  VARMAThetagran = NULL,
+  VARMAalpha = 0,
+  h = 1,
+  cvcut = 0.9,
+  eps = 10^-3
+)
 }
 \arguments{
 \item{Y}{A \eqn{T} by \eqn{k} matrix of time series. If k=1, a univariate autoregressive moving average model is estimated.}

@@ -4,8 +4,17 @@
 \alias{sparseVAR}
 \title{Sparse Estimation of the Vector AutoRegressive (VAR) Model}
 \usage{
-sparseVAR(Y, p = NULL, VARpen = "HLag", VARlseq = NULL, VARgran = NULL,
-  VARalpha = 0, cvcut = 0.9, h = 1, eps = 0.001)
+sparseVAR(
+  Y,
+  p = NULL,
+  VARpen = "HLag",
+  VARlseq = NULL,
+  VARgran = NULL,
+  VARalpha = 0,
+  cvcut = 0.9,
+  h = 1,
+  eps = 0.001
+)
 }
 \arguments{
 \item{Y}{A \eqn{T} by \eqn{k} matrix of time series. If k=1, a univariate autoregressive model is estimated.}

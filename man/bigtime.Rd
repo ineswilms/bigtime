@@ -3,7 +3,6 @@
 \docType{package}
 \name{bigtime}
 \alias{bigtime}
-\alias{bigtime-package}
 \title{bigtime: A package for obtaining sparse estimates of large time series models.}
 \description{
 The bigtime package provides sparse estimators for three large time series models:

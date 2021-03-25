@@ -34,9 +34,9 @@ error_bars <- function (x, upper, lower, width = 0.02, ...) {
 
 image_cv <- function(fit) {
   o <- order(unique(fit$lambdaB))
-  image(x = unique(fit$lambdaB)[o],
+  graphics::image(x = unique(fit$lambdaB)[o],
         y = unique(fit$lambdaPhi),
-        z = matrix(fit$MSFEcv, nr = length(o))[o, ],
+        z = matrix(fit$MSFEcv, nrow = length(o))[o, ],
         xlab = "lambda_B", ylab="lambda_Phi", col = heat.colors(40))
   points(fit$lambdaB_SEopt, fit$lambdaPhi_SEopt, pch = 19)
 }

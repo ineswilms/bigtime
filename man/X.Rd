@@ -4,7 +4,9 @@
 \name{X}
 \alias{X}
 \title{Multivariate Time Series Example}
-\format{A matrix with 50 rows and 3 columns}
+\format{
+A matrix with 50 rows and 3 columns
+}
 \usage{
 X
 }

@@ -4,9 +4,21 @@
 \alias{sparseVARX}
 \title{Sparse Estimation of the Vector AutoRegressive  with Exogenous Variables X (VARX) Model}
 \usage{
-sparseVARX(Y, X, p = NULL, s = NULL, VARXpen = "HLag",
-  VARXlPhiseq = NULL, VARXPhigran = NULL, VARXlBseq = NULL,
-  VARXBgran = NULL, VARXalpha = 0, h = 1, cvcut = 0.9, eps = 10^-3)
+sparseVARX(
+  Y,
+  X,
+  p = NULL,
+  s = NULL,
+  VARXpen = "HLag",
+  VARXlPhiseq = NULL,
+  VARXPhigran = NULL,
+  VARXlBseq = NULL,
+  VARXBgran = NULL,
+  VARXalpha = 0,
+  h = 1,
+  cvcut = 0.9,
+  eps = 10^-3
+)
 }
 \arguments{
 \item{Y}{A \eqn{T} by \eqn{k} matrix of time series. If k=1, a univariate autoregressive model is estimated.}
