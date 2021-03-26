@@ -10,7 +10,6 @@ sparseVAR(
   VARpen = "HLag",
   VARlseq = NULL,
   VARgran = NULL,
-  VARalpha = 0,
   cvcut = 0.9,
   h = 1,
   eps = 0.001
@@ -28,8 +27,6 @@ its own grid. Supplying a grid of values overrides this. WARNING: use with care.
 
 \item{VARgran}{User-specified vector of granularity specifications for the penalty parameter grid:  First element specifies
 how deep the grid should be constructed. Second element specifies how many values the grid should contain.}
-
-\item{VARalpha}{a small positive regularization parameter value corresponding to squared Frobenius penalty. The default is zero.}
 
 \item{cvcut}{Proportion of observations used for model estimation in the time series cross-validation procedure. The remainder is used for forecast evaluation.}
 
@@ -62,8 +59,7 @@ VARfit <- sparseVAR(Y) # sparse VAR
 ARfit <- sparseVAR(Y[,2]) # sparse AR
 }
 \references{
-Nicholson William B., Bien Jacob and Matteson David S. (2017), "High Dimensional Forecasting via Interpretable Vector Autoregression"
-arXiv preprint <arXiv:1412.5250v2>.
+Nicholson William B., Bien Jacob and Matteson David S. (2017), "High-dimensional forecasting via interpretable vector autoregression," Journal of Machine Learning Research, 21(166), 1-52.
 }
 \seealso{
 \link{lagmatrix} and \link{directforecast}

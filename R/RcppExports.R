@@ -29,3 +29,31 @@ gamloopFista <- function(beta_, Y, Z, gammgrid, eps, YMean2, ZMean2, B1, k, p, t
     .Call(`_bigtime_gamloopFista`, beta_, Y, Z, gammgrid, eps, YMean2, ZMean2, B1, k, p, tk, k1, s)
 }
 
+gamloopElem2 <- function(bcube, Y, Z, gammgrid, eps, YMean2, ZMean2, B1, k, p, tk) {
+    .Call(`_bigtime_gamloopElem2`, bcube, Y, Z, gammgrid, eps, YMean2, ZMean2, B1, k, p, tk)
+}
+
+gamloopFista2 <- function(bcube, Y, Z, gammgrid, eps, YMean2, ZMean2, B1, k, p, tk) {
+    .Call(`_bigtime_gamloopFista2`, bcube, Y, Z, gammgrid, eps, YMean2, ZMean2, B1, k, p, tk)
+}
+
+lassoVARFistcpp <- function(beta, trainY, trainZ, lambda, tol, p) {
+    .Call(`_bigtime_lassoVARFistcpp`, beta, trainY, trainZ, lambda, tol, p)
+}
+
+HVARElemAlgcpp <- function(beta, trainY, trainZ, lambda, tol, p) {
+    .Call(`_bigtime_HVARElemAlgcpp`, beta, trainY, trainZ, lambda, tol, p)
+}
+
+HVAR_cvaux_loop_cpp <- function(Y, Z, tseq, gamm, eps, p, estim) {
+    .Call(`_bigtime_HVAR_cvaux_loop_cpp`, Y, Z, tseq, gamm, eps, p, estim)
+}
+
+HVARX_NEW_export_cpp <- function(fullY, fullZ, fullX, k, kX, p, s, lambdaPhi, lambdaB, eps, max_iter, alpha, type, Binit, Phiinit) {
+    .Call(`_bigtime_HVARX_NEW_export_cpp`, fullY, fullZ, fullX, k, kX, p, s, lambdaPhi, lambdaB, eps, max_iter, alpha, type, Binit, Phiinit)
+}
+
+HVARX_cvaux_cpp_loop <- function(Y, Z, X, lambdaPhiseq, lambdaBseq, eps, max_iter, k, kX, p, s, alpha, estim, tseq) {
+    .Call(`_bigtime_HVARX_cvaux_cpp_loop`, Y, Z, X, lambdaPhiseq, lambdaBseq, eps, max_iter, k, kX, p, s, alpha, estim, tseq)
+}
+

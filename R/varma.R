@@ -19,7 +19,6 @@
 #' how deep the grid should be constructed. Second element specifies how many values the grid should contain.
 #' @param VARMApen "HLag" (hierarchical sparse penalty) or "L1" (standard lasso penalty) penalization in the VARMA.
 #' @param VARMAalpha a small positive regularization parameter value corresponding to squared Frobenius penalty in  VARMA. The default is zero.
-#' @param VARalpha a small positive regularization parameter value corresponding to squared Frobenius penalty in PhaseI VAR. The default is zero.
 #' @param eps a small positive numeric value giving the tolerance for convergence in the proximal gradient algorithms.
 #' @param h Desired forecast horizon in time-series cross-validation procedure.
 #' @param cvcut Proportion of observations used for model estimation in the time series cross-validation procedure. The remainder is used for forecast evaluation.
@@ -58,10 +57,10 @@
 #' VARMAfit <- sparseVARMA(Y) # sparse VARMA
 #' y <- matrix(Y[,1], ncol=1)
 #' ARMAfit <- sparseVARMA(y) # sparse ARMA
-sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL, VARalpha=0,
-                     VARMAp=NULL, VARMAq=NULL, VARMApen="HLag",VARMAlPhiseq=NULL, VARMAPhigran=NULL,
-                     VARMAlThetaseq=NULL, VARMAThetagran=NULL, VARMAalpha=0,
-                     h=1, cvcut=0.9, eps=10^-3){
+sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL,
+                        VARMAp=NULL, VARMAq=NULL, VARMApen="HLag",VARMAlPhiseq=NULL, VARMAPhigran=NULL,
+                        VARMAlThetaseq=NULL, VARMAThetagran=NULL, VARMAalpha=0,
+                        h=1, cvcut=0.9, eps=10^-3){
 
   # Check Inputs
   if(!is.matrix(Y)){
@@ -108,7 +107,7 @@ sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL, VARg
     if(VARp<=0){
       stop("The maximum autoregressive order of the PhaseI VAR needs to be a strictly positive integer")
     }
- }
+  }
 
   if((!is.vector(VARlseq) & !is.null(VARlseq)) | length(VARlseq)==1){
     stop("The regularization parameter VARlseq needs to be a vector of length>1 or NULL otherwise")
@@ -127,13 +126,13 @@ sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL, VARg
     if(VARMAp<=0){
       stop("The maximum autoregressive order of the VARMA needs to be a strictly positive integer")
     }
- }
+  }
 
   if(!is.null(VARMAq)){
     if(VARMAq<=0){
       stop("The maximum moving average order of the VARMA needs to be a strictly positive integer")
     }
- }
+  }
 
   if( (!is.vector(VARMAlPhiseq) & !is.null(VARMAlPhiseq)) | length(VARMAlPhiseq)==1){
     stop("The regularization parameter grid VARMAlPhiseq needs to be a vector of length > 1 or NULL otherwise")
@@ -156,9 +155,9 @@ sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL, VARg
     stop("The regularization paramter VARMAalpha needs to be a equal to zero or a small positive number")
   }
 
-  if(VARalpha<0){
-    stop("The regularization paramter VARalpha needs to be a equal to zero or a small positive number")
-  }
+  # if(VARalpha<0){
+  #   stop("The regularization paramter VARalpha needs to be a equal to zero or a small positive number")
+  # }
 
   if(!is.element(VARpen, c("HLag", "L1"))){
     stop("The type of penalization VARpen needs to be either HLag (hierarchical sparse penalization) or L1 (standard lasso penalization)")
@@ -235,14 +234,17 @@ sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL, VARg
   if(is.null(U)){
     ### HVAR ESTIMATION
 
-    HVARcvFIT <- HVAR_cv(Y=Y, p=VARp, lambdaPhiseq=VARlseq, gran1=VARgran1, gran2=VARgran2, T1.cutoff=cvcut, h=h, eps=eps,
-                         VAR.alpha=VARalpha, type=VARpen)
+    HVARcvFIT <- HVAR_cv(Y = Y, p = VARp, h = h, lambdaPhiseq=VARlseq, gran1 = VARgran1, gran2=VARgran2, T1.cutoff=cvcut, eps=eps, type=VARpen)
+
 
     lambdaFLAG <- HVARcvFIT$flag
     HVARmodelFIT <- HVARmodel(Y=Y, p=VARp, h=h)
+    if(HVARmodelFIT$k==1){
+      HVARmodelFIT$fullY <- as.matrix(HVARmodelFIT$fullY)
+    }
 
-    HVARFIT <- HVAR(fullY=HVARmodelFIT$fullY, fullZ=HVARmodelFIT$fullZ, p=HVARmodelFIT$p, k=HVARmodelFIT$k,
-                    lambdaPhi=HVARcvFIT$lambda_opt_oneSE, eps=eps, VAR.alpha=VARalpha, type=VARpen)
+    HVARFIT <- HVAR(fullY=HVARmodelFIT$fullY, fullZ=HVARmodelFIT$fullZ, p=HVARmodelFIT$p, k=HVARmodelFIT$k, lambdaPhi=HVARcvFIT$lambda_opt_oneSE, eps=eps, type=VARpen)
+
 
     VARPhi <- HVARFIT$Phi
     VARphi0 <- HVARFIT$phi0
@@ -260,7 +262,6 @@ sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL, VARg
   }else{
     HVARFIT <- NULL
   }
-
 
   #### START PHASE II ####
   ### Determine maximum AR and MA order of VARMA as a function of time series length T
@@ -305,14 +306,21 @@ sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL, VARg
 
 
   ### Fit VARMA
-  HVARXcvFIT <- HVARX_cv(Y=Y, X=U, p=VARMAp, s=VARMAq, lambdaPhiseq=VARMAlPhiseq, gran1Phi=VARMAPhigran1,
-                         gran2Phi=VARMAPhigran2, lambdaBseq=VARMAlThetaseq, gran1B=VARMAThetagran1,
-                         gran2B=VARMAThetagran2, T1.cutoff=cvcut,eps=eps, max.iter=100,h=h, alpha=VARMAalpha, type=VARMApen)
+  HVARXcvFIT <- HVARX_cv(Y=Y, X=U, p=VARMAp, s=VARMAq, h=h, lambdaPhiseq=VARMAlPhiseq, gran1Phi=VARMAPhigran1, gran2Phi=VARMAPhigran2,
+                             lambdaBseq=VARMAlThetaseq, gran1B=VARMAThetagran1, gran2B=VARMAThetagran2, eps=eps, max.iter=100,
+                             T1.cutoff=cvcut, alpha=VARMAalpha, type=VARMApen)
+
   HVARXmodelFIT <- HVARXmodel(Y=Y, X=U, p=VARMAp, s=VARMAq,h=h)
-  HVARXFIT <- HVARX(fullY=HVARXmodelFIT$fullY, fullZ=HVARXmodelFIT$fullZ, fullX=HVARXmodelFIT$fullX,
-                    k=HVARXmodelFIT$k, kX=HVARXmodelFIT$kX, p=HVARXmodelFIT$p, s=HVARXmodelFIT$s,
-                    lambdaPhi=HVARXcvFIT$lPhi_oneSE, lambdaB=HVARXcvFIT$lB_oneSE,
-                    eps=eps, max.iter=100, alpha=VARMAalpha, type=VARMApen)
+
+  estim <- (VARMApen=="HLag")*2 + (VARMApen=="L1")*1
+  if(HVARXmodelFIT$k==1){
+    HVARXmodelFIT$fullY <- as.matrix(HVARXmodelFIT$fullY)
+  }
+  HVARXFIT <- HVARX_NEW_export_cpp(fullY=HVARXmodelFIT$fullY, fullZ=HVARXmodelFIT$fullZ, fullX=HVARXmodelFIT$fullX,
+                                   k=HVARXmodelFIT$k, kX=HVARXmodelFIT$kX, p=HVARXmodelFIT$p, s=HVARXmodelFIT$s,
+                                   lambdaPhi=HVARXcvFIT$lPhi_oneSE, lambdaB=HVARXcvFIT$lB_oneSE,
+                                   eps=eps, max_iter=100, alpha=VARMAalpha, type=estim, Binit = matrix(0, HVARXmodelFIT$k, HVARXmodelFIT$kX*HVARXmodelFIT$s), Phiinit =  matrix(0, HVARXmodelFIT$k, HVARXmodelFIT$k*HVARXmodelFIT$p))
+
   Phi <- HVARXFIT$Phi
   phi0 <- HVARXFIT$phi0
   Theta <- HVARXFIT$B
@@ -323,7 +331,7 @@ sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL, VARg
   # Output
   out<-list("k"=k, "Y"=Y, "VARp"=VARp, "VARPhihat"=VARPhi, "VARphi0hat"=VARphi0, "U"=U,
             "VARMAp"=VARMAp, "VARMAq"=VARMAq,
-            "Phihat"=Phi, "Thetahat"=Theta, "phi0hat"=phi0,
+            "Phihat"=Phi, "Thetahat"=Theta, "phi0hat"=t(phi0),
             "series_names"=series_names,
             "PhaseI_lambdas"=HVARcvFIT$lambda, "PhaseI_MSFEcv"=HVARcvFIT$MSFE_avg,
             "PhaseI_lambda_SEopt"=HVARcvFIT$lambda_opt_oneSE,"PhaseI_lambda_opt"=HVARcvFIT$lambda_opt,

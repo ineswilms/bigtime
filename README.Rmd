@@ -11,7 +11,13 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-"
 )
 ```
-# bigtime
+# bigtime: Sparse Estimation of Large Time Series Models
+<!-- badges: start -->
+[![CRAN_Version_Badge](http://www.r-pkg.org/badges/version/bigtime)](https://cran.r-project.org/package=bigtime)
+[![CRAN_Downloads_Badge](https://cranlogs.r-pkg.org/badges/grand-total/bigtime)](https://cran.r-project.org/package=bigtime)
+[![License_GPLv2_Badge](https://img.shields.io/badge/License-GPLv2-yellow.svg)](https://www.gnu.org/licenses/old-licenses/gpl-2.0.html)
+[![License_GPLv3_Badge](https://img.shields.io/badge/License-GPLv3-yellow.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
+<!-- badges: end -->
 
 The goal of `bigtime` is to sparsely estimate large time series models such as the Vector AutoRegressive (VAR) Model, the Vector AutoRegressive with Exogenous Variables (VARX) Model, and the Vector AutoRegressive Moving Average (VARMA) Model. The univariate cases are also supported.
 
@@ -154,7 +160,7 @@ lagmatrix(fit=ARMAfit, model="VARMA")
 
 ## References:
 
-* Nicholson William B., Bien Jacob and Matteson David S. (2017), "High Dimensional Forecasting via Interpretable Vector Autoregression", arXiv:1412.5250v2.
+* Nicholson William B., Bien Jacob and Matteson David S. (2020), "High-dimensional forecasting via interpretable vector autoregression", Journal of Machine Learning Research, 21(166), 1-52.
 
 * Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2017), "Sparse Identification and Estimation of High-Dimensional Vector AutoRegressive Moving Averages", arXiv:1707.09208.
 

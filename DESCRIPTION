@@ -1,18 +1,19 @@
 Package: bigtime
 Type: Package
 Title: Sparse Estimation of Large Time Series Models
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: c(
-    person("Ines", "Wilms", email = "ines.wilms@kuleuven.be", role = c("cre","aut")),
+    person("Ines", "Wilms", email = "i.wilms@maastrichtuniversity.nl", role = c("cre","aut")),
     person("David S.", "Matteson", email = "matteson@cornell.edu", role = "aut"),
     person("Jacob", "Bien", email = "jbien@usc.edu", role = "aut"),
-    person("Sumanta", "Basu", email = "sumbose@cornell.edu", role = "aut"))
+    person("Sumanta", "Basu", email = "sumbose@cornell.edu", role = "aut"),
+    person("Will", "Nicholson", email = "wbn8@cornell.edu", role = "aut"))
 Author: Ines Wilms [cre, aut],
   David S. Matteson [aut],
   Jacob Bien [aut],
   Sumanta Basu [aut]
-Maintainer: Ines Wilms <ines.wilms@kuleuven.be>
-Description: Estimation of large Vector AutoRegressive (VAR), Vector AutoRegressive with Exogenous Variables X (VARX) and Vector AutoRegressive Moving Average (VARMA) Models with Structured Lasso Penalties, see Nicholson, Bien and Matteson (2017) <arXiv:1412.5250v2> and Wilms, Basu, Bien and Matteson (2017) <arXiv:1707.09208>.
+Maintainer: Ines Wilms <i.wilms@maastrichtuniversity.nl>
+Description: Estimation of large Vector AutoRegressive (VAR), Vector AutoRegressive with Exogenous Variables X (VARX) and Vector AutoRegressive Moving Average (VARMA) Models with Structured Lasso Penalties, see Nicholson, Wilms, Bien and Matteson (2020) <arXiv:1412.5250v4> and Wilms, Basu, Bien and Matteson (2017) <arXiv:1707.09208>.
 Depends: R (>= 3.1.0), methods
 License: GPL (>= 2)
 Encoding: UTF-8

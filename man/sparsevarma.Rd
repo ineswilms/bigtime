@@ -11,7 +11,6 @@ sparseVARMA(
   VARpen = "HLag",
   VARlseq = NULL,
   VARgran = NULL,
-  VARalpha = 0,
   VARMAp = NULL,
   VARMAq = NULL,
   VARMApen = "HLag",
@@ -39,8 +38,6 @@ its own grid. Supplying a grid of values overrides this. WARNING: use with care.
 
 \item{VARgran}{User-specified vector of granularity specifications for the penalty parameter grid of the PhaseI VAR:  First element specifies
 how deep the grid should be constructed. Second element specifies how many values the grid should contain.}
-
-\item{VARalpha}{a small positive regularization parameter value corresponding to squared Frobenius penalty in PhaseI VAR. The default is zero.}
 
 \item{VARMAp}{User-specified maximum autoregressive lag order of the VARMA. Typical usage is to have the program compute its own maximum lag order based on the time series length.}
 

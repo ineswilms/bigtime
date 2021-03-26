@@ -45,9 +45,8 @@
 #' y <- matrix(Y[,1], ncol=1)
 #' ARXfit <- sparseVARX(Y=y, X=X) # sparse ARX
 sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, VARXPhigran=NULL,
-                        VARXlBseq=NULL,  VARXBgran=NULL, VARXalpha=0, h=1, cvcut=0.9, eps=10^-3){
+                       VARXlBseq=NULL,  VARXBgran=NULL, VARXalpha=0, h=1, cvcut=0.9, eps=10^-3){
 
-  # Check inputs
   # Check Inputs
   if(!is.matrix(Y)){
 
@@ -74,7 +73,7 @@ sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, V
   }
 
   if(nrow(X)!=nrow(Y)){
-      stop("Y and X need to have the same number of rows (observations).")
+    stop("Y and X need to have the same number of rows (observations).")
   }
 
   if(!is.null(colnames(Y))){ # time series names
@@ -193,20 +192,24 @@ sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, V
 
   # Get optimal sparsity parameter via time series cross-validation
   VARXcv <- HVARX_cv(Y=Y, X=X, p=p, s=s, h=h, lambdaPhiseq=VARXlPhiseq, gran1Phi=VARXPhigran1, gran2Phi=VARXPhigran2,
-                     lambdaBseq=VARXlBseq, gran1B=VARXBgran1, gran2B=VARXBgran2, eps=eps, max.iter=100,
-                     T1.cutoff=cvcut, alpha=VARXalpha, type=VARXpen)
+                         lambdaBseq=VARXlBseq, gran1B=VARXBgran1, gran2B=VARXBgran2, eps=eps, max.iter=100,
+                         T1.cutoff=cvcut, alpha=VARXalpha, type=VARXpen)
 
   # VarX estimation with selected regularization parameter
   VARXdata <- HVARXmodel(Y=Y, X=X, p=p, s=s, h=h)
-  VARXmodel <- HVARX(fullY=VARXdata$fullY, fullZ=VARXdata$fullZ, fullX=VARXdata$fullX,
-                     k=VARXdata$k, kX=VARXdata$kX, p=VARXdata$p, s=VARXdata$s,
-                     lambdaPhi=VARXcv$lPhi_oneSE, lambdaB=VARXcv$lB_oneSE,
-                     eps=eps, max.iter=100, alpha=VARXalpha, type=VARXpen)
+  estim <- (VARXpen=="HLag")*2 + (VARXpen=="L1")*1
+  if(VARXdata$k==1){
+    VARXdata$fullY <- as.matrix(VARXdata$fullY)
+  }
+  VARXmodel <- HVARX_NEW_export_cpp(fullY=VARXdata$fullY, fullZ=VARXdata$fullZ, fullX=VARXdata$fullX,
+                                    k=VARXdata$k, kX=VARXdata$kX, p=VARXdata$p, s=VARXdata$s,
+                                    lambdaPhi=VARXcv$lPhi_oneSE, lambdaB=VARXcv$lB_oneSE,
+                                    eps=eps, max_iter=100, alpha=VARXalpha, type=estim, Binit = matrix(0, VARXdata$k, VARXdata$kX*VARXdata$s), Phiinit =  matrix(0, VARXdata$k, VARXdata$k*VARXdata$p))
 
   k <- ncol(Y)
   m <- ncol(X)
   out <- list("k"=k, "Y"=Y, "X"=X, "m"=m,"p"=p, "s"=s ,
-              "Phihat"=VARXmodel$Phi, "Bhat"=VARXmodel$B, "phi0hat"=VARXmodel$phi0,
+              "Phihat"=VARXmodel$Phi, "Bhat"=VARXmodel$B, "phi0hat"=t(VARXmodel$phi0),
               "exogenous_series_names"=exogenous_series_names,
               "endogenous_series_names"=endogenous_series_names,
               "lambdaPhi"=VARXcv$l1$lPhiseq, "lambdaB"=VARXcv$l1$lBseq,
@@ -215,7 +218,6 @@ sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, V
               "MSFEcv"=VARXcv$MSFE_avg, "h"=h)
 
 }
-
 
 HVARXmodel <- function(Y, X, p, s, h=1, Yhat=NULL, cvY="default"){
 
@@ -251,142 +253,11 @@ HVARXmodel <- function(Y, X, p, s, h=1, Yhat=NULL, cvY="default"){
             "cvYdata"=cvYdata)
 }
 
-
-HVARX <- function(fullY, fullZ, fullX, k, kX, p, s, lambdaPhi, lambdaB,
-                  eps=10^-5, max.iter=100, alpha=0, type="HLag"){
-
-  if(k==1){
-    fullY <- matrix(fullY, ncol=1)
-  }
-  # Transformation to remove intercept
-  YMean <- c(apply(fullY, 2, mean))
-  ZMean <- c(apply(fullZ, 1, mean))
-  XMean <- c(apply(fullX, 1, mean))
-  Y <- fullY - matrix(c(rep(1, nrow(fullY))), ncol = 1) %*% matrix(c(apply(fullY, 2, mean)), nrow = 1)
-  Z <- fullZ - c(apply(fullZ, 1, mean)) %*% t(c(rep(1, ncol(fullZ))))
-  X <- fullX - c(apply(fullX, 1, mean)) %*% t(c(rep(1, ncol(fullX))))
-
-  # Proximal gradient algorithm
-  ZX <- rbind(Z,X)
-  tk <- 1/max(Mod(eigen(ZX %*% t(ZX))$values))
-  nbr.series <- c(1:k)
-  if(type=="HLag"){
-  PHIBETAprox <- lapply(nbr.series, FUN=proxHVARX, Ydata=Y, Zdata=Z, Xdata=X, tk=tk, lambdaPhi=lambdaPhi,
-                      lambdaB=lambdaB, k=k, p=p, kX=kX, s=s, eps=eps, max.iter=max.iter, alpha=alpha)
-  }
-
-  if(type=="L1"){
-    PHIBETAprox<-lapply(nbr.series, FUN=proxBasic, Ydata=Y, Zdata=Z, Xdata=X, tk=tk, lambdaPhi=lambdaPhi,
-                        lambdaB=lambdaB, k=k, p=p, kX=kX, s=s, eps=eps, max.iter=max.iter, alpha=alpha)
-  }
-
-  PHIBETA <- matrix(unlist(PHIBETAprox), ncol=k*p+kX*s, nrow=k, byrow=T)
-  PHI <- PHIBETA[, 1:(k*p)]
-  B <- PHIBETA[, -c(1:(k*p))]
-
-  phi0 <- YMean - PHI%*%ZMean - B%*%XMean
-  if(k==1){
-    resids <- t(t(fullY) - c(phi0,PHI)%*%rbind(rep(1, ncol(fullZ)), fullZ)- B%*%fullX)
-  }else{
-    resids <- t(t(fullY) - cbind(phi0,PHI)%*%rbind(rep(1, ncol(fullZ)), fullZ)- B%*%fullX)
-  }
-
-
-  # Output
-  out <- list("Phi"=PHI, "B"=B, "phi0"=phi0, "resids"=resids,
-            "fullY"=fullY, "fullZ"=fullZ, "fullX"=fullX)
-}
-
-proxHVARX <- function(i.series, Ydata, Zdata, Xdata, tk, lambdaPhi, lambdaB,
-                      k, p, kX, s, eps=10^-5, max.iter=100, alpha=0){
-  # Auxiliary Function: proximal gradient algorithm for HVARX estimation
-  # Initialization
-  it <- 3
-  PhiOLD <- PhiOLDOLD <- matrix(0, ncol=k*p, nrow=1)
-  BOLD <- BOLDOLD <- matrix(0, ncol=kX*s, nrow=1)
-  thresh <- eps*10
-
-  # Iterate until convergence
-  while( (thresh>eps) & (it<max.iter)){
-    phi <- PhiOLD + ((it-2)/(it+1))*(PhiOLD-PhiOLDOLD)
-    beta <- BOLD + ((it-2)/(it+1))*(BOLD-BOLDOLD)
-    gradientZ <- -(matrix(Ydata[,i.series], nrow=1)- matrix(phi,nrow=1)%*%Zdata - matrix(beta,nrow=1)%*%Xdata)%*%t(Zdata)
-    gradientX <- -(matrix(Ydata[,i.series], nrow=1)- matrix(phi,nrow=1)%*%Zdata - matrix(beta,nrow=1)%*%Xdata)%*%t(Xdata)
-    argZ <- phi - tk*gradientZ
-    argX <- beta - tk*gradientX
-
-    proxPhi <- prox2HVAR(v=argZ, lambda=tk*lambdaPhi, k=k, p=p)
-    proxB <- prox2HVAR(v=argX, lambda=tk*lambdaB, k=kX, p=s)
-
-    threshPhi <- max(abs(proxPhi - phi))
-    threshB <- max(abs(proxB - beta))
-    thresh <- max(threshPhi, threshB)
-
-    PhiOLDOLD <- PhiOLD
-    BOLDOLD <- BOLD
-    PhiOLD <- proxPhi
-    BOLD <- proxB
-    it <- it+1
-  }
-  proxPhi <- (1/(1+alpha))*proxPhi
-  proxB <- (1/(1+alpha))*proxB
-
-  out <- list("Phi"=proxPhi, "B"=proxB)
-}
-
-proxBasic<-function(i.series,Ydata,Zdata,Xdata,tk,lambdaPhi,lambdaB,k,p,kX,s,eps=10^-5,max.iter=100, alpha=0){
-  # Auxiliary Function: proximal gradient algorithm for l1-VARX estimation
-
-  # Initialization
-  it <- 3
-  PhiOLD <- PhiOLDOLD <- matrix(0, ncol=k*p, nrow=1)
-  BOLD <- BOLDOLD <- matrix(0, ncol=kX*s, nrow=1)
-  thresh <- eps*10
-
-  if(k==1 & p==1){
-    Zdata <- matrix(Zdata, nrow=1)
-  }
-
-  if(kX==1 & s==1){
-    Xdata <- matrix(Xdata, nrow=1)
-  }
-  # Iterate until convergence
-  while( (thresh>eps) & (it<max.iter)){
-    phi <- PhiOLD + ((it-2)/(it+1))*(PhiOLD-PhiOLDOLD)
-    beta <- BOLD + ((it-2)/(it+1))*(BOLD-BOLDOLD)
-
-
-    gradientZ <- -(matrix(Ydata[,i.series], nrow=1) - matrix(phi,nrow=1)%*%Zdata - matrix(beta,nrow=1)%*%Xdata)%*%t(Zdata)
-    gradientX <- -(matrix(Ydata[,i.series], nrow=1) - matrix(phi,nrow=1)%*%Zdata - matrix(beta,nrow=1)%*%Xdata)%*%t(Xdata)
-    argZ <- phi - tk*gradientZ
-    argX <- beta - tk*gradientX
-
-    proxPhi <- unlist(lapply(argZ, ST1a, gam=tk*lambdaPhi))
-    proxB <- unlist(lapply(argX, ST1a, gam=tk*lambdaB))
-
-    threshPhi <- max(abs(proxPhi - phi))
-    threshB <- max(abs(proxB - beta))
-    thresh <- max(threshPhi, threshB)
-
-    PhiOLDOLD <- PhiOLD
-    BOLDOLD <- BOLD
-    PhiOLD <- proxPhi
-    BOLD <- proxB
-    it <- it+1
-  }
-  proxPhi <- (1/(1+alpha))*proxPhi
-  proxB <- (1/(1+alpha))*proxB
-
-  out<-list("Phi"=proxPhi, "B"=proxB)
-}
-
-
-HVARX_cv<-function(Y, X, p, s, h=1, lambdaPhiseq=NULL, gran1Phi=20, gran2Phi=10,
-                   lambdaBseq=NULL, gran1B=20, gran2B=10, eps=10^-5, max.iter=100,
-                   T1.cutoff=0.9, YhatPhaseI=NULL, cvYtype="default", alpha=0, type="HLag"){
+HVARX_cv<- function(Y, X, p, s, h=1, lambdaPhiseq=NULL, gran1Phi=10^2, gran2Phi=10, lambdaBseq=NULL, gran1B=10^2, gran2B=10, eps=10^-5, max.iter=100,
+                    T1.cutoff=0.9, alpha=0, type="HLag"){
 
   # Get response and predictor matrices
-  HVARXmodelFIT <- HVARXmodel(Y=Y, X=X, p=p, s=s, h=h, Yhat=YhatPhaseI, cvY=cvYtype)
+  HVARXmodelFIT <- HVARXmodel(Y=Y, X=X, p=p, s=s, h=h, Yhat=NULL, cvY="default")
   k <- HVARXmodelFIT$k
   kX <- HVARXmodelFIT$kX
   fullY <- HVARXmodelFIT$fullY
@@ -397,18 +268,16 @@ HVARX_cv<-function(Y, X, p, s, h=1, lambdaPhiseq=NULL, gran1Phi=20, gran2Phi=10,
   fullZ <- HVARXmodelFIT$fullZ
   fullYtest <- HVARXmodelFIT$cvYdata
 
-
-
   # Grids regularization parameters
   if(is.null(lambdaPhiseq)){
     lambdaPhiseq <- PenaltyGrid(fullY=fullY, fullZ=fullZ, fullX=fullX, k=k, kX=kX, p=p, s=s,
-                              gran1Phi=gran1Phi, gran2Phi=gran2Phi, gran1B=gran1B, gran2B=gran2B, eps=eps,
-                              max.iter=max.iter, alpha=alpha, type=type)$lambdaPhiseq
+                                    gran1Phi=gran1Phi, gran2Phi=gran2Phi, gran1B=gran1B, gran2B=gran2B, eps=eps,
+                                    max.iter=max.iter, alpha=alpha, type=type)$lambdaPhiseq
   }
   if(is.null(lambdaBseq)){
     lambdaBseq <- PenaltyGrid(fullY=fullY, fullZ=fullZ, fullX=fullX, k=k, kX=kX, p=p, s=s,
-                            gran1Phi=gran1Phi, gran2Phi=gran2Phi, gran1B=gran1B, gran2B=gran2B, eps=eps,
-                            max.iter=max.iter, alpha=alpha, type=type)$lambdaBseq
+                                  gran1Phi=gran1Phi, gran2Phi=gran2Phi, gran1B=gran1B, gran2B=gran2B, eps=eps,
+                                  max.iter=max.iter, alpha=alpha, type=type)$lambdaBseq
   }
   l1 <- list(lPhiseq=sort(rep(lambdaPhiseq,length(lambdaBseq))), lBseq=rep(lambdaBseq,length(lambdaPhiseq)))
 
@@ -416,26 +285,15 @@ HVARX_cv<-function(Y, X, p, s, h=1, lambdaPhiseq=NULL, gran1Phi=20, gran2Phi=10,
   n <- nrow(fullY)
   T1 <- floor(T1.cutoff*n)
   tseq <- T1:(n-1)
-  MSFE_FIT <- lapply(tseq, HVARX_cvaux, fullY=fullY, fullX=fullX, fullZ=fullZ, eps=eps, max.iter=max.iter,
-                     k=k, kX=kX, p=p, s=s, l1=l1, lambdaPhiseq=lambdaPhiseq, lambdaBseq=lambdaBseq,
-                      cvY=cvYtype, fullYtest=fullYtest, alpha=alpha, type=type)
-  allresults <- c()
-  for(i in 1:length(MSFE_FIT)){
-    allresults <- rbind(allresults, MSFE_FIT[[i]])
-  }
-  MSFEmatrix <- allresults[seq(from=1, by=3, length=length(tseq)),]
-  sparsitymatrix <- allresults[seq(from=2, by=3, length=length(tseq)),]
-  MSFEmatrix_relax <- allresults[seq(from=3, by=3, length=length(tseq)),]
 
-  if(length(tseq)==1){
-    MSFEmatrix <- matrix(MSFEmatrix, nrow=1)
-    sparsitymatrix <- matrix(sparsitymatrix, nrow=1)
-    MSFEmatrix_relax <- matrix(MSFEmatrix_relax, nrow=1)
-    MSFE_avg <- apply(MSFEmatrix, 2, mean)
-  }else{
-    MSFE_avg <- apply(MSFEmatrix, 2, mean)
-  }
+  estim <- (type=="HLag")*2 + (type=="L1")*1
+  my_cv <- HVARX_cvaux_cpp_loop(Y = fullY, Z = fullZ, X = fullX,  tseq = tseq, lambdaPhiseq = l1$lPhiseq , lambdaBseq = l1$lBseq, eps = eps,  max_iter = max.iter,
+                                k = k,  kX = kX, p = p, s = s,  alpha = alpha,  estim = estim)
 
+  MSFEmatrix <- my_cv$MSFE
+  sparsitymatrix <- my_cv$sparsity
+
+  MSFE_avg <- apply(MSFEmatrix, 2, mean)
   lPhiopt <- l1$lPhiseq[which.min(MSFE_avg)]
   lBopt <- l1$lBseq[which.min(MSFE_avg)]
 
@@ -501,81 +359,8 @@ HVARX_cv<-function(Y, X, p, s, h=1, lambdaPhiseq=NULL, gran1Phi=20, gran2Phi=10,
             "lPhi_opt"=lPhiopt, "lB_opt"=lBopt)
 }
 
-HVARX_cvaux<-function(t, fullY, fullX, fullZ, eps, max.iter, k, kX, p, s, l1, lambdaPhiseq, lambdaBseq,
-                      cvY="default", fullYtest=NULL, alpha, type="HLag"){
-  # Auxiliary function of HVARX_cv to select optimal sparsity parameters based on time-series cross-validation
-
-  # Training sets
-
-  if(k==1){
-    trainY <- fullY[(1:t),]
-    trainY <- matrix(trainY, ncol=1)
-  }else{
-    trainY <- fullY[(1:t),]
-  }
-
-  if(s==1 & kX==1){
-    trainX <- fullX[,(1:t)]
-    trainX <- matrix(trainX, nrow=1)
-  }else{
-    trainX <- fullX[,(1:t)]
-  }
-
-  if(p==1 & k==1){
-    trainZ <- fullZ[,(1:t)]
-    trainZ <- matrix(trainZ, nrow=1)
-  }else{
-    trainZ <- fullZ[,(1:t)]
-  }
-
-
-  # Test sets
-  testY <- matrix(fullY[t+1,], nrow=1)
-  if(cvY=="predictY"){
-    testY <- matrix(fullYtest[t,], nrow=1)
-  }
-  testX <- matrix(fullX[,t+1], ncol=1)
-  testZ <- matrix(fullZ[,t+1], ncol=1)
-
-
-  morearg <- list(Ytrain=trainY, Xtrain=trainX, Ztrain=trainZ, Ytest=testY, Xtest=testX, Ztest=testZ,
-                  eps=eps, max.iter=max.iter, k=k, kX=kX, p=p, s=s, alpha=alpha, type=type)
-  MSFEscv <- mapply(HVARX_MSFE, l1$lPhiseq, l1$lBseq, MoreArgs = morearg)
-  allresults <- matrix(unlist(MSFEscv), ncol=length(l1$lPhiseq), nrow=3)
-  return(allresults)
-}
-
-HVARX_MSFE<-function(Ytrain, Xtrain, Ztrain, Ytest, Xtest, Ztest, lamPhi, lamB,
-                     eps, max.iter, k, kX, p, s, alpha, type="HLag"){
-  # Auxiliary function to select optimal sparsity parameters based on time-series cross-validation
-
-  HVARXFIT <- HVARX(fullY=Ytrain, fullZ=Ztrain, fullX=Xtrain, k=k, kX=kX, p=p, s=s,
-                    lambdaPhi=lamPhi, lambdaB=lamB, eps=eps, max.iter=max.iter, alpha=alpha, type=type)
-  Phi_FIT <- HVARXFIT$Phi
-  Phi0_FIT <- HVARXFIT$phi0
-  B_FIT <- HVARXFIT$B
-
-  MSFErelax <- NA
-  sparsity <- length(which(Phi_FIT!=0)) + length(which(B_FIT!=0))
-  # if(all(B_FIT==0)|all(Phi_FIT==0)){ # Check all zero solution -> exclude from options
-  #   # MSFE <- NA
-  #   # sparsity <- NA
-  # }else{
-
-    if(k==1){
-      MSFE <- mean(t( t(Ytest)- c(Phi0_FIT, Phi_FIT)%*%rbind(rep(1, ncol(Ztest)), Ztest) - B_FIT%*%Xtest)^2)
-    }else{
-      MSFE <- mean(t( t(Ytest)- cbind(Phi0_FIT, Phi_FIT)%*%rbind(rep(1, ncol(Ztest)), Ztest) - B_FIT%*%Xtest)^2)
-    }
-
-    MSFErelax <- NA
-  # }
-
-  out<-list("MSFE"=MSFE, "sparsity"=sparsity, "MSFErelax"=MSFErelax)
-}
-
-PenaltyGrid<-function(fullY, fullZ, fullX, k, kX, p, s, gran1Phi, gran2Phi, gran1B, gran2B, eps=eps,
-                      max.iter=max.iter, alpha, type="HLag"){
+PenaltyGrid<- function(fullY, fullZ, fullX, k, kX, p, s, gran1Phi, gran2Phi, gran1B, gran2B, eps=eps,
+                       max.iter=max.iter, alpha, type="HLag"){
   lambdamaxZ <- c()
   for (i in 1:k) {
     lambdamaxZ[i]  <- norm2(fullZ %*% fullY[, i])
@@ -589,9 +374,9 @@ PenaltyGrid<-function(fullY, fullZ, fullX, k, kX, p, s, gran1Phi, gran2Phi, gran
   lambdastartX <- max(lambdamaxX)
 
 
-  SparsityLSearch<-SparsityLineSearch(fullY=fullY, fullZ=fullZ, fullX=fullX, k=k, kX=kX, p=p, s=s,
-                                      lstartX=lambdastartX, lstartZ=lambdastartZ, eps=eps,
-                                      max.iter=max.iter, alpha=alpha, type=type)
+  SparsityLSearch <- SparsityLineSearch(fullY=fullY, fullZ=fullZ, fullX=fullX, k=k, kX=kX, p=p, s=s,
+                                            lstartX=lambdastartX, lstartZ=lambdastartZ, eps=eps,
+                                            max.iter=max.iter, alpha=alpha, type=type)
 
   lambdaPhiseq <- exp(seq(from = log(SparsityLSearch$lambdahZ), to = log(SparsityLSearch$lambdahZ/gran1Phi),
                           length = gran2Phi))
@@ -600,19 +385,24 @@ PenaltyGrid<-function(fullY, fullZ, fullX, k, kX, p, s, gran1Phi, gran2Phi, gran
   out<-list("lambdaPhiseq"=lambdaPhiseq, "lambdaBseq"=lambdaBseq)
 }
 
-SparsityLineSearch<-function(fullY, fullZ, fullX, k, kX, p, s, lstartX, lstartZ, eps, max.iter, alpha, type="HLag"){
+SparsityLineSearch<- function(fullY, fullZ, fullX, k, kX, p, s, lstartX, lstartZ, eps, max.iter, alpha, type="HLag"){
   lambdahX <- lstartX
   lambdalX <- 0
   lambdahZ <- lstartZ
   lambdalZ <- 0
   thresh <- 10
+
+  estim <- (type=="HLag")*2 + (type=="L1")*1
+
   while(thresh>.00001)
   {
     lambdaX <- (lambdahX+lambdalX)/2
     lambdaZ <- (lambdahZ+lambdalZ)/2
 
-    HVARXFIT <- HVARX(fullY=fullY, fullZ=fullZ, fullX=fullX, k=k, kX=kX, p=p, s=s,
-                      lambdaPhi=lambdaZ, lambdaB=lambdaX, eps=eps, max.iter=max.iter, alpha=alpha, type=type)
+
+    HVARXFIT <- HVARX_NEW_export_cpp(fullY=fullY, fullZ=fullZ, fullX=fullX, k=k, kX=kX, p=p, s=s,
+                                     lambdaPhi=lambdaZ, lambdaB=lambdaX, eps=eps, max_iter=max.iter, alpha=alpha, type=estim, Binit = matrix(0, k, kX*s), Phiinit =  matrix(0, k, k*p))
+
     paramZ <- HVARXFIT$Phi
     paramX <- HVARXFIT$B
 

@@ -8,7 +8,6 @@
 #' how deep the grid should be constructed. Second element specifies how many values the grid should contain.
 #' @param cvcut Proportion of observations used for model estimation in the time series cross-validation procedure. The remainder is used for forecast evaluation.
 #' @param eps a small positive numeric value giving the tolerance for convergence in the proximal gradient algorithm.
-#' @param VARalpha a small positive regularization parameter value corresponding to squared Frobenius penalty. The default is zero.
 #' @param VARpen "HLag" (hierarchical sparse penalty) or "L1" (standard lasso penalty) penalization.
 #' @export
 #' @return A list with the following components
@@ -25,14 +24,13 @@
 #' \item{lambda_SEopt}{Optimal value of the sparsity parameter as selected by the time-series cross-validation
 #'       procedure and after applying the one-standard-error rule.  This is the value used.}
 #' \item{h}{Forecast horizon h}
-#' @references Nicholson William B., Bien Jacob and Matteson David S. (2017), "High Dimensional Forecasting via Interpretable Vector Autoregression"
-#' arXiv preprint <arXiv:1412.5250v2>.
+#' @references Nicholson William B., Bien Jacob and Matteson David S. (2017), "High-dimensional forecasting via interpretable vector autoregression," Journal of Machine Learning Research, 21(166), 1-52.
 #' @seealso \link{lagmatrix} and \link{directforecast}
 #' @examples
 #' data(Y)
 #' VARfit <- sparseVAR(Y) # sparse VAR
 #' ARfit <- sparseVAR(Y[,2]) # sparse AR
-sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL, VARalpha=0,
+sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL,
                       cvcut=0.9, h=1,  eps=1e-3){
 
   # Check Inputs
@@ -79,9 +77,6 @@ sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL, VARa
     stop("cvcut needs to be a number between 0 and 1")
   }
 
-  if(VARalpha<0){
-    stop("The regularization paramter VARalpha needs to be a equal to zero or a small positive number")
-  }
 
   if(!is.element(VARpen, c("HLag", "L1"))){
     stop("The type of penalization VARpen needs to be either HLag (hierarchical sparse penalization) or L1 (standard lasso penalization)")
@@ -118,13 +113,11 @@ sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL, VARa
   }
 
   # Get optimal sparsity parameter via time series cross-validation
-  VARcv <- HVAR_cv(Y=Y, p=p, h=h, lambdaPhiseq=VARlseq, gran1=VARgran1, gran2=VARgran2, T1.cutoff=cvcut,
-                 eps=eps , VAR.alpha=VARalpha, type=VARpen)
+  VARcv <- HVAR_cv(Y=Y, p=p, h=h, lambdaPhiseq=VARlseq, gran1=VARgran1, gran2=VARgran2, T1.cutoff=cvcut, eps=eps, type=VARpen)
 
   # Var estimation with selected regularization parameter
   VARdata <- HVARmodel(Y=Y, p=p, h=h)
-  VARmodel <- HVAR(fullY=VARdata$fullY, fullZ=VARdata$fullZ, p=VARdata$p, k=VARdata$k,
-             lambdaPhi=VARcv$lambda_opt_oneSE, eps=eps, VAR.alpha=VARalpha, type=VARpen)
+  VARmodel <- HVAR(fullY=VARdata$fullY, fullZ=VARdata$fullZ, p=VARdata$p, k=VARdata$k, lambdaPhi=VARcv$lambda_opt_oneSE, eps=eps, type=VARpen)
 
   k <- ncol(Y)
 
@@ -133,8 +126,6 @@ sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL, VARa
               "MSFEcv"=VARcv$MSFE_avg, "MSFE_all"=VARcv$MSFE_all,
               "lambda_SEopt"=VARcv$lambda_opt_oneSE,"lambda_opt"=VARcv$lambda_opt, "h"=h)
 }
-
-
 
 HVARmodel<-function(Y, p, h=1){
   # Preliminaries
@@ -148,22 +139,22 @@ HVARmodel<-function(Y, p, h=1){
   out<-list("fullY"=fullY, "fullZ"=fullZ, "k"=k, "p"=p)
 }
 
-
-HVAR<-function(fullY, fullZ, p, k, lambdaPhi, eps=1e-5, VAR.alpha=0, type="HLag"){
+HVAR<-function(fullY, fullZ, p, k, lambdaPhi, eps=1e-5, type="HLag"){
 
   # HVAR estimates
   if(type=="HLag"){
-  if(k==1){
-    fullY <- matrix(fullY, ncol=1)
+    if(k==1){
+      fullY <- matrix(fullY, ncol=1)
+    }
+
+    Phi <- HVARElemAlgcpp(array(0, dim=c(k,k*p+1,1)), fullY, fullZ, lambdaPhi, eps, p)
   }
-  Phi <- .HVARElemAlg(array(0, dim=c(k,k*p+1,1)), fullY, fullZ,
-                      lambdaPhi, eps=eps, p, F, rep(1,p))
-  }
+
   # L1 estimates
   if(type=="L1"){
-    Phi <- .lassoVARFist(array(0,dim=c(k,k*p+1,1)), Z=fullZ, Y=fullY, gamm=lambdaPhi, eps=eps, p, F, rep(1,p))
+    Phi <- lassoVARFistcpp(array(0,dim=c(k,k*p+1,1)), fullY, fullZ, lambdaPhi, eps, p)
   }
-  Phi <- (1/(1 + VAR.alpha))*Phi
+
   resids <- t(t(fullY) - Phi[,,1]%*%rbind(rep(1, ncol(fullZ)), fullZ))
   Yhat <- t(Phi[,, 1]%*%rbind(rep(1, ncol(fullZ)), fullZ))
 
@@ -172,8 +163,7 @@ HVAR<-function(fullY, fullZ, p, k, lambdaPhi, eps=1e-5, VAR.alpha=0, type="HLag"
 
 }
 
-HVAR_cv<-function(Y, p, h=1, lambdaPhiseq=NULL, gran1=20, gran2=10, T1.cutoff=0.9,
-                  eps=1e-5 , VAR.alpha=0, type="HLag"){
+HVAR_cv<-function(Y, p, h=1, lambdaPhiseq=NULL, gran1 = 10^2, gran2=10, T1.cutoff=0.9, eps=1e-5, type="HLag"){
 
   # Get response and predictor matrix
   HVARmodelFIT <- HVARmodel(Y=Y, p=p, h=h)
@@ -190,8 +180,8 @@ HVAR_cv<-function(Y, p, h=1, lambdaPhiseq=NULL, gran1=20, gran2=10, T1.cutoff=0.
     jj <- .lfunction3(p, k)
 
     if(type=="HLag"){
-    lambdaPhiseq <- .LambdaGridE(gran1, gran2, jj, fullY, fullZ,"HVARELEM", p, k,
-                                 MN=F, alpha=1/(k+1), C=rep(1,p))
+      lambdaPhiseq <- .LambdaGridE(gran1, gran2, jj, fullY, fullZ,"HVARELEM", p, k,
+                                       MN=F, alpha=1/(k+1), C=rep(1,p))
     }
 
     if(type=="L1"){
@@ -200,39 +190,22 @@ HVAR_cv<-function(Y, p, h=1, lambdaPhiseq=NULL, gran1=20, gran2=10, T1.cutoff=0.
 
   }
 
-
   # Time Series cross-validation loop
   # Choose sparsity parameter that minimizes h-step ahead mean squared prediction error.
   n <- nrow(fullY)
   T1 <- floor(T1.cutoff*n)
   tseq <- T1:(n-1)
 
-  if(type=="HLag"){
-  MSFEcv <-lapply(tseq, HVAR_cvaux, Y=fullY, Z=fullZ, gamm=lambdaPhiseq, eps=eps, p=p,
-                  MN=F, C=rep(1,p), estim="HVARELEM", VAR.alpha=VAR.alpha)
-  }
-
-  if(type=="L1"){
-    MSFEcv<-lapply(tseq, HVAR_cvaux, Y=fullY, Z=fullZ, gamm=lambdaPhiseq, eps=eps, p=p,
-                   MN=F, C=rep(1,p), estim="Basic", VAR.alpha=VAR.alpha)
-  }
-
-  allresults <- c()
-  for(i in 1:length(MSFEcv)){
-    allresults <- rbind(allresults, MSFEcv[[i]]$MSFEs, MSFEcv[[i]]$sparsity)
-  }
-
-  MSFEmatrix <- allresults[seq(from=1, by=2, length=length(tseq)),]
-  sparsitymatrix <- allresults[seq(from=2, by=2, length=length(tseq)),]
-  if(length(tseq)==1){
-    MSFEmatrix <- matrix(MSFEmatrix, nrow=1)
-    sparsitymatrix <- matrix(sparsitymatrix, nrow=1)
-    MSFE_avg <- apply(MSFEmatrix, 2, mean)
-  }else{
-    MSFE_avg <- apply(MSFEmatrix, 2, mean)
-  }
-
-
+  estim <- (type=="HLag")*2 + (type=="L1")*1
+  # Time-series cross-validation for tuning parameter selection
+  my_cv <- HVAR_cvaux_loop_cpp(Y = fullY, Z = fullZ, tseq = tseq, gamm = lambdaPhiseq,  eps = eps, p = p, estim = estim)
+  MSFEmatrix <- my_cv$MSFEcv
+  rownames(MSFEmatrix) <- paste0("t=", tseq)
+  colnames(MSFEmatrix) <- paste0("lambda=", lambdaPhiseq)
+  sparsitymatrix <- my_cv$sparsitycv
+  colnames(sparsitymatrix) <- colnames(MSFEmatrix)
+  rownames(sparsitymatrix) <- rownames(MSFEmatrix)
+  MSFE_avg <- apply(MSFEmatrix, 2, mean)
   lambda_opt <- lambdaPhiseq[which.min(MSFE_avg)]
 
   if(length(lambda_opt)==0){
@@ -242,6 +215,7 @@ HVAR_cv<-function(Y, p, h=1, lambdaPhiseq=NULL, gran1=20, gran2=10, T1.cutoff=0.
       lambda_opt <- lambdaPhiseq[round(median(1:length(lambdaPhiseq)))]
     }
   }
+
   # One-standard error rule to determine optimal lambda values
   lambda_opt_oneSE <- NA
   lambda_optinit <- lambda_opt
@@ -267,64 +241,9 @@ HVAR_cv<-function(Y, p, h=1, lambdaPhiseq=NULL, gran1=20, gran2=10, T1.cutoff=0.
     warning("Lower bound of lambda grid is selected: higher value of first granularity parameter is recommended as an input")
   }
 
+
   # Output
-  out <- list("lambda"=lambdaPhiseq, "lambda_opt_oneSE"=lambda_opt_oneSE,
-            "MSFE_all"=MSFEmatrix, "MSFE_avg"=MSFE_avg, "flag_oneSE"=gridflag_oneSE,
-            "lambda_opt"=lambda_opt)
+  out <- list("lambda" = lambdaPhiseq, "lambda_opt_oneSE" = lambda_opt_oneSE, "MSFE_all" = MSFEmatrix, "MSFE_avg" = MSFE_avg, "flag_oneSE" = gridflag_oneSE,
+              "lambda_opt" = lambda_opt)
+
 }
-
-
-HVAR_cvaux<-function(Y, Z, t, gamm, eps, p, MN, C, estim="HVARELEM", VAR.alpha){
-  # Auxiliary function of HVAR_cv to select optimal sparsity parameter based on time-series cross-validation
-
-  # Preliminaries
-  k <- ncol(Y) # number of time series
-
-
-
-  # Training sets
-  trainY <- Y[(1:t), ]
-  trainZ <- Z[, (1:t)]
-  if(!is.matrix(trainZ)){trainZ <- matrix(trainZ, ncol=1)}
-  if(!is.matrix(trainY)){trainY <- matrix(trainY, ncol=1)}
-
-  # Prediction sets
-  testY <- matrix(Y[t+1,], nrow=1)
-  testZ <- matrix(Z[,t+1], ncol=1)
-
-
-  # HVAR estimation
-  Phi <- array(0,dim=c(k, k*p+1, length(gamm)))
-
-
-
-  if(estim=="HVARELEM"){
-
-  Phi <- .HVARElemAlg(Phi, trainY, trainZ, gamm, eps=eps, p, MN, C)
-
-
-  }
-
-  if(estim=="Basic"){
-    Phi <- .lassoVARFist(Phi, Z=trainZ, Y=trainY, gamm=gamm, eps=eps,p,MN,C)
-
-
-  }
-  Phi <- (1/(1+VAR.alpha))*Phi
-
-
-
-  MSFEs <- apply(Phi, 3, function(U,Y,Z){mean((t(t(Y) - U%*%rbind(rep(1, ncol(Z)), Z)))^2)}, Y=testY, Z=testZ)
-  sparsity <- apply(Phi, 3, function(U){length(which(U[,-1]!=0))})
-
-  if(!(k==1 & p==1)){
-    CHECK_ALLZERO <- apply(Phi, 3, function(U){ length(which((abs(U[,-1]))!=0)) < dim(U)[1]})
-    ALLZERO <- CHECK_ALLZERO
-    # sparsity[ALLZERO] <- NA
-    # MSFEs[ALLZERO] <- NA
-  }
-
-
-  out <- list("MSFEs"=MSFEs, "sparsity"=sparsity)
-}
-
