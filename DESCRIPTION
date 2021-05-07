@@ -7,7 +7,8 @@ Authors@R: c(
     person("David S.", "Matteson", email = "matteson@cornell.edu", role = "aut"),
     person("Jacob", "Bien", email = "jbien@usc.edu", role = "aut"),
     person("Sumanta", "Basu", email = "sumbose@cornell.edu", role = "aut"),
-    person("Will", "Nicholson", email = "wbn8@cornell.edu", role = "aut"))
+    person("Will", "Nicholson", email = "wbn8@cornell.edu", role = "aut"),
+    person("Enrico", "Wegner", email = "e.wegner@student.maastrichtuniversity.nl", role = "aut"))
 Author: Ines Wilms [cre, aut],
   David S. Matteson [aut],
   Jacob Bien [aut],
