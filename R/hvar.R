@@ -1,4 +1,4 @@
-#' Sparse Estimation of the Vector AutoRegressive (VAR) Model
+#' Sparse Estimation of the Vector AutoRegressive (VAR) model
 #' @param Y A \eqn{T} by \eqn{k} matrix of time series. If k=1, a univariate autoregressive model is estimated.
 #' @param p User-specified maximum autoregressive lag order of the VAR. Typical usage is to have the program compute its own maximum lag order based on the time series length.
 #' @param h Desired forecast horizon in time-series cross-validation procedure.
