@@ -347,7 +347,8 @@ arma::cube gamloopFista(NumericVector beta_, const arma::mat& Y,const arma::mat&
 // Lamba loop
 // [[Rcpp::export]]
 arma::cube gamloopElem2(arma::cube bcube, const arma::mat& Y,const arma::mat& Z, arma::colvec gammgrid, const double eps,
-                        const arma::colvec YMean2, const arma::colvec ZMean2, arma::mat B1, const int k, const int p, const double tk){
+                        const arma::colvec YMean2, const arma::colvec ZMean2, arma::mat B1, const int k, const int p, const double tk,
+                        const int flag_restart_opt = 1){
 
   arma::mat B1F2 = B1;
   // IntegerVector dims=beta_.attr("dim");
