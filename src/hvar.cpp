@@ -358,8 +358,9 @@ arma::cube gamloopElem2(arma::cube bcube, const arma::mat& Y,const arma::mat& Z,
   colvec nu=zeros<colvec>(k);
 
   int i;
+  B1 = bcube.slice(0);
   for (i=0; i<ngridpts;++i) {
-    B1F2=bcube.slice(i);
+    B1F2 = (flag_restart_opt == 1) ? B1 : bcube.slice(i); // using previous iter value if fresh opt else use given starting value
     B1 = FistaElem(Y, Z, B1F2, p, k, gammgrid[i], eps, tk);
     nu = YMean2 - B1*ZMean2;
     bcube2.slice(i) = mat(join_horiz(nu, B1));
