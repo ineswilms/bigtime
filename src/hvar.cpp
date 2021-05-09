@@ -13,6 +13,7 @@ using namespace arma;
 struct cv_aux_out{
   arma::mat MSFEs;
   arma::mat sparsity;
+  arma::cube Phi;
 };
 
 struct prox_out{
@@ -346,7 +347,7 @@ arma::cube gamloopFista(NumericVector beta_, const arma::mat& Y,const arma::mat&
 
 // Lamba loop
 // [[Rcpp::export]]
-arma::cube gamloopElem2(arma::cube bcube, const arma::mat& Y,const arma::mat& Z, arma::colvec gammgrid, const double eps,
+arma::cube gamloopElem2(const arma::cube bcube, const arma::mat& Y,const arma::mat& Z, arma::colvec gammgrid, const double eps,
                         const arma::colvec YMean2, const arma::colvec ZMean2, arma::mat B1, const int k, const int p, const double tk,
                         const int flag_restart_opt = 1){
 
@@ -439,7 +440,7 @@ arma::cube lassoVARFistcpp(const arma::cube& beta, const arma::mat& trainY, cons
 
 // [[Rcpp::export]]
 arma::cube HVARElemAlgcpp(const arma::cube& beta, const arma::mat& trainY, const arma::mat& trainZ, const arma::colvec& lambda,
-                          const double& tol, const int& p){
+                          const double& tol, const int& p, const int flag_restart_opt = 0){
   // Prelimaries
   int n = trainY.n_rows;
   int k = trainY.n_cols;
@@ -467,13 +468,13 @@ arma::cube HVARElemAlgcpp(const arma::cube& beta, const arma::mat& trainY, const
 
   arma::mat betaini1 = beta.subcube(0, 1, 0, k-1, k*p + 1 - 1, 0);
   arma::cube betaini = beta.subcube(0, 1, 0, k-1, k*p + 1 - 1, g-1);
-  arma::cube betaout = gamloopElem2(betaini, Y, Z, lambda, tol, YMean.t(), ZMean.t(), betaini1, k, p, tk);
+  arma::cube betaout = gamloopElem2(betaini, Y, Z, lambda, tol, YMean.t(), ZMean.t(), betaini1, k, p, tk, flag_restart_opt);
 
   return(betaout);
 }
 
-
-cv_aux_out HVAR_cvaux_cpp(const arma::mat & Y, const arma::mat& Z, int t, const arma::colvec& gamm, const double eps, int p, const double estim){
+cv_aux_out HVAR_cvaux_cpp(const arma::mat & Y, const arma::mat& Z, int t, const arma::colvec& gamm, const double eps, int p, const double estim,
+                          arma::cube Phi, const int flag_restart_opt = 0){
 
   int k = Y.n_cols;
   int g = gamm.size();
@@ -481,7 +482,6 @@ cv_aux_out HVAR_cvaux_cpp(const arma::mat & Y, const arma::mat& Z, int t, const 
   arma::mat trainZ = Z.submat(0, 0, k*p-1, t-1);
   arma::mat testY = Y.submat(t, 0, t, k-1); // 1 row
   arma::mat testZ = Z.submat(0, t, k*p-1, t); // 1 col
-  arma::cube Phi = zeros(k, k*p+1, g);
   arma::mat testZc = ones(k*p+1, 1);
   testZc.submat(1, 0, k*p + 1 - 1, 0) = testZ;
   arma::mat MSFE = zeros(1, g);
@@ -493,10 +493,8 @@ cv_aux_out HVAR_cvaux_cpp(const arma::mat & Y, const arma::mat& Z, int t, const 
   }
 
   if(estim==2){
-    Phi  = HVARElemAlgcpp(Phi, trainY, trainZ, gamm, eps, p);
+    Phi  = HVARElemAlgcpp(Phi, trainY, trainZ, gamm, eps, p, flag_restart_opt);
   }
-
-
 
   // Forecasts
   for (int igran = 0; igran < g; igran++) {
@@ -512,11 +510,18 @@ cv_aux_out HVAR_cvaux_cpp(const arma::mat & Y, const arma::mat& Z, int t, const 
   cv_aux_out my_cv_aux;
   my_cv_aux.MSFEs = MSFE;
   my_cv_aux.sparsity = sparsity;
+  my_cv_aux.Phi = Phi;
 
 
   return(my_cv_aux);
 }
 
+cv_aux_out HVAR_cvaux_cpp(const arma::mat & Y, const arma::mat& Z, int t, const arma::colvec& gamm, const double eps, int p, const double estim){
+  int k = Y.n_cols;
+  int g = gamm.size();
+  arma::cube Phi = zeros(k, k*p+1, g);
+  return(HVAR_cvaux_cpp(Y, Z, t, gamm, eps, p, estim, Phi, 1));
+}
 
 // [[Rcpp::export]]
 Rcpp::List HVAR_cvaux_loop_cpp(const arma::mat & Y, const arma::mat& Z, const arma::colvec& tseq, const arma::colvec& gamm, const double eps, int p, const double estim){
@@ -530,7 +535,12 @@ Rcpp::List HVAR_cvaux_loop_cpp(const arma::mat & Y, const arma::mat& Z, const ar
   cv_aux_out get_cv_out;
 
   for(int it = 0; it < tlength; it++){
-    get_cv_out = HVAR_cvaux_cpp(Y,  Z, tseq[it], gamm,  eps, p, estim);
+    if (it == 0){
+      get_cv_out = HVAR_cvaux_cpp(Y,  Z, tseq[it], gamm,  eps, p, estim);
+    }
+    else {
+      get_cv_out = HVAR_cvaux_cpp(Y,  Z, tseq[it], gamm,  eps, p, estim, get_cv_out.Phi);
+    }
     MSFEcv.submat(it, 0, it, g-1) = get_cv_out.MSFEs;
     sparsitycv.submat(it, 0, it, g-1) = get_cv_out.sparsity;
   }
