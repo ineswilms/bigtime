@@ -1,4 +1,4 @@
-#' Sparse Estimation of the Vector AutoRegressive (VAR) model
+#' Sparse Estimation of the Vector AutoRegressive (VAR) Model
 #' @param Y A \eqn{T} by \eqn{k} matrix of time series. If k=1, a univariate autoregressive model is estimated.
 #' @param p User-specified maximum autoregressive lag order of the VAR. Typical usage is to have the program compute its own maximum lag order based on the time series length.
 #' @param h Desired forecast horizon in time-series cross-validation procedure.
@@ -9,6 +9,7 @@
 #' @param cvcut Proportion of observations used for model estimation in the time series cross-validation procedure. The remainder is used for forecast evaluation.
 #' @param eps a small positive numeric value giving the tolerance for convergence in the proximal gradient algorithm.
 #' @param VARpen "HLag" (hierarchical sparse penalty) or "L1" (standard lasso penalty) penalization.
+#' @param cv Logical, whether time-series cross-validation needs to be performed (TRUE) or not (FALSE) for selecting the sparsity parameter. If cv=FALSE, the argument cvcut is redundant.
 #' @export
 #' @return A list with the following components
 #' \item{Y}{\eqn{T} by \eqn{k} matrix of time series.}
@@ -31,7 +32,7 @@
 #' VARfit <- sparseVAR(Y) # sparse VAR
 #' ARfit <- sparseVAR(Y[,2]) # sparse AR
 sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL,
-                      cvcut=0.9, h=1,  eps=1e-3){
+                      cv = FALSE, cvcut=0.9, h=1,  eps=1e-3){
 
   # Check Inputs
   if(!is.matrix(Y)){
@@ -65,8 +66,8 @@ sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL,
     }
   }
 
-  if((!is.vector(VARlseq) & !is.null(VARlseq)) | length(VARlseq)==1){
-    stop("The regularization parameter VARlseq needs to be a vector of length>1 or NULL otherwise")
+  if((!is.vector(VARlseq) & !is.null(VARlseq)) ){ # | length(VARlseq)==1
+    stop("The regularization parameter VARlseq needs to be a vector of length=>1 or NULL otherwise")
   }
 
   if(any((VARgran<=0)==T)){
@@ -112,19 +113,70 @@ sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL,
     VARgran2 <- length(VARlseq)
   }
 
-  # Get optimal sparsity parameter via time series cross-validation
-  VARcv <- HVAR_cv(Y=Y, p=p, h=h, lambdaPhiseq=VARlseq, gran1=VARgran1, gran2=VARgran2, T1.cutoff=cvcut, eps=eps, type=VARpen)
+  if(length(VARlseq)==1){ # If user only provides one lambda value, don't do cross-validation
+    cv <- FALSE
+    warning("No cross-validation is performed since only one sparsity parameter is provided.")
+  }
 
-  # Var estimation with selected regularization parameter
-  VARdata <- HVARmodel(Y=Y, p=p, h=h)
-  VARmodel <- HVAR(fullY=VARdata$fullY, fullZ=VARdata$fullZ, p=VARdata$p, k=VARdata$k, lambdaPhi=VARcv$lambda_opt_oneSE, eps=eps, type=VARpen)
+  if(cv){ # Time series cross-validation to get optimal sparsity parameter
+    VARcv <- HVAR_cv(Y=Y, p=p, h=h, lambdaPhiseq=VARlseq, gran1=VARgran1, gran2=VARgran2, T1.cutoff=cvcut, eps=eps, type=VARpen)
 
-  k <- ncol(Y)
+    # Var estimation with selected regularization parameter
+    VARdata <- HVARmodel(Y=Y, p=p, h=h)
+    VARmodel <- HVAR(fullY=VARdata$fullY, fullZ=VARdata$fullZ, p=VARdata$p, k=VARdata$k, lambdaPhi=VARcv$lambda_opt_oneSE, eps=eps, type=VARpen)
 
-  out <- list("k"=k, "Y"=Y, "p"=p, "Phihat"=VARmodel$Phi, "phi0hat"=VARmodel$phi,
-              "series_names"=series_names, "lambdas"=VARcv$lambda,
-              "MSFEcv"=VARcv$MSFE_avg, "MSFE_all"=VARcv$MSFE_all,
-              "lambda_SEopt"=VARcv$lambda_opt_oneSE,"lambda_opt"=VARcv$lambda_opt, "h"=h)
+  }else{ # No time series cross-validation
+
+    Phis <- array(NA, c(k, k*p, VARgran2)) # Estimates AR coefficients for each value in the grid
+    phi0s <- array(NA, c(k, 1, VARgran2)) # Estimates of constants for each value in the grid
+
+    # Set the grid of sparsity parameters
+    VARdata <- HVARmodel(Y=Y, p=p, h=h)
+    k <- VARdata$k # Number of time series
+    fullY <- VARdata$fullY # response matrix
+
+    if(k==1){
+      fullY <- matrix(fullY, ncol=1)
+    }
+    fullZ <- VARdata$fullZ # design matrix
+
+
+    # Get lambda grid if not specified by the user
+    if(is.null(VARlseq)){
+      jj <- .lfunction3(p, k)
+
+      if(VARpen=="HLag"){
+        VARlseq <- .LambdaGridE(VARgran1, VARgran2, jj, fullY, fullZ, "HVARELEM", p, k,
+                                MN=F, alpha=1/(k+1), C=rep(1,p))
+      }
+
+      if(VARpen=="L1"){
+        VARlseq <- .LambdaGridE(VARgran1, VARgran2, jj, fullY, fullZ,"Basic",p,k,MN=F,alpha=1/(k+1),C=rep(1,p))
+      }
+
+    }
+
+    for(il in 1:length(VARlseq)){ # For now in R
+      VARmodel <- HVAR(fullY=VARdata$fullY, fullZ=VARdata$fullZ, p=VARdata$p, k=VARdata$k, lambdaPhi=VARlseq[il], eps=eps, type=VARpen)
+      Phis[,,il] <- VARmodel$Phi
+      phi0s[,,il] <- VARmodel$phi
+    }
+
+  }
+
+  if(cv){
+    out <- list("k"=k, "Y"=Y, "p"=p, "Phihat"=VARmodel$Phi, "phi0hat"=VARmodel$phi,
+                "series_names"=series_names, "lambdas"=VARcv$lambda,
+                "MSFEcv"=VARcv$MSFE_avg, "MSFE_all"=VARcv$MSFE_all,
+                "lambda_SEopt"=VARcv$lambda_opt_oneSE,"lambda_opt"=VARcv$lambda_opt, "h"=h)
+  }else{
+    out <- list("k"=k, "Y"=Y, "p"=p, "Phihat"=Phis, "phi0hat"=phi0s,
+                "series_names"=series_names, "lambdas"=VARlseq,
+                "MSFEcv"=NA, "MSFE_all"=NA,
+                "lambda_SEopt"=NA,"lambda_opt"=NA, "h"=h)
+  }
+
+
 }
 
 HVARmodel<-function(Y, p, h=1){

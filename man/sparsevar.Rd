@@ -10,6 +10,7 @@ sparseVAR(
   VARpen = "HLag",
   VARlseq = NULL,
   VARgran = NULL,
+  cv = FALSE,
   cvcut = 0.9,
   h = 1,
   eps = 0.001
@@ -27,6 +28,8 @@ its own grid. Supplying a grid of values overrides this. WARNING: use with care.
 
 \item{VARgran}{User-specified vector of granularity specifications for the penalty parameter grid:  First element specifies
 how deep the grid should be constructed. Second element specifies how many values the grid should contain.}
+
+\item{cv}{Logical, whether time-series cross-validation needs to be performed (TRUE) or not (FALSE) for selecting the sparsity parameter. If cv=FALSE, the argument cvcut is redundant.}
 
 \item{cvcut}{Proportion of observations used for model estimation in the time series cross-validation procedure. The remainder is used for forecast evaluation.}
 
