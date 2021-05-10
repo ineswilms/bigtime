@@ -3,6 +3,7 @@
 #include <limits>
 #include <algorithm>
 #include <numeric>      // std::iota
+#include <cmath>        // std::abs
 
 // [[Rcpp::plugins(cpp11)]]
 // [[Rcpp::depends(RcppArmadillo)]]
@@ -178,7 +179,7 @@ arma::mat FistaElem(const arma::mat& Y,const arma::mat& Z, arma::mat phi, const 
     phiOLDOLD=phiOLD;
     v=phiR;
     while(thresh>eps)
-    {
+    { 
       v=phiOLD+((j-2)/(j+1))*(phiOLD-phiOLDOLD);
 
       phiR=prox2(vectorise(v)+tk*vectorise((trans(Y.col(i))-v*Z)*trans(Z)),tk*lambda,k,p,res1,w);
@@ -347,8 +348,8 @@ arma::cube gamloopFista(NumericVector beta_, const arma::mat& Y,const arma::mat&
 
 // Lamba loop
 // [[Rcpp::export]]
-arma::cube gamloopElem2(const arma::cube bcube, const arma::mat& Y,const arma::mat& Z, arma::colvec gammgrid, const double eps,
-                        const arma::colvec YMean2, const arma::colvec ZMean2, arma::mat B1, const int k, const int p, const double tk,
+arma::cube gamloopElem2(arma::cube &bcube, const arma::mat& Y,const arma::mat& Z, arma::colvec gammgrid, const double eps,
+                        const arma::colvec YMean2, const arma::colvec ZMean2, arma::mat &B1, const int k, const int p, const double tk,
                         const int flag_restart_opt = 1){
 
   arma::mat B1F2 = B1;
@@ -439,7 +440,7 @@ arma::cube lassoVARFistcpp(const arma::cube& beta, const arma::mat& trainY, cons
 }
 
 // [[Rcpp::export]]
-arma::cube HVARElemAlgcpp(const arma::cube& beta, const arma::mat& trainY, const arma::mat& trainZ, const arma::colvec& lambda,
+arma::cube HVARElemAlgcpp(const arma::cube &beta, const arma::mat& trainY, const arma::mat& trainZ, const arma::colvec& lambda,
                           const double& tol, const int& p, const int flag_restart_opt = 0){
   // Prelimaries
   int n = trainY.n_rows;
@@ -920,4 +921,50 @@ Rcpp::List HVARX_cvaux_cpp_loop(const arma::mat& Y, const arma::mat& Z, const ar
     Rcpp::Named("MSFEcv") = MSFEcv,
     Rcpp::Named("sparsitycv") = sparsitycv);
   return(results);
+}
+
+
+
+bool moveup_LGSearch_cpp(arma::mat &param){
+  int n = param.n_rows;
+  int k = param.n_cols;
+
+  int i = 0;
+  int j = 0;
+  for (int i=0; i<n; i++){
+    for (int j=0; j<k; j++){
+      if (param(i, j) != 0) return(false);
+    }
+  }
+  return(true);
+}
+
+// estim 1 = lasso
+// estim 2 = hvar
+// [[Rcpp::export]]
+double LGSearch_cpp(double gstart, arma::mat &Y, arma::mat &Z, arma::cube beta, int estim, int k, int p) {
+  double lambdah = gstart;
+  double lambdal = 0.0;
+  arma::mat param;
+
+  while (std::abs(lambdah - lambdal) > 0.00001){
+    double lambda = (lambdah + lambdal)/2;
+    arma::colvec lvec(1);
+    lvec.fill(lambda);
+    if (estim == 1){
+      beta = lassoVARFistcpp(beta, Y, Z, lvec, 0.0001, p);
+      param = beta.slice(0).cols(1, k*p);
+    }
+    else if (estim == 2){
+      beta = HVARElemAlgcpp(beta, Y, Z, lvec, 0.0001, p);
+      param = beta.slice(0).cols(1, k*p);
+    }
+
+    bool move_up = moveup_LGSearch_cpp(param);
+    if (move_up) lambdah = lambda;
+    else lambdal = lambda;
+
+  }
+
+  return(lambdah);
 }

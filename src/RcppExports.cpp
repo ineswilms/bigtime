@@ -118,23 +118,24 @@ BEGIN_RCPP
 END_RCPP
 }
 // gamloopElem2
-arma::cube gamloopElem2(arma::cube bcube, const arma::mat& Y, const arma::mat& Z, arma::colvec gammgrid, const double eps, const arma::colvec YMean2, const arma::colvec ZMean2, arma::mat B1, const int k, const int p, const double tk);
-RcppExport SEXP _bigtime_gamloopElem2(SEXP bcubeSEXP, SEXP YSEXP, SEXP ZSEXP, SEXP gammgridSEXP, SEXP epsSEXP, SEXP YMean2SEXP, SEXP ZMean2SEXP, SEXP B1SEXP, SEXP kSEXP, SEXP pSEXP, SEXP tkSEXP) {
+arma::cube gamloopElem2(arma::cube& bcube, const arma::mat& Y, const arma::mat& Z, arma::colvec gammgrid, const double eps, const arma::colvec YMean2, const arma::colvec ZMean2, arma::mat& B1, const int k, const int p, const double tk, const int flag_restart_opt);
+RcppExport SEXP _bigtime_gamloopElem2(SEXP bcubeSEXP, SEXP YSEXP, SEXP ZSEXP, SEXP gammgridSEXP, SEXP epsSEXP, SEXP YMean2SEXP, SEXP ZMean2SEXP, SEXP B1SEXP, SEXP kSEXP, SEXP pSEXP, SEXP tkSEXP, SEXP flag_restart_optSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< arma::cube >::type bcube(bcubeSEXP);
+    Rcpp::traits::input_parameter< arma::cube& >::type bcube(bcubeSEXP);
     Rcpp::traits::input_parameter< const arma::mat& >::type Y(YSEXP);
     Rcpp::traits::input_parameter< const arma::mat& >::type Z(ZSEXP);
     Rcpp::traits::input_parameter< arma::colvec >::type gammgrid(gammgridSEXP);
     Rcpp::traits::input_parameter< const double >::type eps(epsSEXP);
     Rcpp::traits::input_parameter< const arma::colvec >::type YMean2(YMean2SEXP);
     Rcpp::traits::input_parameter< const arma::colvec >::type ZMean2(ZMean2SEXP);
-    Rcpp::traits::input_parameter< arma::mat >::type B1(B1SEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type B1(B1SEXP);
     Rcpp::traits::input_parameter< const int >::type k(kSEXP);
     Rcpp::traits::input_parameter< const int >::type p(pSEXP);
     Rcpp::traits::input_parameter< const double >::type tk(tkSEXP);
-    rcpp_result_gen = Rcpp::wrap(gamloopElem2(bcube, Y, Z, gammgrid, eps, YMean2, ZMean2, B1, k, p, tk));
+    Rcpp::traits::input_parameter< const int >::type flag_restart_opt(flag_restart_optSEXP);
+    rcpp_result_gen = Rcpp::wrap(gamloopElem2(bcube, Y, Z, gammgrid, eps, YMean2, ZMean2, B1, k, p, tk, flag_restart_opt));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -176,8 +177,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // HVARElemAlgcpp
-arma::cube HVARElemAlgcpp(const arma::cube& beta, const arma::mat& trainY, const arma::mat& trainZ, const arma::colvec& lambda, const double& tol, const int& p);
-RcppExport SEXP _bigtime_HVARElemAlgcpp(SEXP betaSEXP, SEXP trainYSEXP, SEXP trainZSEXP, SEXP lambdaSEXP, SEXP tolSEXP, SEXP pSEXP) {
+arma::cube HVARElemAlgcpp(const arma::cube& beta, const arma::mat& trainY, const arma::mat& trainZ, const arma::colvec& lambda, const double& tol, const int& p, const int flag_restart_opt);
+RcppExport SEXP _bigtime_HVARElemAlgcpp(SEXP betaSEXP, SEXP trainYSEXP, SEXP trainZSEXP, SEXP lambdaSEXP, SEXP tolSEXP, SEXP pSEXP, SEXP flag_restart_optSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -187,7 +188,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const arma::colvec& >::type lambda(lambdaSEXP);
     Rcpp::traits::input_parameter< const double& >::type tol(tolSEXP);
     Rcpp::traits::input_parameter< const int& >::type p(pSEXP);
-    rcpp_result_gen = Rcpp::wrap(HVARElemAlgcpp(beta, trainY, trainZ, lambda, tol, p));
+    Rcpp::traits::input_parameter< const int >::type flag_restart_opt(flag_restart_optSEXP);
+    rcpp_result_gen = Rcpp::wrap(HVARElemAlgcpp(beta, trainY, trainZ, lambda, tol, p, flag_restart_opt));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -257,6 +259,23 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// LGSearch_cpp
+double LGSearch_cpp(double gstart, arma::mat& Y, arma::mat& Z, arma::cube beta, int estim, int k, int p);
+RcppExport SEXP _bigtime_LGSearch_cpp(SEXP gstartSEXP, SEXP YSEXP, SEXP ZSEXP, SEXP betaSEXP, SEXP estimSEXP, SEXP kSEXP, SEXP pSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< double >::type gstart(gstartSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type Z(ZSEXP);
+    Rcpp::traits::input_parameter< arma::cube >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< int >::type estim(estimSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    rcpp_result_gen = Rcpp::wrap(LGSearch_cpp(gstart, Y, Z, beta, estim, k, p));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_bigtime_norm2", (DL_FUNC) &_bigtime_norm2, 1},
@@ -266,13 +285,14 @@ static const R_CallMethodDef CallEntries[] = {
     {"_bigtime_ST1a", (DL_FUNC) &_bigtime_ST1a, 2},
     {"_bigtime_ST3a", (DL_FUNC) &_bigtime_ST3a, 2},
     {"_bigtime_gamloopFista", (DL_FUNC) &_bigtime_gamloopFista, 13},
-    {"_bigtime_gamloopElem2", (DL_FUNC) &_bigtime_gamloopElem2, 11},
+    {"_bigtime_gamloopElem2", (DL_FUNC) &_bigtime_gamloopElem2, 12},
     {"_bigtime_gamloopFista2", (DL_FUNC) &_bigtime_gamloopFista2, 11},
     {"_bigtime_lassoVARFistcpp", (DL_FUNC) &_bigtime_lassoVARFistcpp, 6},
-    {"_bigtime_HVARElemAlgcpp", (DL_FUNC) &_bigtime_HVARElemAlgcpp, 6},
+    {"_bigtime_HVARElemAlgcpp", (DL_FUNC) &_bigtime_HVARElemAlgcpp, 7},
     {"_bigtime_HVAR_cvaux_loop_cpp", (DL_FUNC) &_bigtime_HVAR_cvaux_loop_cpp, 7},
     {"_bigtime_HVARX_NEW_export_cpp", (DL_FUNC) &_bigtime_HVARX_NEW_export_cpp, 15},
     {"_bigtime_HVARX_cvaux_cpp_loop", (DL_FUNC) &_bigtime_HVARX_cvaux_cpp_loop, 14},
+    {"_bigtime_LGSearch_cpp", (DL_FUNC) &_bigtime_LGSearch_cpp, 7},
     {NULL, NULL, 0}
 };
 

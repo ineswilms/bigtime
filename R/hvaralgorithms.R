@@ -63,11 +63,18 @@
     beta <- array(0,dim=c(k,k*p+1,1))
   }
 
-  gamstart <- LGSearch(gamstart,Y,Z,beta,group,k,p,jj,MN,alpha,C)
+  if (group == "HVARELEM" | group =="Basci"){
+    estim <- ifelse(group == "Basic", 1, 2)
+    gamstart <- LGSearch_cpp(gamstart, Y, Z, beta, estim, k, p)
+  }
+  else{
+    gamstart <- LGSearch(gamstart,Y,Z,beta,group,k,p,jj,MN,alpha,C)
+  }
 
   gamm <- exp(seq(from = log(gamstart), to = log(gamstart/gran1), length = gran2))
   return(gamm)
 }
+
 
 LGSearch<- function(gstart, Y, Z, BOLD, group, k, p, gs, MN, alpha, C)
 {

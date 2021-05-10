@@ -2,7 +2,7 @@
 % Please edit documentation in R/hvar.R
 \name{sparseVAR}
 \alias{sparseVAR}
-\title{Sparse Estimation of the Vector AutoRegressive (VAR) Model}
+\title{Sparse Estimation of the Vector AutoRegressive (VAR) model}
 \usage{
 sparseVAR(
   Y,
@@ -51,7 +51,7 @@ A list with the following components
 \item{h}{Forecast horizon h}
 }
 \description{
-Sparse Estimation of the Vector AutoRegressive (VAR) Model
+Sparse Estimation of the Vector AutoRegressive (VAR) model
 }
 \examples{
 data(Y)
