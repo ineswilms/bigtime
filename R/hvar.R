@@ -9,6 +9,7 @@
 #' @param cvcut Proportion of observations used for model estimation in the time series cross-validation procedure. The remainder is used for forecast evaluation.
 #' @param eps a small positive numeric value giving the tolerance for convergence in the proximal gradient algorithm.
 #' @param VARpen "HLag" (hierarchical sparse penalty) or "L1" (standard lasso penalty) penalization.
+#' @param cv Logical, whether time-series cross-validation needs to be performed (TRUE) or not (FALSE) for selecting the sparsity parameter. If cv=FALSE, the argument cvcut is redundant.
 #' @export
 #' @return A list with the following components
 #' \item{Y}{\eqn{T} by \eqn{k} matrix of time series.}
@@ -31,7 +32,7 @@
 #' VARfit <- sparseVAR(Y) # sparse VAR
 #' ARfit <- sparseVAR(Y[,2]) # sparse AR
 sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL,
-                      cvcut=0.9, h=1,  eps=1e-3, cv = FALSE){
+                      cv = FALSE, cvcut=0.9, h=1,  eps=1e-3){
 
   # Check Inputs
   if(!is.matrix(Y)){
