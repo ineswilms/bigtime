@@ -1,0 +1,254 @@
+#' Simulates a VAR(p) with various sparsity patterns
+#'
+#' @param periods Number of periods to simulate
+#' @param k Number of time series
+#' @param p Maximum lag number. In case of sparsity_patter="none" this will be
+#' the actual number of lags for all variables
+#' @param coef_mat Coefficient matrix in companion form. If not provided,
+#' one will be simulated
+#' @param const constent term of VAR. Default is zero
+#' @param e_dist Either a function taking argument n indicating the number of
+#' variables in the system, or a matrix of dimensions k x (periods+burnin)
+#' @param init_y Initial values. Defaults to zero
+#' @param max_abs_eigval Maximum Eigenvalue of companion matrix. Only applicable
+#' if coefficient matrix is being simulated
+#' @param burnin Number of periods to be used for burnin
+#' @param sparsity_pattern The sparsity pattern that should be simulated.
+#' Options are: none for a dense VAR, lasso for a VAR with random zeroes,
+#' and HVAR for an elementwise hirichical sparsity pattern
+#' @param sparsity_options Named list of additional options for
+#' when sparsity pattern is lasso or hvar. For lasso the option num_zero
+#' determines the number of zeros. For hvar, the options zero_min (zero_max)
+#' give the minimum (maximum) of zeroes for each variable in each equation,
+#' and the option zeroes_in_self (boolean) determines if any of the
+#' cofficients of a variable on itself should be zero.
+#' @param ... additional arguments passed to e_dist
+#' @export
+#' @return Returns an object of S3 class bigtime.simVAR containing the following
+#' \item{Y}{Simulated Data}
+#' \item{periods}{Number of periods of simulation}
+#' \item{k}{Number of endogenous variables}
+#' \item{p}{Maximum lag length; might be shorter due to sparsity patterns}
+#' \item{coef_mat}{Coefficient Matrix used}
+#' \item{is_coef_mat_simulated}{TRUE if the coef_mat was simulted, FALSE if
+#' it was user provided}
+#' \item{const}{Constant term}
+#' \item{e_dist}{Errors used in the construction of the data}
+#' \item{init_y}{Initial conditions}
+#' \item{max_abs_eigval}{Maximum eigenvalue to which the companion matrix
+#' was constraint}
+#' \item{burnin}{Burnin period used}
+#' \item{sparsity_pattern}{Which sparsity pattern was used}
+#' \item{sparsity_options}{Extra options for the sparsity patterns that were used}
+#' \item{seed}{seed used for the simulation}
+simVAR <- function(periods, k, p, coef_mat = NULL, const = rep(0, k), e_dist = rnorm,
+                   init_y = rep(0, k*p) , max_abs_eigval = runif(1, 0, 1), burnin = periods,
+                   sparsity_pattern = c("none", "lasso", "hvar"),
+                   sparsity_options = NULL,
+                   seed = NULL,
+                   ...){
+
+  if (is.null(seed)) warning("No seed is being used. Replication might be infeasible")
+  if (!is.null(seed)) set.seed(seed)
+
+  # Checking all variables
+  if (periods <= 0) stop("Must simulate at least one period: periods > 0")
+  if (k < 1) stop("Must have at least one variable: k >= 1")
+  if (!is.function(e_dist) & !is.matrix(e_dist)) stop("e_dist must either be a function or a matrix of dimensions k x (periods + burnin)")
+  if (is.matrix(e_dist)){
+    if ((ncol(e_dist) < periods | nrow(e_dist) < k)) stop("e_dist must be a function or a matrix of dimensions k x (periods + burnin)")
+  }
+  if (!is.null(coef_mat)) {
+    if (k*p != ncol(coef_mat)) stop("coef_mat must have k*p columns not ", ncol(coef_mat))
+  }
+  if (!(length(const) == 1 | length(const) == k)) stop("const must either be of length one or of length k, not of length", length(const))
+  if (p < 1) stop("Must include at least one lag: p >= 1")
+  if (!(length(init_y) == 1 | length(init_y) == k*p)) stop("init_y must be of length one or of length k*p, not of length", length(init_y))
+  if (max_abs_eigval < 0 | max_abs_eigval >=1) stop("Maximum eigenvalue must be strictly between zero and one, not ", max_abs_eigval)
+  if (burnin < 0) stop("burnin must be non-negative: burnin >= 0")
+  if (burnin == 0) warning("Not burning in the series is not recommended")
+  if (!is.null(coef_mat)) warning("Will not use provided sparsity_pattern since coef_mat was given")
+
+  # Which sparsity pattern was chosen?
+  sparsity_pattern <- match.arg(sparsity_pattern)
+
+  # Creating coef_mat if needed
+  is_coef_mat_simulated <- is.null(coef_mat)
+  if (is.null(coef_mat)) coef_mat <- create_rand_coef_mat(k, p, runif, max_abs_eigval, sparsity_pattern, sparsity_options)
+
+  # Getting error terms
+  if (is.function(e_dist)) e_dist <- do.call(cbind, lapply(1:(periods+burnin), function(x) e_dist(n = k, ...)))
+  e_dist <- rbind(e_dist, matrix(0, nrow = k*(p-1), ncol = ncol(e_dist)))
+
+  # constructing the constent
+  if (length(const) == 1) const <- rep(const, k)
+  const <- c(const, rep(0, k*(p-1)))
+
+  # constructing the intial values
+  if (length(init_y) == 1) init_y <- rep(init_y, k*p)
+
+
+  Y <- simVAR_cpp(periods, k, p, coef_mat, const, e_dist, init_y, burnin)
+  colnames(Y) <- paste0("Y", 1:k)
+
+  sim_data <- list(
+    Y = Y,
+    periods = periods,
+    k = k,
+    p = p,
+    coef_mat = coef_mat,
+    is_coef_mat_simulated = is_coef_mat_simulated,
+    const = const,
+    e_dist = e_dist,
+    init_y = init_y,
+    max_abs_eigval = max_abs_eigval,
+    burnin = burnin,
+    sparsity_pattern = sparsity_pattern,
+    sparsity_options = sparsity_options,
+    seed = seed
+  )
+  class(sim_data) <- "bigtime.simVAR"
+  sim_data
+}
+
+
+#' Creates a random coefficient matrix
+#'
+#' @param k number of time series
+#' @param p number of lags
+#' @param dist distribution to draw coefficients from; must take n as argument
+#' indicating number of draws wanted and must return one value per draw wanted,
+#' e.g. no vector/matrix returns. Default is uniform distribution: Not currently used
+#' @param max_abs_eigval if < 1, then var will be stable
+#' @param sparsity_pattern The sparsity pattern that should be simulated.
+#' Options are: none for a dense VAR, lasso for a VAR with random zeroes,
+#' and HVAR for an elementwise hirichical sparsity pattern
+#' @param sparsity_options Named list of additional options for
+#' when sparsity pattern is lasso or hvar. For lasso the option num_zero
+#' determines the number of zeros. For hvar, the options zero_min (zero_max)
+#' give the minimum (maximum) of zeroes for each variable in each equation,
+#' and the option zeroes_in_self (boolean) determines if any of the
+#' cofficients of a variable on itself should be zero.
+#' @param ... additional arguments forwarded to dist
+#' @export
+#' @return Returns a coefficient matrix in companion form.
+create_rand_coef_mat <- function(k, p,
+                                 dist = runif,
+                                 max_abs_eigval = 0.99,
+                                 sparsity_pattern = c("none", "lasso", "hvar"),
+                                 sparsity_options = NULL,
+                                 ...){
+  sparsity_pattern <- match.arg(sparsity_pattern)
+  phi_vals <- runif(k*p*k, min = -100, max = 100)
+  # randomly push some phis higher
+  # This somewhat helps to makes some coefficients way larger w.r.t other
+  # and hence makes it a bit more realistic
+  # TODO: make this an option
+  push_higher <- sample(c(TRUE, FALSE), floor(length(phi_vals)/3), replace = TRUE)
+  phi_vals[push_higher] <- phi_vals[push_higher]*10
+  # phi_vals <- rnorm(k*p*k, mean = runif(1, -1, 1), sd = 5)*100
+  phis <- matrix(phi_vals, nrow = k, ncol = p*k)
+
+  if (sparsity_pattern == "lasso"){
+    # Some phi_vals will randomly be set to zero
+    num_zero <- sparsity_options$num_zero
+    if(is.null(num_zero)) {
+      warning("Number of coefficients to be zero (num_zero) was not specified in sparsity_options. Defaulting to ", k*p)
+      num_zero <- k*p
+    }
+    set_zero <- sample(1:(k*k*p), num_zero, replace = FALSE)
+    phis[set_zero] <- 0
+  }
+  else if (sparsity_pattern == "hvar"){
+    zero_min <- sparsity_options$zero_min
+    zero_max <- sparsity_options$zero_max
+    zeroes_in_self <- sparsity_options$zeroes_in_self
+    if (is.null(zero_min)){
+      warning("Minimum of zero was not given in sparsity_options. Defaulting to 0")
+      zero_min <- 0
+    }
+    if (is.null(zero_max)){
+      warning("Maximum of zero was not given in sparsity_options. Defaulting to ", floor(p/2))
+      zero_max <- floor(p/2)
+    }
+    if (is.null(zeroes_in_self)){
+      warning("Not specified whether there should be zero in self lags. Defaulting to true")
+      zeroes_in_self <- TRUE
+    }
+    if(zero_max < zero_min) stop("zero_min must be smaller-equal than zero_max")
+
+    for (k1 in 1:k){
+      for (k2 in 1:k){
+        if (k2 == k1 & !zeroes_in_self) next
+        zeros <- sample(zero_min:zero_max, 1)
+        if (zeros == 0) next
+        set_zero <- seq(k2, k*p, k)[(p+1-zeros):p]
+        phis[k1, set_zero] <- 0
+      }
+    }
+  }
+
+
+  I <- diag(1, nrow = k*(p-1), k*(p-1))
+  O <- matrix(0, nrow = k*(p-1), ncol = k)
+  coef_mat <- rbind(phis, cbind(I, O))
+  while (max(abs(eigen(coef_mat)$values))>max_abs_eigval) {
+    phis <- phis*0.99
+    coef_mat <- rbind(phis, cbind(I, O))
+  }
+  rownames(coef_mat) <- c(paste0("Y", 1:k), rep("", dim(coef_mat)[[1]]-k))
+  colnames(coef_mat) <- paste0(rownames(coef_mat)[1:k], ".L", rep(1:p, each = k))
+
+  coef_mat
+}
+
+#' Plots a simulated VAR
+#' @param sim_data Simulated data of class bigtime.simVAR obtained
+#' from the simVAR function
+#' @export
+#' @return Returns a ggplot2 plot
+plot.bigtime.simVAR <- function(sim_data, ...){
+  Y <- sim_data$Y
+  if (!require(tidyverse, quietly = TRUE)) stop("tidyverse must be installed")
+  as_tibble(Y) %>%
+    mutate(Time = 1:n()) %>%
+    pivot_longer(-Time, names_to = "Series", values_to = "SimData") %>%
+    ggplot() +
+    geom_line(aes(Time, SimData)) +
+    facet_grid(rows = vars(Series)) +
+    ylab("") +
+    theme_bw()
+}
+
+
+#' Gives a small summary of a VAR simulation
+#' @param sim_data Simulated data of class bigtiem.simVAR obtained
+#' from the simVAR function
+#' @param plot Should the VAR be plotted. Default is TRUE
+#' @export
+#' @return If plot=TRUE, then a ggplot2 plot will be returned
+summary.bigtime.simVAR <- function(sim_data, plot = TRUE, ...){
+  cat("#### General Information #### \n\n")
+  cat("Seed \t\t\t\t\t", sim_data$seed, "\n")
+  cat("Periods Simulated \t\t\t", sim_data$periods, "\n")
+  cat("Periods used as burnin \t\t\t", sim_data$burnin, "\n")
+  cat("Variables Simulated \t\t\t", sim_data$k, "\n")
+  cat("Number of Lags \t\t\t\t", sim_data$p, "\n")
+  cat("Coefficients were randomly created? \t", sim_data$is_coef_mat_simulated, "\n")
+  cat("Maximum Eigenvalue of Companion Matrix \t", sim_data$max_abs_eigval, "\n")
+  cat("Sparsity Pattern \t\t\t", sim_data$sparsity_pattern, "\n")
+
+  cat("\n\n#### Sparsity Options #### \n\n")
+  print(sim_data$sparsity_options)
+
+  cat("\n\n#### Coefficient Matrix #### \n\n")
+  print(t(sim_data$coef_mat[1:sim_data$k, ]))
+
+  if(plot) plot(sim_data)
+}
+
+
+
+
+
+
