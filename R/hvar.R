@@ -118,11 +118,14 @@ sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL,
     warning("No cross-validation is performed since only one sparsity parameter is provided.")
   }
 
+  # Set the grid of sparsity parameters
+  VARdata <- HVARmodel(Y=Y, p=p, h=h)
+  k <- VARdata$k # Number of time series
+
   if(cv){ # Time series cross-validation to get optimal sparsity parameter
     VARcv <- HVAR_cv(Y=Y, p=p, h=h, lambdaPhiseq=VARlseq, gran1=VARgran1, gran2=VARgran2, T1.cutoff=cvcut, eps=eps, type=VARpen)
 
     # Var estimation with selected regularization parameter
-    VARdata <- HVARmodel(Y=Y, p=p, h=h)
     VARmodel <- HVAR(fullY=VARdata$fullY, fullZ=VARdata$fullZ, p=VARdata$p, k=VARdata$k, lambdaPhi=VARcv$lambda_opt_oneSE, eps=eps, type=VARpen)
 
   }else{ # No time series cross-validation
@@ -130,9 +133,6 @@ sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL,
     Phis <- array(NA, c(k, k*p, VARgran2)) # Estimates AR coefficients for each value in the grid
     phi0s <- array(NA, c(k, 1, VARgran2)) # Estimates of constants for each value in the grid
 
-    # Set the grid of sparsity parameters
-    VARdata <- HVARmodel(Y=Y, p=p, h=h)
-    k <- VARdata$k # Number of time series
     fullY <- VARdata$fullY # response matrix
 
     if(k==1){
