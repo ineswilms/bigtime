@@ -2,6 +2,7 @@
 #' @param fit Fitted VAR or VARX model.
 #' returned by \code{\link{sparseVAR}} or \code{\link{sparseVARX}}.
 #' @param model Type of model that was estimated: VAR or VARX.
+#' @param ... Not currently used
 #' @export
 plot_cv <- function(fit, model, ...) {
   if (model == "VAR") {

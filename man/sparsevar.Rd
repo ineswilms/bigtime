@@ -10,7 +10,7 @@ sparseVAR(
   VARpen = "HLag",
   VARlseq = NULL,
   VARgran = NULL,
-  cv = FALSE,
+  cv = TRUE,
   cvcut = 0.9,
   h = 1,
   eps = 0.001

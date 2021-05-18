@@ -276,6 +276,38 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// recursiveforecast_cpp
+arma::mat recursiveforecast_cpp(arma::vec& inity, arma::mat& FF, arma::vec& c, int h);
+RcppExport SEXP _bigtime_recursiveforecast_cpp(SEXP initySEXP, SEXP FFSEXP, SEXP cSEXP, SEXP hSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< arma::vec& >::type inity(initySEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type FF(FFSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type c(cSEXP);
+    Rcpp::traits::input_parameter< int >::type h(hSEXP);
+    rcpp_result_gen = Rcpp::wrap(recursiveforecast_cpp(inity, FF, c, h));
+    return rcpp_result_gen;
+END_RCPP
+}
+// simVAR_cpp
+arma::mat simVAR_cpp(int periods, int k, int p, arma::mat& coef_mat, arma::vec& c, arma::mat& e, arma::vec& init_y, int burnin);
+RcppExport SEXP _bigtime_simVAR_cpp(SEXP periodsSEXP, SEXP kSEXP, SEXP pSEXP, SEXP coef_matSEXP, SEXP cSEXP, SEXP eSEXP, SEXP init_ySEXP, SEXP burninSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< int >::type periods(periodsSEXP);
+    Rcpp::traits::input_parameter< int >::type k(kSEXP);
+    Rcpp::traits::input_parameter< int >::type p(pSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type coef_mat(coef_matSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type c(cSEXP);
+    Rcpp::traits::input_parameter< arma::mat& >::type e(eSEXP);
+    Rcpp::traits::input_parameter< arma::vec& >::type init_y(init_ySEXP);
+    Rcpp::traits::input_parameter< int >::type burnin(burninSEXP);
+    rcpp_result_gen = Rcpp::wrap(simVAR_cpp(periods, k, p, coef_mat, c, e, init_y, burnin));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
     {"_bigtime_norm2", (DL_FUNC) &_bigtime_norm2, 1},
@@ -293,6 +325,8 @@ static const R_CallMethodDef CallEntries[] = {
     {"_bigtime_HVARX_NEW_export_cpp", (DL_FUNC) &_bigtime_HVARX_NEW_export_cpp, 15},
     {"_bigtime_HVARX_cvaux_cpp_loop", (DL_FUNC) &_bigtime_HVARX_cvaux_cpp_loop, 14},
     {"_bigtime_LGSearch_cpp", (DL_FUNC) &_bigtime_LGSearch_cpp, 7},
+    {"_bigtime_recursiveforecast_cpp", (DL_FUNC) &_bigtime_recursiveforecast_cpp, 4},
+    {"_bigtime_simVAR_cpp", (DL_FUNC) &_bigtime_simVAR_cpp, 8},
     {NULL, NULL, 0}
 };
 

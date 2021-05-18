@@ -11,6 +11,8 @@ plot_cv(fit, model, ...)
 returned by \code{\link{sparseVAR}} or \code{\link{sparseVARX}}.}
 
 \item{model}{Type of model that was estimated: VAR or VARX.}
+
+\item{...}{Not currently used}
 }
 \description{
 Plot the Cross Validation Error Curve for a Sparse VAR or VARX

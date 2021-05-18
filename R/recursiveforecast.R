@@ -19,6 +19,16 @@
 #' \item{h}{Selected forecast horizon}
 #' \item{lambda}{list of lambdas for which the forecasts were made}
 #' \item{Y}{Data used for recursive forecasting}
+#' @example
+#' sim_data <- bigtime::simVAR(200, 5, 5)
+#' summary(sim_data)
+#' mod <- bigtime::sparseVAR(sim_data$Y)
+#' bigtime::is.stable(mod)
+#' fcst_recursive <- bigtime::recursiveforecast(mod, h = 4)
+#' plot(fcst_recursive, series = "Y1")
+#' fcst_direct <- bigtime::directforecast(mod, "VAR")
+#' fcst_direct
+#' fcst_recursive$fcst
 recursiveforecast <- function(mod, h=1, lambda = NULL){
   if (!("bigtime.VAR" %in% class(mod))) stop("Recursive Forecasting is only supported for VAR models estimated using bigtime::sparseVAR")
   if (!is.null(lambda) & length(lambda) > 1) stop("Must either forecast using all lambdas or only one.")
@@ -45,11 +55,11 @@ recursiveforecast <- function(mod, h=1, lambda = NULL){
     fcst <- array(dim = c(h, mod$k, dim(Phi_hat)[3]))
     for (slice in 1:dim(Phi_hat)[3]){
       fcst[, , slice] <- .recursiveforecast(mod$Y, Phi_hat[, , slice],
-                                            phi_0[, , slice], init, h)
+                                            phi_0[, , slice], h)
     }
   }
   else {
-    fcst <- .recursiveforecast(mod$Y, Phi_hat, phi_0, init, h)
+    fcst <- .recursiveforecast(mod$Y, Phi_hat, phi_0, h)
   }
 
   # Checking whether cv was performed. In this case mod$lambdas > 1 but only
@@ -76,12 +86,9 @@ recursiveforecast <- function(mod, h=1, lambda = NULL){
 #' @param Y data matrix
 #' @param Phi_hat coefficient matrix
 #' @param phi_0 constent terms
-#' @param init starting values of recursive forecast. Usually the last p
-#' observations of each variable. Must be in the form
-#' (y_1t, y_2t, y_1t-1, y_2t-1, ...)
 #' @param h forecast horizon
 #' @return Returns a matrix of forecasts
-.recursiveforecast <- function(Y, Phi_hat, phi_0, init, h){
+.recursiveforecast <- function(Y, Phi_hat, phi_0, h){
   # Constructing the companion form for quicker forecasting
   k <- nrow(Phi_hat)
   p <- ncol(Phi_hat)/k
@@ -117,16 +124,20 @@ recursiveforecast <- function(mod, h=1, lambda = NULL){
 #' Default names for series are Y1, Y2, ... if the original data does
 #' not have any column names
 #'
-#' @param fcst Recursive Forecast obtained using bigtime::recursiveforecast
+#' @param x Recursive Forecast obtained using bigtime::recursiveforecast
 #' @param series Series name. If original data has not names, then use Y1 for
 #' the first series, Y2 for the second, and so on
 #' @param lmbda lambdas to be used for plotting. If forecast was done using only
 #' one lambda, then this will be ignored.
 #' @param last_n last n observations of the original data to include in the plot
+#' @param ... Not currently used
 #' @export
 #' @return Returns a ggplot
-plot.bigtime.recursiveforecast <- function(fcst, series, lmbda=NULL,
-                                           last_n = floor(nrow(fcst$Y)*0.1)){
+plot.bigtime.recursiveforecast <- function(x, series=NULL, lmbda=NULL,
+                                           last_n = floor(nrow(fcst$Y)*0.1), ...){
+  cn <- colnames(x$fcst)
+  if (is.na(series)) series <- ifelse(is.null(cn), "Y1", cn[[1]])
+  fcst <- x
   # Setting up Y so it is in the right form
   Y <- as.data.frame(fcst$Y)
   cnames <- colnames(Y)
@@ -145,45 +156,45 @@ plot.bigtime.recursiveforecast <- function(fcst, series, lmbda=NULL,
     fcast <- cbind(fcast, lambda)
   }
 
-  if(!require(tidyverse, quietly = TRUE)) stop("tidyverse must be installed")
-  Y <- as_tibble(Y[, series, drop = FALSE]) %>% mutate(t = 1:n())
-  fcast <- as_tibble(fcast[, c(series, "lambda")]) %>%
-    group_by(lambda) %>%
-    mutate(t = 1:n()+nrow(Y)) %>%
-    ungroup()
+  # if(!require(tidyverse, quietly = TRUE)) stop("tidyverse must be installed")
+  Y <- dplyr::as_tibble(Y[, series, drop = FALSE]) %>% dplyr::mutate(t = 1:dplyr::n())
+  fcast <- dplyr::as_tibble(fcast[, c(series, "lambda")]) %>%
+    dplyr::group_by(lambda) %>%
+    dplyr::mutate(t = 1:dplyr::n()+nrow(Y)) %>%
+    dplyr::ungroup()
 
   if (length(fcst$lambda) == 1 | length(lmbda) == 1){
     # The model was either forecasted using only one lambda
     # or we wish to plot only for one lambda
     if (is.null(lmbda)) lmbda <- fcst$lambda
     if (!(lmbda %in% fcast$lambda)) stop("Selected lambda was not used for forecasting.")
-    fcast <- fcast %>% filter(lambda == lmbda)
+    fcast <- fcast %>% dplyr::filter(lambda == lmbda)
 
     p <- Y %>%
-      filter(t >= n() - last_n) %>%
-      ggplot() +
-      geom_line(aes_string("t", series), color = "black") +
-      geom_line(data = fcast, aes_string("t", series, group = "lambda"), color = "coral3") +
-      theme_bw()
+      dplyr::filter(t >= dplyr::n() - last_n) %>%
+      ggplot2::ggplot() +
+      ggplot2::geom_line(ggplot2::aes_string("t", series), color = "black") +
+      ggplot2::geom_line(data = fcast, ggplot2::aes_string("t", series, group = "lambda"), color = "coral3") +
+      ggplot2::theme_bw()
   }else {
     # Plotting for multiple lambdas
     # In this case we plot a ribbon
     message("Plotting ribbon from min to max because multiple lambdas are used")
-    if (!is.null(lmbda)) fcast <- fcast %>% filter(lambda %in% lmbda)
+    if (!is.null(lmbda)) fcast <- fcast %>% dplyr::filter(lambda %in% lmbda)
     fcast <- fcast %>%
-      group_by(t) %>%
-      mutate_at(.vars = vars(!!series), .funs = list(min = min, max = max)) %>%
-      summarise_all(.funs = function(x) x[[length(x)]])
+      dplyr::group_by(t) %>%
+      dplyr::mutate_at(.vars = dplyr::vars(!!series), .funs = list(min = min, max = max)) %>%
+      dplyr::summarise_all(.funs = function(x) x[[length(x)]])
 
     p <- Y %>%
-      filter(t >= n() - last_n) %>%
-      ggplot() +
-      geom_line(aes_string("t", series), color = "black") +
-      geom_ribbon(data = fcast, aes(x = t, ymin = min, ymax = max), alpha = 0.5, fill = "coral3", color = "coral3") +
-      theme_bw()
+      dplyr::filter(t >= dplyr::n() - last_n) %>%
+      ggplot2::ggplot() +
+      ggplot2::geom_line(ggplot2::aes_string("t", series), color = "black") +
+      ggplot2::geom_ribbon(data = fcast, ggplot2::aes(x = t, ymin = min, ymax = max), alpha = 0.5, fill = "coral3", color = "coral3") +
+      ggplot2::theme_bw()
   }
 
-  p + xlab("Time")
+  p + ggplot2::xlab("Time")
 }
 
 #' Checks whether a VAR is stable

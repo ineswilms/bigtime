@@ -32,7 +32,7 @@
 #' VARfit <- sparseVAR(Y) # sparse VAR
 #' ARfit <- sparseVAR(Y[,2]) # sparse AR
 sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL,
-                      cv = FALSE, cvcut=0.9, h=1,  eps=1e-3){
+                      cv = TRUE, cvcut=0.9, h=1,  eps=1e-3){
 
   # Check Inputs
   if(!is.matrix(Y)){

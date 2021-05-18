@@ -61,3 +61,11 @@ LGSearch_cpp <- function(gstart, Y, Z, beta, estim, k, p) {
     .Call(`_bigtime_LGSearch_cpp`, gstart, Y, Z, beta, estim, k, p)
 }
 
+recursiveforecast_cpp <- function(inity, FF, c, h) {
+    .Call(`_bigtime_recursiveforecast_cpp`, inity, FF, c, h)
+}
+
+simVAR_cpp <- function(periods, k, p, coef_mat, c, e, init_y, burnin) {
+    .Call(`_bigtime_simVAR_cpp`, periods, k, p, coef_mat, c, e, init_y, burnin)
+}
+

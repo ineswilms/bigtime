@@ -22,6 +22,9 @@
 #' give the minimum (maximum) of zeroes for each variable in each equation,
 #' and the option zeroes_in_self (boolean) determines if any of the
 #' cofficients of a variable on itself should be zero.
+#' @param decay How much smaller should parameters for laters lags be. The
+#' smaller, the larger will early parameters be w.r.t. later ones.
+#' @param seed Seed to be used for the simulation
 #' @param ... additional arguments passed to e_dist
 #' @export
 #' @return Returns an object of S3 class bigtime.simVAR containing the following
@@ -44,7 +47,7 @@
 simVAR <- function(periods, k, p, coef_mat = NULL, const = rep(0, k), e_dist = rnorm,
                    init_y = rep(0, k*p) , max_abs_eigval = runif(1, 0, 1), burnin = periods,
                    sparsity_pattern = c("none", "lasso", "hvar"),
-                   sparsity_options = NULL,
+                   sparsity_options = NULL, decay = 1/p,
                    seed = NULL,
                    ...){
 
@@ -68,13 +71,14 @@ simVAR <- function(periods, k, p, coef_mat = NULL, const = rep(0, k), e_dist = r
   if (burnin < 0) stop("burnin must be non-negative: burnin >= 0")
   if (burnin == 0) warning("Not burning in the series is not recommended")
   if (!is.null(coef_mat)) warning("Will not use provided sparsity_pattern since coef_mat was given")
+  if (decay > 1 | decay <=0) stop("Decay parameter must be between 0 and 1 (including)")
 
   # Which sparsity pattern was chosen?
   sparsity_pattern <- match.arg(sparsity_pattern)
 
   # Creating coef_mat if needed
   is_coef_mat_simulated <- is.null(coef_mat)
-  if (is.null(coef_mat)) coef_mat <- create_rand_coef_mat(k, p, runif, max_abs_eigval, sparsity_pattern, sparsity_options)
+  if (is.null(coef_mat)) coef_mat <- create_rand_coef_mat(k, p, runif, max_abs_eigval, sparsity_pattern, sparsity_options, decay = decay)
 
   # Getting error terms
   if (is.function(e_dist)) e_dist <- do.call(cbind, lapply(1:(periods+burnin), function(x) e_dist(n = k, ...)))
@@ -129,25 +133,24 @@ simVAR <- function(periods, k, p, coef_mat = NULL, const = rep(0, k), e_dist = r
 #' give the minimum (maximum) of zeroes for each variable in each equation,
 #' and the option zeroes_in_self (boolean) determines if any of the
 #' cofficients of a variable on itself should be zero.
+#' @param decay How fast should coefficient shrink when the lag increases.
 #' @param ... additional arguments forwarded to dist
 #' @export
 #' @return Returns a coefficient matrix in companion form.
 create_rand_coef_mat <- function(k, p,
                                  dist = runif,
-                                 max_abs_eigval = 0.99,
+                                 max_abs_eigval = 0.8,
                                  sparsity_pattern = c("none", "lasso", "hvar"),
                                  sparsity_options = NULL,
+                                 decay = 0.5,
                                  ...){
   sparsity_pattern <- match.arg(sparsity_pattern)
-  phi_vals <- runif(k*p*k, min = -100, max = 100)
-  # randomly push some phis higher
-  # This somewhat helps to makes some coefficients way larger w.r.t other
-  # and hence makes it a bit more realistic
-  # TODO: make this an option
-  push_higher <- sample(c(TRUE, FALSE), floor(length(phi_vals)/3), replace = TRUE)
-  phi_vals[push_higher] <- phi_vals[push_higher]*10
-  # phi_vals <- rnorm(k*p*k, mean = runif(1, -1, 1), sd = 5)*100
+  # phi_vals <- runif(k*p*k, min = -100, max = 100)
+  phi_vals <- rnorm(k*p*k, sd = 10)
   phis <- matrix(phi_vals, nrow = k, ncol = p*k)
+  scale <- decay^(seq(0, p-1, by = 1))
+  scale <- rep(scale, each = k)
+  phis <- t(apply(phis, 1, function(x) x*scale))
 
   if (sparsity_pattern == "lasso"){
     # Some phi_vals will randomly be set to zero
@@ -203,31 +206,37 @@ create_rand_coef_mat <- function(k, p,
 }
 
 #' Plots a simulated VAR
-#' @param sim_data Simulated data of class bigtime.simVAR obtained
+#' @param x Simulated data of class bigtime.simVAR obtained
 #' from the simVAR function
+#' @param ... Not currently used
 #' @export
 #' @return Returns a ggplot2 plot
-plot.bigtime.simVAR <- function(sim_data, ...){
+plot.bigtime.simVAR <- function(x, ...){
+  Time <- SimData <- Series <- NULL # Needed because of non-standard evaluation
+
+  sim_data <- x
   Y <- sim_data$Y
-  if (!require(tidyverse, quietly = TRUE)) stop("tidyverse must be installed")
-  as_tibble(Y) %>%
-    mutate(Time = 1:n()) %>%
-    pivot_longer(-Time, names_to = "Series", values_to = "SimData") %>%
-    ggplot() +
-    geom_line(aes(Time, SimData)) +
-    facet_grid(rows = vars(Series)) +
-    ylab("") +
-    theme_bw()
+  # if (!require(tidyverse, quietly = TRUE)) stop("tidyverse must be installed")
+  dplyr::as_tibble(Y) %>%
+    dplyr::mutate(Time = 1:dplyr::n()) %>%
+    tidyr::pivot_longer(-Time, names_to = "Series", values_to = "SimData") %>%
+    ggplot2::ggplot() +
+    ggplot2::geom_line(ggplot2::aes(Time, SimData)) +
+    ggplot2::facet_grid(rows = dplyr::vars(Series)) +
+    ggplot2::ylab("") +
+    ggplot2::theme_bw()
 }
 
 
 #' Gives a small summary of a VAR simulation
-#' @param sim_data Simulated data of class bigtiem.simVAR obtained
+#' @param object Simulated data of class bigtime.simVAR obtained
 #' from the simVAR function
 #' @param plot Should the VAR be plotted. Default is TRUE
+#' @param ... Not currently used
 #' @export
 #' @return If plot=TRUE, then a ggplot2 plot will be returned
-summary.bigtime.simVAR <- function(sim_data, plot = TRUE, ...){
+summary.bigtime.simVAR <- function(object, plot = TRUE, ...){
+  sim_data <- object
   cat("#### General Information #### \n\n")
   cat("Seed \t\t\t\t\t", sim_data$seed, "\n")
   cat("Periods Simulated \t\t\t", sim_data$periods, "\n")
