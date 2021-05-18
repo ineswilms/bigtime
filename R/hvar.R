@@ -176,7 +176,8 @@ sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL,
                 "lambda_SEopt"=NA,"lambda_opt"=NA, "h"=h)
   }
 
-
+  class(out) <- "bigtime.VAR"
+  out
 }
 
 HVARmodel<-function(Y, p, h=1){
