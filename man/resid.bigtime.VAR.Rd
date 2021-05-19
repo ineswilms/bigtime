@@ -17,3 +17,9 @@ Returns a matrix of residuals.
 \description{
 Gives the residuals for VAR models estimated using sparseVAR
 }
+\examples{
+dat <- bigtime::simVAR(200, 2, 5, decay = 0.001, seed = 6150533)
+mod <- bigtime::sparseVAR(dat$Y)
+f <- fitted(mod)
+res <- resid(mod)
+}
