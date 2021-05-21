@@ -136,3 +136,30 @@ diagnostics_plot <- function(mod, variable = 1, dates=NULL){
 }
 
 
+#' Checks whether a VAR is stable
+#'
+#' Using a model estimated by bigtime::sparseVAR, this function checks whether
+#' the resulting VAR is stable
+#'
+#' @param mod model estimated using bigtime::sparseVAR. Can only be a model
+#' with one coefficient vector. Hence, the model must either be estimated using
+#' cv=TRUE or by giving a single lambda value
+#' @param verbose If TRUE, then the actual maximum eigenvalue of the companion
+#' matrix will be printed to the console. Default is FALSE
+#' @export
+#' @return Returns TRUE if the VAR is stable and FALSE otherwise
+is.stable <- function(mod, verbose = FALSE){
+  if (!("bigtime.VAR") %in% class(mod)) stop("Model is not a VAR model estimated using bigtime::sparseVAR")
+  if (!is.matrix(mod$Phihat)) stop("Model contains multiple coefficient estimates. It is not clear which model is meant. Please reduce the model to one coefficient estimate")
+  Phi_hat <- mod$Phihat
+  k <- mod$k
+  p <- mod$p
+  I <- diag(1, k*(p-1), k*(p-1))
+  O <- matrix(0, k*(p-1), k)
+
+  FF <- rbind(Phi_hat, cbind(I, O))
+  max_eigval <- max(abs(eigen(FF)$value))
+  if (verbose) cat("Maximum eigenvalue of Companion Matrix: ", max_eigval, "\n")
+  if (max_eigval < 1) return(TRUE)
+  FALSE
+}
