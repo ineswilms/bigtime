@@ -12,7 +12,7 @@ simVAR(
   const = rep(0, k),
   e_dist = rnorm,
   init_y = rep(0, k * p),
-  max_abs_eigval = runif(1, 0, 1),
+  max_abs_eigval = 0.8,
   burnin = periods,
   sparsity_pattern = c("none", "lasso", "hvar"),
   sparsity_options = NULL,

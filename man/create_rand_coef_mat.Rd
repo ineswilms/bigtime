@@ -7,7 +7,6 @@
 create_rand_coef_mat(
   k,
   p,
-  dist = runif,
   max_abs_eigval = 0.8,
   sparsity_pattern = c("none", "lasso", "hvar"),
   sparsity_options = NULL,
@@ -19,10 +18,6 @@ create_rand_coef_mat(
 \item{k}{number of time series}
 
 \item{p}{number of lags}
-
-\item{dist}{distribution to draw coefficients from; must take n as argument
-indicating number of draws wanted and must return one value per draw wanted,
-e.g. no vector/matrix returns. Default is uniform distribution: Not currently used}
 
 \item{max_abs_eigval}{if < 1, then var will be stable}
 

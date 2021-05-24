@@ -45,7 +45,7 @@
 #' \item{sparsity_options}{Extra options for the sparsity patterns that were used}
 #' \item{seed}{seed used for the simulation}
 simVAR <- function(periods, k, p, coef_mat = NULL, const = rep(0, k), e_dist = rnorm,
-                   init_y = rep(0, k*p) , max_abs_eigval = runif(1, 0, 1), burnin = periods,
+                   init_y = rep(0, k*p), max_abs_eigval = 0.8, burnin = periods,
                    sparsity_pattern = c("none", "lasso", "hvar"),
                    sparsity_options = NULL, decay = 1/p,
                    seed = NULL,
@@ -78,7 +78,7 @@ simVAR <- function(periods, k, p, coef_mat = NULL, const = rep(0, k), e_dist = r
 
   # Creating coef_mat if needed
   is_coef_mat_simulated <- is.null(coef_mat)
-  if (is.null(coef_mat)) coef_mat <- create_rand_coef_mat(k, p, runif, max_abs_eigval, sparsity_pattern, sparsity_options, decay = decay)
+  if (is.null(coef_mat)) coef_mat <- create_rand_coef_mat(k, p, max_abs_eigval, sparsity_pattern, sparsity_options, decay = decay)
 
   # Getting error terms
   if (is.function(e_dist)) e_dist <- do.call(cbind, lapply(1:(periods+burnin), function(x) e_dist(n = k, ...)))
@@ -120,9 +120,6 @@ simVAR <- function(periods, k, p, coef_mat = NULL, const = rep(0, k), e_dist = r
 #'
 #' @param k number of time series
 #' @param p number of lags
-#' @param dist distribution to draw coefficients from; must take n as argument
-#' indicating number of draws wanted and must return one value per draw wanted,
-#' e.g. no vector/matrix returns. Default is uniform distribution: Not currently used
 #' @param max_abs_eigval if < 1, then var will be stable
 #' @param sparsity_pattern The sparsity pattern that should be simulated.
 #' Options are: none for a dense VAR, lasso for a VAR with random zeroes,
@@ -138,12 +135,15 @@ simVAR <- function(periods, k, p, coef_mat = NULL, const = rep(0, k), e_dist = r
 #' @export
 #' @return Returns a coefficient matrix in companion form.
 create_rand_coef_mat <- function(k, p,
-                                 dist = runif,
                                  max_abs_eigval = 0.8,
                                  sparsity_pattern = c("none", "lasso", "hvar"),
                                  sparsity_options = NULL,
                                  decay = 0.5,
                                  ...){
+  if (max_abs_eigval <= 0) stop("max_abs_eigval must be strictly postive, max_abs_eigval > 0")
+  if (k < 1) stop("Model must have at least one variable: k>=1")
+  if (p < 1) stop("Model must contain at least one lag: p > 1")
+
   sparsity_pattern <- match.arg(sparsity_pattern)
   # phi_vals <- runif(k*p*k, min = -100, max = 100)
   phi_vals <- rnorm(k*p*k, sd = 10)
@@ -179,6 +179,7 @@ create_rand_coef_mat <- function(k, p,
       zeroes_in_self <- TRUE
     }
     if(zero_max < zero_min) stop("zero_min must be smaller-equal than zero_max")
+    if (zero_min > p | zero_max > p) stop("zero_min and zero_max must be at most p")
 
     for (k1 in 1:k){
       for (k2 in 1:k){
