@@ -83,6 +83,46 @@ fitted.bigtime.VAR <- function(object, ...){
   fit
 }
 
+#' Gives the fitted values of a model estimated using sparseVARX
+#'
+#' @param object model estimated using sparseVARX
+#' @param ... Not currently used
+#' @export
+#' @return Returns a matrix of fitted values
+fitted.bigtime.VARX <- function(object, ...){
+  mod <- object
+  dat <- HVARXmodel(mod$Y, mod$X, mod$p, mod$s, mod$h)
+  X <- t(dat$fullX)
+  Y <- t(dat$fullZ)
+
+  fit <- lapply(1:nrow(X), function(i) mod$Phihat%*%Y[i, ] + mod$Bhat%*%X[i, ] + mod$phi0hat)
+  fit <- t(do.call(cbind, fit))
+  if (!is.null(colnames(mod$Y))) colnames(fit) <- colnames(mod$Y)
+  fit
+}
+
+
+#' Gives the fitted values of a model estimated using sparseVARMA
+#'
+#' @param object model estimated using sparseVARMA
+#' @param ... Not currently used
+#' @export
+#' @return Returns a matrix of fitted values
+fitted.bigtime.VARMA <- function(object, ...){
+  mod <- object
+
+  # A VARMA is basically a VARX if we consider the errors as exogenous
+  # We thus only need to restructure the model and can then use
+  # fitted.bigtime.VARX
+
+  mod_tmp <- mod
+  mod_tmp$Bhat <- mod$Thetahat
+  mod_tmp$X <- mod$U
+  mod_tmp$p <- mod$VARMAp
+  mod_tmp$s <- mod$VARMAq
+  fitted.bigtime.VARX(mod_tmp)
+}
+
 
 #' Creates a diagnostic Plot
 #'
