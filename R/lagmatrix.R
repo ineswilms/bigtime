@@ -10,6 +10,7 @@
 #' Lhats <- lagmatrix(fit=VARXfit, model="VARX")
 lagmatrix <- function(fit, returnplot=F){
 
+  model <- "none"
   if ("bigtime.VAR" %in% class(fit)) model <- "VAR"
   if ("bigtime.VARX" %in% class(fit)) model <- "VARX"
   if ("bigtime.VARMA" %in% class(fit)) model <- "VARMA"

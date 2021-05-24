@@ -169,13 +169,71 @@ fitted.bigtime.VARMA <- function(object, ...){
 #'                        sparsity_pattern = "hvar")
 #' mod <- sparseVAR(dat$Y, h = 1)
 #' diagnostics_plot(mod, variable = 1)
-diagnostics_plot <- function(mod, variable = 1, dates=NULL){
+diagnostics_plot <- function(mod, variable = 1, dates = NULL){
+  UseMethod("diagnostics_plot", mod)
+}
+
+
+#' diagnostics_plot function for VAR models
+#' @param mod VAR model estimated using sparseVAR
+#' @param variable Variable to show. Either numeric (which column) or character
+#' (variable name)
+#' @param dates Optional Date vector.
+#' @export
+diagnostics_plot.bigtime.VAR <- function(mod, variable = 1, dates=NULL){
   if(!"bigtime.VAR" %in% class(mod)) stop("Only implemented for VAR models")
   if (mod$selection == "none") stop("Cannot be used with selection='none'. Choose other selection procedure in sparseVAR or call ic_selection on model first.")
   fit <- fitted.bigtime.VAR(mod)
   res <- residuals.bigtime.VAR(mod)
   s <- dim(mod$Y)[1] - dim(fit)[1]
   Y <- mod$Y[-c(1:s), ]
+
+  .diagnostics_plot(Y, fit, res, s, variable, dates)
+}
+
+
+#' diagnostics_plot function for VARX models
+#' @param mod VAR model estimated using sparseVARX
+#' @param variable Variable to show. Either numeric (which column) or character
+#' (variable name)
+#' @param dates Optional Date vector.
+#' @export
+diagnostics_plot.bigtime.VARX <- function(mod, variable = 1, dates = NULL){
+  if (!"bigtime.VARX" %in% class(mod)) stop("Only implemented for VARX models")
+  fit <- fitted.bigtime.VARX(mod)
+  res <- residuals.bigtime.VARX(mod)
+  s <- nrow(mod$Y) - nrow(fit)
+  Y <- mod$Y[-c(1:s), ]
+  .diagnostics_plot(Y, fit, res, s, variable, dates)
+}
+
+
+#' diagnostics_plot function for VARMA models
+#' @param mod VAR model estimated using sparseVARMA
+#' @param variable Variable to show. Either numeric (which column) or character
+#' (variable name)
+#' @param dates Optional Date vector.
+#' @export
+diagnostics_plot.bigtime.VARMA <- function(mod, variable = 1, dates = NULL){
+  if (!"bigtime.VARMA" %in% class(mod)) stop("Only implemented for VARMA models")
+  fit <- fitted.bigtime.VARMA(mod)
+  res <- residuals.bigtime.VARMA(mod)
+  s <- nrow(mod$Y) - nrow(fit)
+  Y <- mod$Y[-c(1:s), ]
+  .diagnostics_plot(Y, fit, res, s, variable, dates)
+}
+
+
+#' Internal function to plot the diagnostics plot
+#' @param Y observed values
+#' @param fit fitted values
+#' @param res residual values
+#' @param s how many observations were lost
+#' @param variable variable to plot: either numeric or colname
+#' @param dates vector of dates of length nrow(Y)
+#' @keywords internal
+.diagnostics_plot <- function(Y, fit, res, s, variable, dates){
+
   if (is.numeric(variable)) {
     if (variable > ncol(fit)) stop("Data does not have ", variable, " columns, but only ", ncol(fit))
     if (variable <= 0) stop("variable must be a name or an index >= 1")
