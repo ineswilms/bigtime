@@ -22,7 +22,7 @@ The number of non-zero coefficients are taken as the degrees of freedom.
 This is not valid in cases in which p>N
 }
 \examples{
-dat <- bigtime::simVAR(200, 2, 5, decay = 0.01)
-mod <- bigtime::sparseVAR(scale(dat$Y), cv=FALSE)
+dat <- simVAR(200, 2, 5, decay = 0.01)
+mod <- sparseVAR(scale(dat$Y))
 ics <- get_ic_vals(mod)
 }

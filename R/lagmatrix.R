@@ -7,7 +7,7 @@
 #' data(Y)
 #' data(X)
 #' VARXfit <- sparseVARX(Y=Y, X=X) # sparse VARX
-#' Lhats <- lagmatrix(fit=VARXfit, model="VARX")
+#' Lhats <- lagmatrix(fit=VARXfit)
 lagmatrix <- function(fit, returnplot=F){
 
   model <- "none"

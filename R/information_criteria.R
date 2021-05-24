@@ -35,14 +35,14 @@ ic_selection <- function(mod, ic = c("bic", "aic", "hq"), verbose = FALSE){
 #' \item{selected_lambdas}{Which lambdas were selected}
 #'
 #' @examples
-#' dat <- bigtime::simVAR(200, 2, 5, decay = 0.01)
-#' mod <- bigtime::sparseVAR(scale(dat$Y), cv=FALSE)
+#' dat <- simVAR(200, 2, 5, decay = 0.01)
+#' mod <- sparseVAR(scale(dat$Y))
 #' ics <- get_ic_vals(mod)
 get_ic_vals <- function(mod, verbose = TRUE){
   if (!("bigtime.VAR" %in% class(mod))) stop("Currently only implemented for VAR models")
   tt <- nrow(mod$Y)
   if (mod$p * mod$k >= tt) warning("IC selection is only recommended for cases in which p < T")
-  if (is.matrix(mod$Phihat)) stop("Model was estimated using only one penalty parameter. Set cv=FALSE in sparseVAR.")
+  if (is.matrix(mod$Phihat)) stop("Model was estimated using only one penalty parameter.")
 
   n3 <- dim(mod$Phihat)[3]
   ics <- matrix(ncol = 3, nrow = n3)
@@ -50,6 +50,7 @@ get_ic_vals <- function(mod, verbose = TRUE){
     mod_tmp <- mod
     mod_tmp$Phihat <- mod$Phihat[, , i]
     mod_tmp$phi0hat <- mod$phi0hat[, , i]
+    mod_tmp$selection <- "tmp"
 
     res <- residuals(mod_tmp)
     df <- sum(mod$Phihat[, , i] != 0)
@@ -99,6 +100,7 @@ get_ic_vals <- function(mod, verbose = TRUE){
 #' @param res Matrix of residuals
 #' @param tt number of time periods
 #' @param df degrees of freedom
+#' @keywords internal
 .get_ic_vals <- function(res, tt, df){
   Omega <- cov(res)
   log_det_omega <- log(det(Omega))

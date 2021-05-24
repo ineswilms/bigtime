@@ -7,7 +7,7 @@
 is.stable(mod, verbose = FALSE)
 }
 \arguments{
-\item{mod}{model estimated using bigtime::sparseVAR. Can only be a model
+\item{mod}{model estimated using sparseVAR. Can only be a model
 with one coefficient vector. Hence, the model must either be estimated using
 cv=TRUE or by giving a single lambda value}
 

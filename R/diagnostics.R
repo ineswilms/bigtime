@@ -167,7 +167,7 @@ fitted.bigtime.VARMA <- function(object, ...){
 #' @examples
 #' dat <- simVAR(200, 2, 5, decay = 0.1, seed = 6150533,
 #'                        sparsity_pattern = "hvar")
-#' mod <- sparseVAR(dat$Y, h = 1)
+#' mod <- sparseVAR(dat$Y, selection = "bic", h = 1)
 #' diagnostics_plot(mod, variable = 1)
 diagnostics_plot <- function(mod, variable = 1, dates = NULL){
   UseMethod("diagnostics_plot", mod)
