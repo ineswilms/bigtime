@@ -300,7 +300,7 @@ diagnostics_plot.bigtime.VARMA <- function(mod, variable = 1, dates = NULL){
 #' Using a model estimated by bigtime::sparseVAR, this function checks whether
 #' the resulting VAR is stable
 #'
-#' @param mod model estimated using bigtime::sparseVAR. Can only be a model
+#' @param mod model estimated using sparseVAR. Can only be a model
 #' with one coefficient vector. Hence, the model must either be estimated using
 #' cv=TRUE or by giving a single lambda value
 #' @param verbose If TRUE, then the actual maximum eigenvalue of the companion
@@ -308,7 +308,7 @@ diagnostics_plot.bigtime.VARMA <- function(mod, variable = 1, dates = NULL){
 #' @export
 #' @return Returns TRUE if the VAR is stable and FALSE otherwise
 is.stable <- function(mod, verbose = FALSE){
-  if (!("bigtime.VAR") %in% class(mod)) stop("Model is not a VAR model estimated using bigtime::sparseVAR")
+  if (!("bigtime.VAR") %in% class(mod)) stop("Model is not a VAR model estimated using sparseVAR")
   if (mod$selection == "none") stop("Model did not use any selection procedure. It is not clear which model is meant. Please use a selection procedure in sparseVAR or calls ic_selection on model.")
   Phi_hat <- mod$Phihat
   k <- mod$k
