@@ -6,10 +6,10 @@
 #' its own grid. Supplying a grid of values overrides this. WARNING: use with care.
 #' @param VARgran User-specified vector of granularity specifications for the penalty parameter grid:  First element specifies
 #' how deep the grid should be constructed. Second element specifies how many values the grid should contain.
-#' @param cvcut Proportion of observations used for model estimation in the time series cross-validation procedure. The remainder is used for forecast evaluation.
+#' @param cvcut Proportion of observations used for model estimation in the time series cross-validation procedure. The remainder is used for forecast evaluation. Redundant if selection is not "cv".
 #' @param eps a small positive numeric value giving the tolerance for convergence in the proximal gradient algorithm.
 #' @param VARpen "HLag" (hierarchical sparse penalty) or "L1" (standard lasso penalty) penalization.
-#' @param cv Logical, whether time-series cross-validation needs to be performed (TRUE) or not (FALSE) for selecting the sparsity parameter. If cv=FALSE, the argument cvcut is redundant.
+#' @param selection One of "none" (default), "cv" (Time Series Cross-Validation), "bic", "aic", "hq". Used to select the optimal penalization.
 #' @export
 #' @return A list with the following components
 #' \item{Y}{\eqn{T} by \eqn{k} matrix of time series.}
@@ -32,7 +32,8 @@
 #' VARfit <- sparseVAR(Y) # sparse VAR
 #' ARfit <- sparseVAR(Y[,2]) # sparse AR
 sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL,
-                      cv = TRUE, cvcut=0.9, h=1,  eps=1e-3){
+                      selection = c("none", "cv", "bic", "aic", "hq"),
+                      cvcut=0.9, h=1,  eps=1e-3){
 
   # Check Inputs
   if(!is.matrix(Y)){
@@ -45,6 +46,7 @@ sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL,
 
   }
 
+  selection = match.arg(selection)
 
   if(nrow(Y)<10){
     stop("The time series length is too small.")
@@ -113,8 +115,8 @@ sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL,
     VARgran2 <- length(VARlseq)
   }
 
-  if(length(VARlseq)==1){ # If user only provides one lambda value, don't do cross-validation
-    cv <- FALSE
+  if(length(VARlseq)==1 & selection == "cv"){ # If user only provides one lambda value, don't do cross-validation
+    selection <- "none"
     warning("No cross-validation is performed since only one sparsity parameter is provided.")
   }
 
@@ -122,7 +124,7 @@ sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL,
   VARdata <- HVARmodel(Y=Y, p=p, h=h)
   k <- VARdata$k # Number of time series
 
-  if(cv){ # Time series cross-validation to get optimal sparsity parameter
+  if(selection == "cv"){ # Time series cross-validation to get optimal sparsity parameter
     VARcv <- HVAR_cv(Y=Y, p=p, h=h, lambdaPhiseq=VARlseq, gran1=VARgran1, gran2=VARgran2, T1.cutoff=cvcut, eps=eps, type=VARpen)
 
     # Var estimation with selected regularization parameter
@@ -164,19 +166,24 @@ sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL,
 
   }
 
-  if(cv){
+  if(selection == "cv"){
     out <- list("k"=k, "Y"=Y, "p"=p, "Phihat"=VARmodel$Phi, "phi0hat"=VARmodel$phi,
                 "series_names"=series_names, "lambdas"=VARcv$lambda,
                 "MSFEcv"=VARcv$MSFE_avg, "MSFE_all"=VARcv$MSFE_all,
-                "lambda_SEopt"=VARcv$lambda_opt_oneSE,"lambda_opt"=VARcv$lambda_opt, "h"=h)
+                "lambda_SEopt"=VARcv$lambda_opt_oneSE,"lambda_opt"=VARcv$lambda_opt, "h"=h,
+                "selection" = selection)
   }else{
     out <- list("k"=k, "Y"=Y, "p"=p, "Phihat"=Phis, "phi0hat"=phi0s,
                 "series_names"=series_names, "lambdas"=VARlseq,
                 "MSFEcv"=NA, "MSFE_all"=NA,
-                "lambda_SEopt"=NA,"lambda_opt"=NA, "h"=h)
+                "lambda_SEopt"=NA,"lambda_opt"=NA, "h"=h,
+                "selection" = selection)
   }
-
   class(out) <- "bigtime.VAR"
+
+  # If user wants to use IC for selection
+  if (selection %in% c("bic", "aic", "hq")) out <- ic_selection(out, ic = selection, verbose = TRUE)
+
   out
 }
 
