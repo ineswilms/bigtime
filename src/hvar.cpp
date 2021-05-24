@@ -15,8 +15,7 @@ struct cv_aux_out{
   arma::mat MSFEs;
   arma::mat sparsity;
   arma::cube Phi;
-  arma::mat varxPhi;
-  arma::mat varxB;
+  arma::cube varxB;
 };
 
 struct prox_out{
@@ -854,7 +853,7 @@ cv_aux_out HVARX_cvaux_cpp(const arma::mat& Y, const arma::mat& Z, const arma::m
                            const arma::colvec& lambdaPhiseq,  const arma::colvec& lambdaBseq,
                            const double eps, const double max_iter, int k, int kX, int p, int s, 
                            const double alpha, const double estim, 
-                           arma::mat myBinit, arma::mat myPhiinit, const int flag_restart_opt = 0){
+                           arma::cube myBinit, arma::cube myPhiinit, const int flag_restart_opt = 0){
 
 
   int g = lambdaPhiseq.size(); // 10*10
@@ -867,22 +866,32 @@ cv_aux_out HVARX_cvaux_cpp(const arma::mat& Y, const arma::mat& Z, const arma::m
 
   hvarx hvarx_out;
   arma::mat Phifit;
+  arma::cube Phicv = zeros(k, k*p, g);
   arma::mat Bfit;
+  arma::cube Bcv = zeros(k, kX*s, g);
   arma::mat phi0fit;
 
   arma::mat MSFE = zeros(1, g);
   arma::mat sparsity = zeros(1, g);
   arma::mat pred;
 
-  Bfit = myBinit;
-  Phifit = myPhiinit;
+
+  Bfit = myBinit.slice(0);
+  Phifit = myPhiinit.slice(0);
   for (int igran = 0; igran < g; igran++) {
+
+    if (flag_restart_opt == 0){
+      Bfit = myBinit.slice(igran);
+      Phifit = myPhiinit.slice(igran);
+    }
 
     hvarx_out = HVARX_NEW_cpp(trainY, trainZ, trainX, k, kX, p, s, lambdaPhiseq[igran], lambdaBseq[igran], eps, max_iter, alpha,  estim,  Bfit, Phifit);
 
 
     Phifit = hvarx_out.PHI;
+    Phicv.slice(igran) = Phifit;
     Bfit = hvarx_out.B;
+    Bcv.slice(igran) = Bfit;
     phi0fit = hvarx_out.phi0;
 
     pred = Bfit*testX + Phifit*testZ + phi0fit.t();
@@ -897,8 +906,8 @@ cv_aux_out HVARX_cvaux_cpp(const arma::mat& Y, const arma::mat& Z, const arma::m
   cv_aux_out hvarx_cv_out;
   hvarx_cv_out.MSFEs = MSFE;
   hvarx_cv_out.sparsity = sparsity;
-  hvarx_cv_out.varxPhi = Phifit;
-  hvarx_cv_out.varxB = Bfit;
+  hvarx_cv_out.Phi = Phicv;
+  hvarx_cv_out.varxB = Bcv;
   return(hvarx_cv_out);
 }
 
@@ -909,8 +918,9 @@ cv_aux_out HVARX_cvaux_cpp(const arma::mat& Y, const arma::mat& Z, const arma::m
                            const arma::colvec& lambdaPhiseq,  const arma::colvec& lambdaBseq,
                            const double eps, const double max_iter, int k, int kX, int p, int s, 
                            const double alpha, const double estim){
-  arma::mat myBinit = zeros(k, kX*s);
-  arma::mat myPhiinit = zeros(k, k*p);
+  int g = lambdaPhiseq.size(); // 10*10
+  arma::cube myBinit = zeros(k, kX*s, g);
+  arma::cube myPhiinit = zeros(k, k*p, g);
   return(HVARX_cvaux_cpp(Y, Z, X, t, lambdaPhiseq, lambdaBseq, eps, max_iter, k, kX, p, s, alpha, estim, myBinit, myPhiinit, 1));
 }
 
@@ -934,7 +944,7 @@ Rcpp::List HVARX_cvaux_cpp_loop(const arma::mat& Y, const arma::mat& Z, const ar
     else {
       // For some reasons it would give me different results if I would also take the previous B as starting values ...
       // TODO: find out why!
-      get_cv_out = HVARX_cvaux_cpp(Y, Z, X, tseq[it], lambdaPhiseq, lambdaBseq, eps, max_iter, k,  kX,  p,  s,  alpha,  estim, zeros(k, kX*s), zeros(k, k*p));
+      get_cv_out = HVARX_cvaux_cpp(Y, Z, X, tseq[it], lambdaPhiseq, lambdaBseq, eps, max_iter, k,  kX,  p,  s,  alpha,  estim, get_cv_out.varxB, get_cv_out.Phi);
     }
     MSFEcv.submat(it, 0, it, g-1) = get_cv_out.MSFEs;
     sparsitycv.submat(it, 0, it, g-1) = get_cv_out.sparsity;
