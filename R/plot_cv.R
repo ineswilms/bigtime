@@ -1,11 +1,11 @@
 #' Plot the Cross Validation Error Curve for a Sparse VAR or VARX
 #' @param fit Fitted VAR or VARX model.
 #' returned by \code{\link{sparseVAR}} or \code{\link{sparseVARX}}.
-#' @param model Type of model that was estimated: VAR or VARX.
 #' @param ... Not currently used
 #' @export
-plot_cv <- function(fit, model, ...) {
-  if (model == "VAR") {
+plot_cv <- function(fit, ...) {
+  if ("bigtime.VAR" %in% class(fit)) {
+    if (fit$selection != "cv") stop("No cross-validation was used in model estimation. Set selection='cv' in sparseVAR")
     # This copied mostly from ggb package
     m <- fit$MSFEcv
     se <- apply(fit$MSFE_all, 2, sd) / sqrt(nrow(fit$MSFE_all))
@@ -17,7 +17,7 @@ plot_cv <- function(fit, model, ...) {
                col = "darkgrey")
     graphics::abline(v = c(fit$lambda_opt, fit$lambda_SEopt), lty = 3)
   }
-  else if (model == "VARX") {
+  else if ("bigtime.VARX" %in% class(fit)) {
     image_cv(fit)
   } else stop("Unsupported type.")
   invisible()

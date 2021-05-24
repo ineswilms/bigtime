@@ -1,6 +1,5 @@
 #' Creates Lagmatrix of Estimated Coefficients
 #' @param fit Fitted VAR, VARX or VARMA model.
-#' @param model Type of model that was estimated: VAR, VARX or VARMA.
 #' @param returnplot TRUE or FALSE: return plot of lag matrix or not.
 #' @export
 #' @return A list with estimated lag matrix of the VAR model, or lag matrices of the VARX or VARMA model. The rows contain the responses, the columns contain the predictors.
@@ -9,13 +8,20 @@
 #' data(X)
 #' VARXfit <- sparseVARX(Y=Y, X=X) # sparse VARX
 #' Lhats <- lagmatrix(fit=VARXfit, model="VARX")
-lagmatrix <- function(fit, model, returnplot=F){
+lagmatrix <- function(fit, returnplot=F){
+
+  if ("bigtime.VAR" %in% class(fit)) model <- "VAR"
+  if ("bigtime.VARX" %in% class(fit)) model <- "VARX"
+  if ("bigtime.VARMA" %in% class(fit)) model <- "VARMA"
 
   if(!is.element(model, c("VAR", "VARX", "VARMA"))){
     stop("The model needs to be either VAR, VARX or VARMA")
   }
 
   if(model=="VAR"){
+
+    if (fit$selection == "none") stop("Model did not use any selection procedure. Please use a selection procedure in sparseVAR or call ic_selection on model first.")
+
     k <- fit$k
     p <- fit$p
     coef <- fit$Phihat

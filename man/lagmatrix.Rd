@@ -4,14 +4,14 @@
 \alias{lagmatrix}
 \title{Creates Lagmatrix of Estimated Coefficients}
 \usage{
-lagmatrix(fit, model, returnplot = F)
+lagmatrix(fit, returnplot = F)
 }
 \arguments{
 \item{fit}{Fitted VAR, VARX or VARMA model.}
 
-\item{model}{Type of model that was estimated: VAR, VARX or VARMA.}
-
 \item{returnplot}{TRUE or FALSE: return plot of lag matrix or not.}
+
+\item{model}{Type of model that was estimated: VAR, VARX or VARMA.}
 }
 \value{
 A list with estimated lag matrix of the VAR model, or lag matrices of the VARX or VARMA model. The rows contain the responses, the columns contain the predictors.

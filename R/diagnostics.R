@@ -12,6 +12,20 @@
 #' res <- resid(mod)
 residuals.bigtime.VAR <- function(object, ...){
   mod <- object
+
+  # We must catch the special case in which no selection precedure was used
+  if (mod$selection == "none"){
+    res <- array(dim = c(nrow(mod$Y)-mod$p, mod$k, length(mod$lambdas)))
+    for (i in 1:length(mod$lambdas)){
+      mod_tmp <- mod
+      mod_tmp$Phihat <- mod$Phihat[, , i]
+      mod_tmp$phi0hat <- mod$phi0hat[, , i]
+      mod_tmp$selection <- "tmp"
+      res[, , i] <- residuals.bigtime.VAR(mod_tmp, ...)
+    }
+    return(res)
+  }
+
   fit <- fitted.bigtime.VAR(mod, ...)
   s <- dim(mod$Y)[1] - dim(fit)[1]
   res <- mod$Y[-(1:s), ] - fit
@@ -49,6 +63,20 @@ resid.bigtime.VAR <- function(object, ...){
 #'
 fitted.bigtime.VAR <- function(object, ...){
   mod <- object
+
+  # We must catch the special case in which no selection procedure was used
+  if (mod$selection == "none"){
+    fit <- array(dim = c(nrow(mod$Y)-mod$p, mod$k, length(mod$lambdas)))
+    for (i in 1:length(mod$lambdas)){
+      mod_tmp <- mod
+      mod_tmp$Phihat <- mod$Phihat[, , i]
+      mod_tmp$phi0hat <- mod$phi0hat[, , i]
+      mod_tmp$selection <- "tmp"
+      fit[, , i] <- fitted.bigtime.VAR(mod_tmp, ...)
+    }
+    return(fit)
+  }
+
   VARdata <- HVARmodel(Y=mod$Y, p=mod$p, h=mod$h)
   fit <- t(apply(VARdata$fullZ, 2, function(x) mod$Phihat%*%x + mod$phi0hat))
   colnames(fit) <- colnames(mod$Y)
@@ -71,6 +99,7 @@ fitted.bigtime.VAR <- function(object, ...){
 #' diagnostics_plot(mod, variable = 1)
 diagnostics_plot <- function(mod, variable = 1, dates=NULL){
   if(!"bigtime.VAR" %in% class(mod)) stop("Only implemented for VAR models")
+  if (mod$selection == "none") stop("Cannot be used with selection='none'. Choose other selection procedure in sparseVAR or call ic_selection on model first.")
   fit <- fitted.bigtime.VAR(mod)
   res <- residuals.bigtime.VAR(mod)
   s <- dim(mod$Y)[1] - dim(fit)[1]
@@ -150,7 +179,7 @@ diagnostics_plot <- function(mod, variable = 1, dates=NULL){
 #' @return Returns TRUE if the VAR is stable and FALSE otherwise
 is.stable <- function(mod, verbose = FALSE){
   if (!("bigtime.VAR") %in% class(mod)) stop("Model is not a VAR model estimated using bigtime::sparseVAR")
-  if (!is.matrix(mod$Phihat)) stop("Model contains multiple coefficient estimates. It is not clear which model is meant. Please reduce the model to one coefficient estimate")
+  if (mod$selection == "none") stop("Model did not use any selection procedure. It is not clear which model is meant. Please use a selection procedure in sparseVAR or calls ic_selection on model.")
   Phi_hat <- mod$Phihat
   k <- mod$k
   p <- mod$p
