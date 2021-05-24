@@ -339,4 +339,6 @@ sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL, VARg
             "PhaseII_lambdaPhi_opt"=HVARXcvFIT$lPhi_opt, "PhaseII_lambdaPhi_SEopt"=HVARXcvFIT$lPhi_oneSE,
             "PhaseII_lambdaTheta_opt"=HVARXcvFIT$lB_opt, "PhaseII_lambdaTheta_SEopt"=HVARXcvFIT$lB_oneSE,
             "PhaseII_MSFEcv"=HVARXcvFIT$MSFE_avg, "h"=h)
+  class(out) <- "bigtime.VARMA"
+  out
 }

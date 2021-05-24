@@ -216,7 +216,8 @@ sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, V
               "lambdaPhi_opt"=VARXcv$lPhi_opt, "lambdaPhi_SEopt"=VARXcv$lPhi_oneSE,
               "lambdaB_opt"=VARXcv$lB_opt, "lambdaB_SEopt"=VARXcv$lB_oneSE,
               "MSFEcv"=VARXcv$MSFE_avg, "h"=h)
-
+  class(out) <- "bigtime.VARX"
+  out
 }
 
 HVARXmodel <- function(Y, X, p, s, h=1, Yhat=NULL, cvY="default"){
