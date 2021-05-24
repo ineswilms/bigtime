@@ -934,7 +934,7 @@ Rcpp::List HVARX_cvaux_cpp_loop(const arma::mat& Y, const arma::mat& Z, const ar
     else {
       // For some reasons it would give me different results if I would also take the previous B as starting values ...
       // TODO: find out why!
-      get_cv_out = HVARX_cvaux_cpp(Y, Z, X, tseq[it], lambdaPhiseq, lambdaBseq, eps, max_iter, k,  kX,  p,  s,  alpha,  estim, zeros(k, kX*s), get_cv_out.varxPhi);
+      get_cv_out = HVARX_cvaux_cpp(Y, Z, X, tseq[it], lambdaPhiseq, lambdaBseq, eps, max_iter, k,  kX,  p,  s,  alpha,  estim, zeros(k, kX*s), zeros(k, k*p));
     }
     MSFEcv.submat(it, 0, it, g-1) = get_cv_out.MSFEs;
     sparsitycv.submat(it, 0, it, g-1) = get_cv_out.sparsity;
