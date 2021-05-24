@@ -1,7 +1,6 @@
 
 #' Function to obtain h-step ahead direct forecast based on estimated VAR, VARX or VARMA model
 #' @param fit Fitted sparse VAR, VARX or VARMA model.
-#' @param model Type of model that was estimated: VAR, VARX or VARMA.
 #' @param h Desired forecast horizon.
 #' @export
 #' @return Vector of length k containing the h-step ahead forecasts for the k time series.
@@ -9,7 +8,12 @@
 #' data(Y)
 #' VARfit <- sparseVAR(Y) # sparse VAR
 #' VARforecast <- directforecast(fit=VARfit, model="VAR", h=1)
-directforecast <- function(fit, model, h=1){
+directforecast <- function(fit, h=1){
+
+  model <- "none"
+  if ("bigtime.VAR" %in% class(fit)) model <- "VAR"
+  if ("bigtime.VARX" %in% class(fit)) model <- "VARX"
+  if ("bigtime.VARMA" %in% class(fit)) model <- "VARMA"
 
   if(h<=0){
     stop("Forecast horizon h must be a strictly positive integer.")
@@ -27,6 +31,21 @@ directforecast <- function(fit, model, h=1){
   k <- ncol(fit$Y)
 
   if(model=="VAR"){
+
+    # We need to catch the situation in which no selection was done
+    if (fit$selection == "none"){
+      fcst <- array(dim = c(1, ncol(fit$Y), length(fit$lambdas)))
+      for (i in 1:length(fit$lambdas)){
+        mod_tmp <- fit
+        mod_tmp$selection <- "tmp"
+        mod_tmp$Phihat <- fit$Phihat[, , i]
+        mod_tmp$phi0hat <- fit$phi0hat[, , i]
+        fcst[, , i] <- directforecast(mod_tmp, h = h)
+      }
+      return(fcst)
+    }
+
+
     Y <- fit$Y
     p <- fit$p
     Phi <- fit$Phihat

@@ -4,12 +4,10 @@
 \alias{directforecast}
 \title{Function to obtain h-step ahead direct forecast based on estimated VAR, VARX or VARMA model}
 \usage{
-directforecast(fit, model, h = 1)
+directforecast(fit, h = 1)
 }
 \arguments{
 \item{fit}{Fitted sparse VAR, VARX or VARMA model.}
-
-\item{model}{Type of model that was estimated: VAR, VARX or VARMA.}
 
 \item{h}{Desired forecast horizon.}
 }

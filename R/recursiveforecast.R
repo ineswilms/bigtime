@@ -136,7 +136,7 @@ recursiveforecast <- function(mod, h=1, lambda = NULL){
 plot.bigtime.recursiveforecast <- function(x, series=NULL, lmbda=NULL,
                                            last_n = floor(nrow(fcst$Y)*0.1), ...){
   cn <- colnames(x$fcst)
-  if (is.na(series)) series <- ifelse(is.null(cn), "Y1", cn[[1]])
+  if (is.null(series)) series <- ifelse(is.null(cn), "Y1", cn[[1]])
   fcst <- x
   # Setting up Y so it is in the right form
   Y <- as.data.frame(fcst$Y)
