@@ -49,6 +49,38 @@ resid.bigtime.VAR <- function(object, ...){
 }
 
 
+#' Gives the residuals for VARX models estimated using sparseVARX
+#'
+#' @param object model estimated using sparseVARX
+#' @param ... Not currently used
+#' @export
+#' @return Returns a matrix of residuals.
+residuals.bigtime.VARX <- function(object, ...){
+  mod <- object
+  fit <- fitted.bigtime.VARX(mod, ...)
+  s <- nrow(mod$Y) - nrow(fit)
+  res <- mod$Y[-(1:s), ] - fit
+  colnames(res) <- colnames(mod$Y)
+  res
+}
+
+
+#' Gives the residuals for VARMA models estimated using sparseVARMA
+#'
+#' @param object model estimated using sparseVARMA
+#' @param ... Not currently used
+#' @export
+#' @return Returns a matrix of residuals.
+residuals.bigtime.VARMA <- function(object, ...){
+  mod <- object
+  fit <- fitted.bigtime.VARMA(mod, ...)
+  s <- nrow(mod$Y) - nrow(fit)
+  res <- mod$Y[-(1:s), ] - fit
+  colnames(res) <- colnames(mod$Y)
+  res
+}
+
+
 #' Gives the fitted values of a model estimated using sparseVAR
 #'
 #' @param object model estimated using sparseVAR
