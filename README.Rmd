@@ -58,9 +58,9 @@ To make estimation of large VAR models feasible, one could start by using an L1-
 A time-series cross-validation procedure is used to select the sparsity parameters. The default  is to use a cross-validation score based on one-step ahead predictions but you can change the default forecast horizon under the argument `h`. 
 The function `lagmatrix` returns the lagmatrix of the estimated autoregressive coefficients. If entry $(i,j)=x$, this means that the sparse estimator indicates the effect of time series $j$ on time series $i$ to last for $x$ periods.  
 ```{r}
-VARL1 <- sparseVAR(Y=Y, VARpen="L1") # default forecast horizon is h=1
+VARL1 <- sparseVAR(Y=Y, VARpen="L1", selection = "cv") # default forecast horizon is h=1; using cross-validation
 par(mfrow=c(1, 1))
-LhatL1 <- lagmatrix(fit=VARL1, model="VAR", returnplot=T)
+LhatL1 <- lagmatrix(fit=VARL1, returnplot=T)
 ```
 
 The lag matrix is typically sparse as it contains soms empty (i.e., zero) cells. However, VAR models estimated with a standard L1-penalty are typically not easily interpretable as they select many high lag order coefficients (i.e., large values in the lagmatrix). 
@@ -68,9 +68,9 @@ The lag matrix is typically sparse as it contains soms empty (i.e., zero) cells.
 To circumvent this problem, we advise using a lag-based hierarchically sparse estimation procedure, which boils down to using the default option HLag for the `VARpen` argument.
 This estimation procedures encourages low maximum lag orders, often results in sparser lagmatrices, and hence more interpretable models:
 ```{r}
-VARHLag <- sparseVAR(Y=Y) # VARpen="HLag" is the default
+VARHLag <- sparseVAR(Y=Y, selection = "cv") # VARpen="HLag" is the default
 par(mfrow=c(1, 1))
-LhatHLag <- lagmatrix(fit=VARHLag, model="VAR", returnplot=T)
+LhatHLag <- lagmatrix(fit=VARHLag, returnplot=T)
 
 ```
 
@@ -78,26 +78,26 @@ LhatHLag <- lagmatrix(fit=VARHLag, model="VAR", returnplot=T)
 Often practitioners are interested in incorparating the impact of unmodeled exogenous variables (X) into the VAR model. To do this, you can use the `sparseVARX` function which has an argument `X` where you can enter the data matrix of exogenous time series.
 When applying the `lagmatrix` function to an estimated sparse VARX model, the lag matrices of both the endogenous and exogenous autoregressive coefficients are returned.
 ```{r}
-VARXfit <- sparseVARX(Y=Y, X=X) 
+VARXfit <- sparseVARX(Y=Y, X=X) # VARX models always to Cross-Validation 
 par(mfrow=c(1, 2))
-LhatVARX <- lagmatrix(fit=VARXfit, model="VARX", returnplot=T)
+LhatVARX <- lagmatrix(fit=VARXfit, returnplot=T)
 ```
 
 ### Vector AutoRegressive Moving Average (VARMA) Models
 VARMA models generalized VAR models and often allow for more parsimonious representations of the data generating process. To estimate a VARMA model to a multivariate time series data set, use the function `sparseVARMA`. Now lag matrices are obtained for the autoregressive (AR) coefficients and the moving average (MAs) coefficients.
 ```{r}
-VARMAfit <- sparseVARMA(Y=Y) 
+VARMAfit <- sparseVARMA(Y=Y)  # VARMA models always do Cross-Validation
 par(mfrow=c(1, 2))
-LhatVARMA <- lagmatrix(fit=VARMAfit, model="VARMA", returnplot=T)
+LhatVARMA <- lagmatrix(fit=VARMAfit, returnplot=T)
 ```
 
 ## Evaluating Forecast Performance
 To obtain forecasts from the estimated models, you can use the `directforecast` function. The default forecast horizon (argument `h`) is set to one such that one-step ahead forecasts are obtained, but you can specify your desired forecast horizon. Finally, we compare the forecast accuracy of the different models by comparing their forecasts to the actual time series values.
 In this example, the VARMA model has the best forecast performance (i.e., lowest mean squared prediction error). This is no surprise as the multivariate time series  $Y$ was generated from a VARMA model.
 ```{r}
-VARf <- directforecast(VARHLag, model="VAR") # default is h=1
-VARXf <- directforecast(VARXfit, model="VARX")
-VARMAf <- directforecast(VARMAfit, model="VARMA")
+VARf <- directforecast(VARHLag) # default is h=1
+VARXf <- directforecast(VARXfit)
+VARMAf <- directforecast(VARMAfit)
 
 mean((VARf-Ytest)^2)
 mean((VARXf-Ytest)^2)
@@ -119,8 +119,8 @@ for(i in 2:n){
 }
 par(mfrow=c(1,1))
 plot(y, type="l", xlab="Time", ylab="")
-ARfit <- sparseVAR(Y=y) 
-lagmatrix(fit=ARfit, model="VAR")
+ARfit <- sparseVAR(Y=y, selection = "cv")
+lagmatrix(fit=ARfit)
 ```
 
 ### AutoRegressive with Exogenous Variables (ARX) Models
@@ -137,7 +137,7 @@ for(i in 2:n){
 par(mfrow=c(1,1))
 plot(y, type="l", xlab="Time", ylab="")
 ARXfit <- sparseVARX(Y=y, X=x) 
-lagmatrix(fit=ARXfit, model="VARX")
+lagmatrix(fit=ARXfit)
 ```
 
 
@@ -155,12 +155,12 @@ for(i in 2:n){
 par(mfrow=c(1,1))
 plot(y, type="l", xlab="Time", ylab="")
 ARMAfit <- sparseVARMA(Y=y) 
-lagmatrix(fit=ARMAfit, model="VARMA")
+lagmatrix(fit=ARMAfit)
 ```
 
 ## Additional Resources
 
-For a non-technical introduction to VAR models see this interactive [notebook](https://mybinder.org/v2/gh/enweg/SnT_VARS/main?urlpath=shiny/App/) and for an interactive notebook demostrating the use of BigTime for high-dimensional VARs, see this  [notebook](https://mybinder.org/v2/gh/enweg/SnT_BigTime/main?urlpath=shiny/App/)
+For a non-technical introduction to VAR models see this interactive [notebook](https://mybinder.org/v2/gh/enweg/SnT_VARS/main?urlpath=shiny/App/) and for an interactive notebook demostrating the use of BigTime for high-dimensional VARs, see this  [notebook](https://mybinder.org/v2/gh/enweg/SnT_BigTime/main?urlpath=shiny/App/). *Note: Loading these notebook sometimes can take quite some time. Please be patient or try another time.*
 
 
 ## References:

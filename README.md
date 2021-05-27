@@ -51,6 +51,7 @@ for(i in 1:ncol(Y)){
 ![](man/figures/README-unnamed-chunk-1-1.png)<!-- -->
 
 ``` r
+
 par(mfrow=c(3,2), mar=c(2.5, 2.5, 1, 1))
 for(i in 1:ncol(X)){
   plot(X[,i], type="l", ylab="", xlab="Time", main=paste("Exogenous Time series", i))
@@ -71,14 +72,14 @@ sparsity parameters. The default is to use a cross-validation score
 based on one-step ahead predictions but you can change the default
 forecast horizon under the argument `h`. The function `lagmatrix`
 returns the lagmatrix of the estimated autoregressive coefficients. If
-entry (*i*, *j*) = *x*, this means that the sparse estimator indicates
-the effect of time series *j* on time series *i* to last for *x*
+entry \((i,j)=x\), this means that the sparse estimator indicates the
+effect of time series \(j\) on time series \(i\) to last for \(x\)
 periods.
 
 ``` r
-VARL1 <- sparseVAR(Y=Y, VARpen="L1") # default forecast horizon is h=1
+VARL1 <- sparseVAR(Y=Y, VARpen="L1", selection = "cv") # default forecast horizon is h=1; using cross-validation
 par(mfrow=c(1, 1))
-LhatL1 <- lagmatrix(fit=VARL1, model="VAR", returnplot=T)
+LhatL1 <- lagmatrix(fit=VARL1, returnplot=T)
 ```
 
 ![](man/figures/README-unnamed-chunk-2-1.png)<!-- -->
@@ -95,9 +96,9 @@ encourages low maximum lag orders, often results in sparser lagmatrices,
 and hence more interpretable models:
 
 ``` r
-VARHLag <- sparseVAR(Y=Y) # VARpen="HLag" is the default
+VARHLag <- sparseVAR(Y=Y, selection = "cv") # VARpen="HLag" is the default
 par(mfrow=c(1, 1))
-LhatHLag <- lagmatrix(fit=VARHLag, model="VAR", returnplot=T)
+LhatHLag <- lagmatrix(fit=VARHLag, returnplot=T)
 ```
 
 ![](man/figures/README-unnamed-chunk-3-1.png)<!-- -->
@@ -113,9 +114,9 @@ of both the endogenous and exogenous autoregressive coefficients are
 returned.
 
 ``` r
-VARXfit <- sparseVARX(Y=Y, X=X) 
+VARXfit <- sparseVARX(Y=Y, X=X) # VARX models always to Cross-Validation 
 par(mfrow=c(1, 2))
-LhatVARX <- lagmatrix(fit=VARXfit, model="VARX", returnplot=T)
+LhatVARX <- lagmatrix(fit=VARXfit, returnplot=T)
 ```
 
 ![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
@@ -129,9 +130,9 @@ a VARMA model to a multivariate time series data set, use the function
 coefficients and the moving average (MAs) coefficients.
 
 ``` r
-VARMAfit <- sparseVARMA(Y=Y) 
+VARMAfit <- sparseVARMA(Y=Y)  # VARMA models always do Cross-Validation
 par(mfrow=c(1, 2))
-LhatVARMA <- lagmatrix(fit=VARMAfit, model="VARMA", returnplot=T)
+LhatVARMA <- lagmatrix(fit=VARMAfit, returnplot=T)
 ```
 
 ![](man/figures/README-unnamed-chunk-5-1.png)<!-- -->
@@ -145,16 +146,16 @@ can specify your desired forecast horizon. Finally, we compare the
 forecast accuracy of the different models by comparing their forecasts
 to the actual time series values. In this example, the VARMA model has
 the best forecast performance (i.e., lowest mean squared prediction
-error). This is no surprise as the multivariate time series *Y* was
+error). This is no surprise as the multivariate time series \(Y\) was
 generated from a VARMA model.
 
 ``` r
-VARf <- directforecast(VARHLag, model="VAR") # default is h=1
-VARXf <- directforecast(VARXfit, model="VARX")
-VARMAf <- directforecast(VARMAfit, model="VARMA")
+VARf <- directforecast(VARHLag) # default is h=1
+VARXf <- directforecast(VARXfit)
+VARMAf <- directforecast(VARMAfit)
 
 mean((VARf-Ytest)^2)
-#> [1] 2.448348
+#> [1] 2.789974
 mean((VARXf-Ytest)^2)
 #> [1] 2.491267
 mean((VARMAf-Ytest)^2) # lowest=best
@@ -164,13 +165,13 @@ mean((VARMAf-Ytest)^2) # lowest=best
 ## Univariate Models
 
 The functions `sparseVAR`, `sparseVARX`, `sparseVARMA` can also be used
-for the univariate setting where the response time series *Y* is
+for the univariate setting where the response time series \(Y\) is
 univariate. Below we illustrate the usefulness of the sparse estimation
 procedure as automatic lag selection procedures.
 
 ### AutoRegressive (AR) Models
 
-We start by generating a time series of length *n* = 50 from a
+We start by generating a time series of length \(n=50\) from a
 stationary AR model and by plotting it. The `sparseVAR` function can
 also be used in the univariate case as it allows the argument `Y` to be
 a vector. The `lagmatrix` function gives the selected autoregressive
@@ -190,16 +191,16 @@ plot(y, type="l", xlab="Time", ylab="")
 ![](man/figures/README-unnamed-chunk-7-1.png)<!-- -->
 
 ``` r
-ARfit <- sparseVAR(Y=y) 
-lagmatrix(fit=ARfit, model="VAR")
+ARfit <- sparseVAR(Y=y, selection = "cv")
+lagmatrix(fit=ARfit)
 #> $LPhi
 #>      [,1]
-#> [1,]    1
+#> [1,]    0
 ```
 
 ### AutoRegressive with Exogenous Variables (ARX) Models
 
-We start by generating a time series of length *n* = 50 from a
+We start by generating a time series of length \(n=50\) from a
 stationary ARX model and by plotting it. The `sparseVARX` function can
 also be used in the univariate case as it allows the arguments `Y` and
 `X` to be vectors. The `lagmatrix` function gives the selected
@@ -223,19 +224,19 @@ plot(y, type="l", xlab="Time", ylab="")
 
 ``` r
 ARXfit <- sparseVARX(Y=y, X=x) 
-lagmatrix(fit=ARXfit, model="VARX")
+lagmatrix(fit=ARXfit)
 #> $LPhi
 #>      [,1]
 #> [1,]    1
 #> 
 #> $LB
 #>      [,1]
-#> [1,]   10
+#> [1,]    0
 ```
 
 ### AutoRegressive Moving Average (ARMA) Models
 
-We start by generating a time series of length *n* = 50 from a
+We start by generating a time series of length \(n=50\) from a
 stationary ARMA model and by plotting it. The `sparseVARMA` function can
 also be used in the univariate case as it allows the argument `Y` to be
 a vector. The `lagmatrix` function gives the selected autoregressive
@@ -259,7 +260,7 @@ plot(y, type="l", xlab="Time", ylab="")
 
 ``` r
 ARMAfit <- sparseVARMA(Y=y) 
-lagmatrix(fit=ARMAfit, model="VARMA")
+lagmatrix(fit=ARMAfit)
 #> $LPhi
 #>      [,1]
 #> [1,]    1
@@ -269,17 +270,27 @@ lagmatrix(fit=ARMAfit, model="VARMA")
 #> [1,]    0
 ```
 
+## Additional Resources
+
+For a non-technical introduction to VAR models see this interactive
+[notebook](https://mybinder.org/v2/gh/enweg/SnT_VARS/main?urlpath=shiny/App/)
+and for an interactive notebook demostrating the use of BigTime for
+high-dimensional VARs, see this
+[notebook](https://mybinder.org/v2/gh/enweg/SnT_BigTime/main?urlpath=shiny/App/).
+*Note: Loading these notebook sometimes can take quite some time. Please
+be patient or try another time.*
+
 ## References:
 
--   Nicholson William B., Bien Jacob and Matteson David S. (2020),
+  - Nicholson William B., Bien Jacob and Matteson David S. (2020),
     “High-dimensional forecasting via interpretable vector
     autoregression”, Journal of Machine Learning Research, 21(166),
     1-52.
 
--   Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2017),
+  - Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2017),
     “Sparse Identification and Estimation of High-Dimensional Vector
     AutoRegressive Moving Averages”, arXiv:1707.09208.
 
--   Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2017),
+  - Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2017),
     “Interpretable Vector AutoRegressions with Exogenous Time Series”,
     arXiv.
