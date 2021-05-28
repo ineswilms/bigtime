@@ -10,12 +10,19 @@ plot_cv <- function(fit, ...) {
     m <- fit$MSFEcv
     se <- apply(fit$MSFE_all, 2, sd) / sqrt(nrow(fit$MSFE_all))
     yrang = range(c(m - se, m + se), na.rm = TRUE)
+    par(xpd = FALSE)
     graphics::plot(fit$lambdas, m, xlab = "lambda",
                    ylab = "Cross-validation Error",
                    pch = 19, col = 2, ylim = yrang, log = "x", ...)
     error_bars(fit$lambdas, m - se, m + se, width = 0.01,
                col = "darkgrey")
-    graphics::abline(v = c(fit$lambda_opt, fit$lambda_SEopt), lty = 3)
+    # graphics::abline(v = c(fit$lambda_opt, fit$lambda_SEopt), lty = 3)
+    graphics::abline(v = c(fit$lambda_opt), lty = 3, lwd = 2)
+    graphics::abline(v = c(fit$lambda_SEopt), lty = 3, lwd = 2, col = 2)
+    graphics::legend("top", xpd = TRUE,
+                     inset = c(0.05, -0.25),
+                     legend = c("Opt. lambda", "SE Opt. lambda"),
+                     col = c(1, 2), lty = c(3, 3), bty = "n", horiz = TRUE, lwd = c(2, 2))
   }
   else if ("bigtime.VARX" %in% class(fit)) {
     image_cv(fit)
