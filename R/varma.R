@@ -194,6 +194,7 @@ sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL, VARg
     stop("The convergence tolerance parameter eps needs to be a small positive number")
   }
 
+  .check_if_standardised(Y)
 
   # Initialization
   HVARcvFIT  <- HVARFIT <-  NA

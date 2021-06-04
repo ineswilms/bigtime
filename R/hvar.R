@@ -46,6 +46,7 @@ sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL,
 
   }
 
+  .check_if_standardised(Y)
   selection = match.arg(selection)
 
   if(nrow(Y)<10){

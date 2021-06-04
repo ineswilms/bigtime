@@ -335,3 +335,21 @@ is.stable <- function(mod, verbose = FALSE){
   if (max_eigval < 1) return(TRUE)
   FALSE
 }
+
+
+.check_if_standardised <- function(Y){
+  Y_sd <- apply(Y, 2, sd)
+  names(Y_sd) <- NULL
+  Y_mu <- apply(Y, 2, mean)
+  names(Y_mu) <- NULL
+  if (!isTRUE(all.equal(rep(1, length(Y_sd)), Y_sd))) warning("It is recommended to standardise your data such that all variables have unit standard deviation")
+  if (!isTRUE(all.equal(rep(0, length(Y_mu)), Y_mu))) warning("It is recommended to standardise your data such that all variables have zero mean.")
+}
+
+
+
+
+
+
+
+

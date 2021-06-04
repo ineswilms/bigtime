@@ -157,6 +157,9 @@ sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, V
     stop("The convergence tolerance parameter eps needs to be a small positive number")
   }
 
+  .check_if_standardised(Y)
+  .check_if_standardised(X)
+
   # Set maximum orders
   if(is.null(p)){
     p <- floor(1.5*sqrt(nrow(Y)))
