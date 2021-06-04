@@ -17,7 +17,8 @@ sparseVARX(
   VARXalpha = 0,
   h = 1,
   cvcut = 0.9,
-  eps = 10^-3
+  eps = 10^-3,
+  selection = c("none", "cv", "bic", "aic", "hq")
 )
 }
 \arguments{
@@ -50,6 +51,8 @@ how deep the grid should be constructed. Second element specifies how many value
 \item{cvcut}{Proportion of observations used for model estimation in the time series cross-validation procedure. The remainder is used for forecast evaluation.}
 
 \item{eps}{a small positive numeric value giving the tolerance for convergence in the proximal gradient algorithm.}
+
+\item{selection}{Model selection method to be used. Default is none, which will return all values for all penalisations.}
 }
 \value{
 A list with the following components

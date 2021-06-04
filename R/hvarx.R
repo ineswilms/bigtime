@@ -16,6 +16,7 @@
 #' @param cvcut Proportion of observations used for model estimation in the time series cross-validation procedure. The remainder is used for forecast evaluation.
 #' @param VARXalpha a small positive regularization parameter value corresponding to squared Frobenius penalty. The default is zero.
 #' @param VARXpen "HLag" (hierarchical sparse penalty) or "L1" (standard lasso penalty) penalization in VARX.
+#' @param selection Model selection method to be used. Default is none, which will return all values for all penalisations.
 #' @export
 #' @return A list with the following components
 #' \item{Y}{\eqn{T} by \eqn{k} matrix of endogenous time series.}
@@ -45,9 +46,11 @@
 #' y <- matrix(Y[,1], ncol=1)
 #' ARXfit <- sparseVARX(Y=y, X=X) # sparse ARX
 sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, VARXPhigran=NULL,
-                       VARXlBseq=NULL,  VARXBgran=NULL, VARXalpha=0, h=1, cvcut=0.9, eps=10^-3){
+                       VARXlBseq=NULL,  VARXBgran=NULL, VARXalpha=0, h=1, cvcut=0.9, eps=10^-3,
+                       selection = c("none", "cv", "bic", "aic", "hq")){
 
   # Check Inputs
+  selection = match.arg(selection)
   if(!is.matrix(Y)){
 
     if(is.vector(Y) & length(Y)>1){
@@ -190,32 +193,83 @@ sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, V
     VARXBgran2 <- length(VARXlBseq)
   }
 
-  # Get optimal sparsity parameter via time series cross-validation
-  VARXcv <- HVARX_cv(Y=Y, X=X, p=p, s=s, h=h, lambdaPhiseq=VARXlPhiseq, gran1Phi=VARXPhigran1, gran2Phi=VARXPhigran2,
-                         lambdaBseq=VARXlBseq, gran1B=VARXBgran1, gran2B=VARXBgran2, eps=eps, max.iter=100,
-                         T1.cutoff=cvcut, alpha=VARXalpha, type=VARXpen)
-
-  # VarX estimation with selected regularization parameter
+  # Preparing VARX data
   VARXdata <- HVARXmodel(Y=Y, X=X, p=p, s=s, h=h)
   estim <- (VARXpen=="HLag")*2 + (VARXpen=="L1")*1
   if(VARXdata$k==1){
     VARXdata$fullY <- as.matrix(VARXdata$fullY)
   }
-  VARXmodel <- HVARX_NEW_export_cpp(fullY=VARXdata$fullY, fullZ=VARXdata$fullZ, fullX=VARXdata$fullX,
-                                    k=VARXdata$k, kX=VARXdata$kX, p=VARXdata$p, s=VARXdata$s,
-                                    lambdaPhi=VARXcv$lPhi_oneSE, lambdaB=VARXcv$lB_oneSE,
-                                    eps=eps, max_iter=100, alpha=VARXalpha, type=estim, Binit = matrix(0, VARXdata$k, VARXdata$kX*VARXdata$s), Phiinit =  matrix(0, VARXdata$k, VARXdata$k*VARXdata$p))
-
   k <- ncol(Y)
   m <- ncol(X)
-  out <- list("k"=k, "Y"=Y, "X"=X, "m"=m,"p"=p, "s"=s ,
-              "Phihat"=VARXmodel$Phi, "Bhat"=VARXmodel$B, "phi0hat"=t(VARXmodel$phi0),
-              "exogenous_series_names"=exogenous_series_names,
-              "endogenous_series_names"=endogenous_series_names,
-              "lambdaPhi"=VARXcv$l1$lPhiseq, "lambdaB"=VARXcv$l1$lBseq,
-              "lambdaPhi_opt"=VARXcv$lPhi_opt, "lambdaPhi_SEopt"=VARXcv$lPhi_oneSE,
-              "lambdaB_opt"=VARXcv$lB_opt, "lambdaB_SEopt"=VARXcv$lB_oneSE,
-              "MSFEcv"=VARXcv$MSFE_avg, "h"=h)
+  Phihat <- NULL
+  phi0hat <- NULL
+  Bhat <- NULL
+
+
+  if (selection == "cv"){
+    # Get optimal sparsity parameter via time series cross-validation
+    VARXcv <- HVARX_cv(Y=Y, X=X, p=p, s=s, h=h, lambdaPhiseq=VARXlPhiseq, gran1Phi=VARXPhigran1, gran2Phi=VARXPhigran2,
+                       lambdaBseq=VARXlBseq, gran1B=VARXBgran1, gran2B=VARXBgran2, eps=eps, max.iter=100,
+                       T1.cutoff=cvcut, alpha=VARXalpha, type=VARXpen)
+
+    VARXmodel <- HVARX_NEW_export_cpp(fullY=VARXdata$fullY, fullZ=VARXdata$fullZ, fullX=VARXdata$fullX,
+                                      k=VARXdata$k, kX=VARXdata$kX, p=VARXdata$p, s=VARXdata$s,
+                                      lambdaPhi=VARXcv$lPhi_oneSE, lambdaB=VARXcv$lB_oneSE,
+                                      eps=eps, max_iter=100, alpha=VARXalpha, type=estim,
+                                      Binit = matrix(0, VARXdata$k, VARXdata$kX*VARXdata$s),
+                                      Phiinit =  matrix(0, VARXdata$k, VARXdata$k*VARXdata$p))
+    Phihat <- VARXmodel$Phi
+    phi0hat <- t(VARXmodel$phi0)
+    Bhat <- VARXmodel$B
+    out <- list("k"=k, "Y"=Y, "X"=X, "m"=m,"p"=p, "s"=s ,
+                "Phihat"=Phihat, "Bhat"=Bhat, "phi0hat"=phi0hat,
+                "exogenous_series_names"=exogenous_series_names,
+                "endogenous_series_names"=endogenous_series_names,
+                "lambdaPhi"=VARXcv$l1$lPhiseq, "lambdaB"=VARXcv$l1$lBseq,
+                "lambdaPhi_opt"=VARXcv$lPhi_opt, "lambdaPhi_SEopt"=VARXcv$lPhi_oneSE,
+                "lambdaB_opt"=VARXcv$lB_opt, "lambdaB_SEopt"=VARXcv$lB_oneSE,
+                "MSFEcv"=VARXcv$MSFE_avg, "h"=h, selection = selection)
+
+  }else { # Not time series cross validation
+    # Grids regularization parameters
+    if(is.null(VARXlPhiseq)){
+      VARXlPhiseq <- PenaltyGrid(fullY=VARXdata$fullY, fullZ=VARXdata$fullZ, fullX=VARXdata$fullX, k=VARXdata$k, kX=VARXdata$kX, p=VARXdata$p, s=VARXdata$s,
+                                  gran1Phi=VARXPhigran1, gran2Phi=VARXPhigran2, gran1B=VARXBgran1, gran2B=VARXBgran2, eps=eps,
+                                  max.iter=100, alpha=VARXalpha, type=VARXpen)$lambdaPhiseq
+    }
+    if(is.null(VARXlBseq)){
+      VARXlBseq <- PenaltyGrid(fullY=VARXdata$fullY, fullZ=VARXdata$fullZ, fullX=VARXdata$fullX, k=VARXdata$k, kX=VARXdata$kX, p=VARXdata$p, s=VARXdata$s,
+                                gran1Phi=VARXPhigran1, gran2Phi=VARXPhigran2, gran1B=VARXBgran1, gran2B=VARXBgran2, eps=eps,
+                                max.iter=100, alpha=VARXalpha, type=VARXpen)$lambdaBseq
+    }
+    l1 <- list(lPhiseq=sort(rep(VARXlPhiseq,length(VARXlBseq))), lBseq=rep(VARXlBseq,length(VARXlPhiseq)))
+    l1.mat <- do.call(cbind, l1)
+
+    Phihat <- array(NA, dim = c(VARXdata$k, VARXdata$k * VARXdata$p, length(l1$lPhiseq)))
+    phi0hat <- array(NA, dim = c(VARXdata$k, 1, length(l1$lPhiseq)))
+    Bhat <- array(NA, dim = c(VARXdata$k, VARXdata$kX * VARXdata$s, length(l1$lPhiseq)))
+    for (i in 1:nrow(l1.mat)){
+      VARXmodel <- HVARX_NEW_export_cpp(fullY=VARXdata$fullY, fullZ=VARXdata$fullZ, fullX=VARXdata$fullX,
+                                       k=VARXdata$k, kX=VARXdata$kX, p=VARXdata$p, s=VARXdata$s,
+                                       lambdaPhi=l1.mat[i, 1], lambdaB=l1.mat[i, 2],
+                                       eps=eps, max_iter=100, alpha=VARXalpha, type=estim,
+                                       Binit = matrix(0, VARXdata$k, VARXdata$kX*VARXdata$s),
+                                       Phiinit =  matrix(0, VARXdata$k, VARXdata$k*VARXdata$p))
+      Phihat[, , i] <- VARXmodel$Phi
+      phi0hat[, , i] <- t(VARXmodel$phi0)
+      Bhat[, , i] <- VARXmodel$B
+
+      out <- list("k"=k, "Y"=Y, "X"=X, "m"=m,"p"=p, "s"=s ,
+                  "Phihat"=Phihat, "Bhat"=Bhat, "phi0hat"=phi0hat,
+                  "exogenous_series_names"=exogenous_series_names,
+                  "endogenous_series_names"=endogenous_series_names,
+                  "lambdaPhi"=l1$lPhiseq, "lambdaB"=l1$lBseq,
+                  "lambdaPhi_opt"=NA, "lambdaPhi_SEopt"=NA,
+                  "lambdaB_opt"=NA, "lambdaB_SEopt"=NA,
+                  "MSFEcv"=NA, "h"=h, selection = selection)
+    }
+  }
+
   class(out) <- "bigtime.VARX"
   out
 }
