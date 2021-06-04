@@ -2,20 +2,14 @@
 % Please edit documentation in R/information_criteria.R
 \name{get_ic_vals}
 \alias{get_ic_vals}
-\title{Calculates the Information Criteria for a model estimated using sparseVAR}
+\title{Calculates the Information Criteria for a VAR, VARX, VARMA model}
 \usage{
 get_ic_vals(mod, verbose = TRUE)
 }
 \arguments{
-\item{mod}{Model estimated using sparseVAR}
+\item{mod}{Model estimated using sparseVAR, sparseVARX, or sparseVARMA}
 
 \item{verbose}{Should information about the optimal selection be printed?}
-}
-\value{
-Returns a list containing
-\item{ics}{Values of the ICs for all lambdas}
-\item{mins}{Which ic lead to the minimum (the row number)}
-\item{selected_lambdas}{Which lambdas were selected}
 }
 \description{
 The number of non-zero coefficients are taken as the degrees of freedom.

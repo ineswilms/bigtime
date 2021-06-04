@@ -271,6 +271,7 @@ sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, V
   }
 
   class(out) <- "bigtime.VARX"
+  if (selection %in% c("bic", "aic", "hq")) out <- ic_selection(out, ic = selection, verbose = TRUE)
   out
 }
 

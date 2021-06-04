@@ -33,22 +33,6 @@ residuals.bigtime.VAR <- function(object, ...){
   res
 }
 
-#' Gives the residuals for VAR models estimated using sparseVAR
-#'
-#' @param object model estimated using sparseVAR
-#' @param ... Not currently used
-#' @export
-#' @return Returns a matrix of residuals.
-#' @examples
-#' dat <- bigtime::simVAR(200, 2, 5, decay = 0.001, seed = 6150533)
-#' mod <- bigtime::sparseVAR(dat$Y)
-#' f <- fitted(mod)
-#' res <- resid(mod)
-resid.bigtime.VAR <- function(object, ...){
-  residuals.bigtime.VAR(object, ...)
-}
-
-
 #' Gives the residuals for VARX models estimated using sparseVARX
 #'
 #' @param object model estimated using sparseVARX
@@ -57,6 +41,20 @@ resid.bigtime.VAR <- function(object, ...){
 #' @return Returns a matrix of residuals.
 residuals.bigtime.VARX <- function(object, ...){
   mod <- object
+
+  # Must cover the case when model was estimated using multiple lambda
+  if (mod$selection == "none"){
+    res <- array(NA, dim = c(nrow(mod$Y) - max(mod$p, mod$s), ncol(mod$Y), length(mod$lambdaPhi)))
+    for (i in 1:length(mod$lambdaPhi)){
+      mod_tmp <- mod
+      mod_tmp$Phihat <- mod$Phihat[, , i]
+      mod_tmp$phi0hat <- mod$phi0hat[, , i]
+      mod_tmp$Bhat <- mod$Bhat[, , i]
+      mod_tmp$selection <- "tmp"
+      res[, , i] <- residuals.bigtime.VARX(mod_tmp, ...)
+    }
+    return(res)
+  }
   fit <- fitted.bigtime.VARX(mod, ...)
   s <- nrow(mod$Y) - nrow(fit)
   res <- mod$Y[-(1:s), ] - fit
@@ -123,6 +121,21 @@ fitted.bigtime.VAR <- function(object, ...){
 #' @return Returns a matrix of fitted values
 fitted.bigtime.VARX <- function(object, ...){
   mod <- object
+
+  # Must cover the case when model was estimated using multiple lambda
+  if (mod$selection == "none"){
+    fit <- array(NA, dim = c(nrow(mod$Y) - max(mod$p, mod$s), ncol(mod$Y), length(mod$lambdaPhi)))
+    for (i in 1:length(mod$lambdaPhi)){
+      mod_tmp <- mod
+      mod_tmp$Phihat <- mod$Phihat[, , i]
+      mod_tmp$phi0hat <- mod$phi0hat[, , i]
+      mod_tmp$Bhat <- mod$Bhat[, , i]
+      mod_tmp$selection <- "tmp"
+      fit[, , i] <- fitted.bigtime.VARX(mod_tmp, ...)
+    }
+    return(fit)
+  }
+
   dat <- HVARXmodel(mod$Y, mod$X, mod$p, mod$s, mod$h)
   X <- t(dat$fullX)
   Y <- t(dat$fullZ)
