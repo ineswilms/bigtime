@@ -63,8 +63,7 @@ lagmatrix <- function(fit, returnplot=F){
       else
         rownames(Lhat) <- fit$series_names
       par(mfrow=c(1,1))
-      plotlaghat(datamatrix=Lhat, cl.lim=c(0, p),
-                 title="Lhat", mar=c(0.5, 0.1, 2, 0.1))
+      plotlagmat(Lhat)
     }
 
     Lhat <- list("LPhi"=Lhat)
@@ -172,11 +171,9 @@ lagmatrix <- function(fit, returnplot=F){
         }
       }
 
-      plotlaghat(datamatrix=Lhat1, cl.lim=c(0, p),
-                 title="Lhat", mar=c(0.5, 0.1, 2, 0.1))
 
-      plotlaghat(datamatrix=Lhat2, cl.lim=c(0, s),
-                 title="Lhat", mar=c(0.5, 0.1, 2, 0.1))
+      plotlagmat(Lhat1)
+      plotlagmat(Lhat2)
     }
   }
 
@@ -185,203 +182,34 @@ lagmatrix <- function(fit, returnplot=F){
 }
 
 
-plotlaghat <- function (datamatrix, title = "", mar = c(0, 0, 0, 0), cl.lim, addlegend=T,
-                            norowname=F, nocolname=F)
-{ # This function is based on the corrplot function from the corrplot Rpackage
+plotlagmat <- function(lagmat){
+  lmat <- tidyr::as_tibble(lagmat)
+  lmat <- lmat %>%
+    dplyr::mutate(Response = rownames(lagmat)) %>%
+    tidyr::pivot_longer(-Response, names_to = "Predictor", values_to = "Lags")
 
-  corr <- datamatrix
+  p <- ggplot2::ggplot(data = lmat,
+                  ggplot2::aes(x = Predictor, y = Response, fill = Lags)) +
+    ggplot2::geom_tile() +
+    ggplot2::geom_text(ggplot2::aes(x = Predictor, y = Response, label = Lags),
+                       color = "black", size = 5) +
+    ggplot2::theme_bw() +
+    ggplot2::scale_fill_gradient(low = "#ffffff", high = "#147aff") +
+    ggplot2::scale_x_discrete(position = "top") +
+    ggplot2::theme(
+      panel.grid.major = ggplot2::element_blank(),
+      panel.grid.minor = ggplot2::element_blank(),
+      panel.border = ggplot2::element_blank(),
+      panel.background = ggplot2::element_blank(),
+      axis.ticks = ggplot2::element_blank(),
+      axis.title.x.top = ggplot2::element_text(margin = ggplot2::margin(b = 20),
+                                               size = 15),
+      axis.title.y = ggplot2::element_text(margin = ggplot2::margin(r = 20),
+                                           size = 15),
+      axis.text.x = ggplot2::element_text(face = "bold",
+                                          size = 10, angle = 90),
+      axis.text.y = ggplot2::element_text(face = "bold", size = 10)
+    )
 
-  # Settings from corrplot function
-  type <- "full"
-  outline <- T
-  diag <- T
-  addCoefasPercent <- FALSE
-  tl.offset <- 0.4
-  tl.srt <- 90
-  tl.cex <- 1.2
-  tl.col <- "black"
-  cl.ratio <- 0.1
-  cl.length <- NULL
-  cl.align.text <- "c"
-  cl.offset <- 0.5
-  cl.cex <- 0.8
-  number.cex <- 1
-  number.font <- 2
-  number.digits <- NULL
-  bg <- "white"
-  addgrid.col <- "grey"
-  addCoef.col <- "black"
-  rect.col <-  "black"
-
-
-  intercept <- -cl.lim[1]
-  zoom <- 1/(diff(cl.lim))
-  corr <- (intercept + corr) * zoom
-
-  cl.lim2 <- (intercept + cl.lim) * zoom
-  int <- intercept * zoom
-  col <- colorRampPalette(c("#67001F", "#B2182B", "#D6604D",
-                            "#F4A582", "#FDDBC7", "#FFFFFF", "#D1E5F0", "#92C5DE",
-                            "#4393C3", "#2166AC", "#053061"))(200)
-  n <- nrow(corr)
-  m <- ncol(corr)
-  min.nm <- min(n, m)
-  ord <- seq_len(min.nm)
-  apply_mat_filter <- function(mat) {
-    x <- matrix(1:n * m, n, m)
-    switch(type, upper = mat[row(x) > col(x)] <- Inf, lower = mat[row(x) <
-                                                                    col(x)] <- Inf)
-    if (!diag) {
-      diag(mat) <- Inf
-    }
-    return(mat)
-  }
-  getPos.Dat <- function(mat) {
-    tmp <- apply_mat_filter(mat)
-    Dat <- tmp[is.finite(tmp)]
-    ind <- which(is.finite(tmp), arr.ind = TRUE)
-    Pos <- ind
-    Pos[, 1] <- ind[, 2]
-    Pos[, 2] <- -ind[, 1] + 1 + n
-    return(list(Pos, Dat))
-  }
-  Pos <- getPos.Dat(corr)[[1]]
-  n2 <- max(Pos[, 2])
-  n1 <- min(Pos[, 2])
-  nn <- n2 - n1
-  newrownames <- as.character(rownames(corr)[(n + 1 - n2):(n +
-                                                             1 - n1)])
-  m2 <- max(Pos[, 1])
-  m1 <- min(Pos[, 1])
-  mm <- max(1, m2 - m1)
-  newcolnames <- as.character(colnames(corr)[m1:m2])
-  DAT <- getPos.Dat(corr)[[2]]
-  len.DAT <- length(DAT)
-  assign.color <- function(dat = DAT, color = col) {
-    newcorr <- (dat + 1)/2
-    newcorr[newcorr <= 0] <- 0
-    newcorr[newcorr >= 1] <- 1 - 1e-16
-    color[floor(newcorr * length(color)) + 1]
-  }
-  col.fill <- assign.color()
-  isFALSE <- function(x) identical(x, FALSE)
-  isTRUE <- function(x) identical(x, TRUE)
-  tl.pos <- switch(type, full = "lt", lower = "ld", upper = "td")
-  cl.pos <- switch(type, full = "r", lower = "b", upper = "r")
-  col.border <- "black"
-
-  oldpar <- par(mar = mar, bg = "white")
-  on.exit(par(oldpar), add = TRUE)
-
-  plot.new()
-  xlabwidth <- ylabwidth <- 0
-  for (i in 1:50) {
-    xlim <- c(m1 - 0.5 - xlabwidth, m2 + 0.5 + mm * cl.ratio *
-                (cl.pos == "r"))
-    ylim <- c(n1 - 0.5 - nn * cl.ratio * (cl.pos == "b"),
-              n2 + 0.5 + ylabwidth)
-    plot.window(xlim + c(-0.2, 0.2), ylim + c(-0.2, 0.2),
-                asp = 1, xaxs = "i", yaxs = "i")
-    x.tmp <- max(strwidth(newrownames, cex = tl.cex))
-    y.tmp <- max(strwidth(newcolnames, cex = tl.cex))
-    if (min(x.tmp - xlabwidth, y.tmp - ylabwidth) < 1e-04) {
-      break
-    }
-    xlabwidth <- x.tmp
-    ylabwidth <- y.tmp
-  }
-  if (tl.pos == "n" || tl.pos == "d") {
-    xlabwidth <- ylabwidth <- 0
-  }
-  if (tl.pos == "td")
-    ylabwidth <- 0
-  if (tl.pos == "ld")
-    xlabwidth <- 0
-  laboffset <- strwidth("W", cex = tl.cex) * tl.offset
-  xlim <- c(m1 - 0.5 - xlabwidth - laboffset, m2 + 0.5 +
-              mm * cl.ratio * (cl.pos == "r")) + c(-0.35, 0.15)
-  ylim <- c(n1 - 0.5 - nn * cl.ratio * (cl.pos == "b"),
-            n2 + 0.5 + ylabwidth * abs(sin(tl.srt * pi/180)) +
-              laboffset)
-  +c(-0.15, 0.35)
-  if (.Platform$OS.type == "windows") {
-    grDevices::windows.options(width = 7, height = 7 *
-                                 diff(ylim)/diff(xlim))
-  }
-  plot.window(xlim = xlim, ylim = ylim, asp = 1, xlab = "",
-              ylab = "", xaxs = "i", yaxs = "i")
-
-  laboffset <- strwidth("W", cex = tl.cex) * tl.offset
-  symbols(Pos, add = TRUE, inches = FALSE, squares = rep(1,
-                                                         len.DAT), bg = bg, fg = bg)
-
-
-  number.digits <- switch(addCoefasPercent + 1, 2, 0)
-
-  stopifnot(number.digits%%1 == 0)
-  stopifnot(number.digits >= 0)
-
-  NA_LABEL_MAX_CHARS <- 2
-
-
-  symbols(Pos, add = TRUE, inches = FALSE, squares = rep(1,
-                                                         len.DAT), bg = col.fill, fg = col.border)
-
-  symbols(Pos, add = TRUE, inches = FALSE, bg = NA, squares = rep(1, len.DAT), fg = addgrid.col)
-
-  colRange <- assign.color(dat = cl.lim2)
-  ind1 <- which(col == colRange[1])
-  ind2 <- which(col == colRange[2])
-  colbar <- col[ind1:ind2]
-  if (is.null(cl.length)) {
-    cl.length <- ifelse(length(colbar) > 20, 11, length(colbar) +
-                          1)
-  }
-  labels <- seq(cl.lim[1], cl.lim[2], length = cl.length)
-  if (cl.pos == "r") {
-    vertical <- TRUE
-    xlim <- c(m2 + 0.5 + mm * 0.02, m2 + 0.5 + mm * cl.ratio)
-    ylim <- c(n1 - 0.5, n2 + 0.5)
-  }
-  if (cl.pos == "b") {
-    vertical <- FALSE
-    xlim <- c(m1 - 0.5, m2 + 0.5)
-    ylim <- c(n1 - 0.5 - nn * cl.ratio, n1 - 0.5 - nn *
-                0.02)
-  }
-
-  if(addlegend){
-    # Add legend
-    colorlegend(colbar = colbar, labels = round(labels, 0),
-                offset = cl.offset, ratio.colbar = 0.3, cex = cl.cex,
-                xlim = xlim, ylim = ylim, vertical = vertical, align = cl.align.text)
-  }
-
-
-  pos.xlabel <- cbind(m1:m2, n2 + 0.5 + laboffset)
-  pos.ylabel <- cbind(m1 - 0.5, n2:n1)
-
-  if(norowname){
-    newrownames <- rep("",length(newrownames))
-  }
-
-  if(nocolname){
-    newcolnames <- rep("",length(newcolnames))
-  }
-
-  text(pos.xlabel[, 1], pos.xlabel[, 2], newcolnames,
-       srt = tl.srt, adj = ifelse(tl.srt == 0, c(0.5,
-                                                 0), c(0, 0)), col = tl.col, cex = tl.cex, offset = tl.offset)
-  text(pos.ylabel[, 1], pos.ylabel[, 2], newrownames,
-       col = tl.col, cex = tl.cex, pos = 2, offset = tl.offset)
-
-  # title(title, ...)
-
-  # Add numbers to each non-zero cell
-  check <- c(datamatrix)
-  check[check==0] <- c("")
-  text(Pos[, 1], Pos[, 2], col = addCoef.col, labels = check,
-       cex = number.cex, font = number.font)
-
-
+  plot(p)
 }
