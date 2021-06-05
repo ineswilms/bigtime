@@ -6,7 +6,7 @@
 #' @examples
 #' data(Y)
 #' data(X)
-#' VARXfit <- sparseVARX(Y=Y, X=X) # sparse VARX
+#' VARXfit <- sparseVARX(Y=scale(Y), X=scale(X), selection = "cv") # sparse VARX
 #' Lhats <- lagmatrix(fit=VARXfit)
 lagmatrix <- function(fit, returnplot=F){
 
@@ -183,6 +183,9 @@ lagmatrix <- function(fit, returnplot=F){
 
 
 plotlagmat <- function(lagmat){
+  Response <- Predictor <- Lags <- NULL # Needed because otherwise cran complaines about lazy evaluation
+
+
   lmat <- tidyr::as_tibble(lagmat)
   lmat <- lmat %>%
     dplyr::mutate(Response = rownames(lagmat)) %>%

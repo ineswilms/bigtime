@@ -20,6 +20,6 @@ Creates Lagmatrix of Estimated Coefficients
 \examples{
 data(Y)
 data(X)
-VARXfit <- sparseVARX(Y=Y, X=X) # sparse VARX
+VARXfit <- sparseVARX(Y=scale(Y), X=scale(X), selection = "cv") # sparse VARX
 Lhats <- lagmatrix(fit=VARXfit)
 }
