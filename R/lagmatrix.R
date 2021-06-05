@@ -375,7 +375,6 @@ plotlaghat <- function (datamatrix, title = "", mar = c(0, 0, 0, 0), cl.lim, add
   text(pos.ylabel[, 1], pos.ylabel[, 2], newrownames,
        col = tl.col, cex = tl.cex, pos = 2, offset = tl.offset)
 
-
   # title(title, ...)
 
   # Add numbers to each non-zero cell

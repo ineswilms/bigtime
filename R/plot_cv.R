@@ -25,6 +25,7 @@ plot_cv <- function(fit, ...) {
                      col = c(1, 2), lty = c(3, 3), bty = "n", horiz = TRUE, lwd = c(2, 2))
   }
   else if ("bigtime.VARX" %in% class(fit)) {
+    if (fit$selection != "cv") stop("No cross-validation was used in model estimation. Set selection='cv' in sparseVAR")
     image_cv(fit)
   } else stop("Unsupported type.")
   invisible()

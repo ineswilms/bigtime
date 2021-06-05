@@ -109,6 +109,7 @@ fitted.bigtime.VAR <- function(object, ...){
 
   VARdata <- HVARmodel(Y=mod$Y, p=mod$p, h=mod$h)
   fit <- t(apply(VARdata$fullZ, 2, function(x) mod$Phihat%*%x + mod$phi0hat))
+  if (ncol(mod$Y) == 1) fit <- t(fit) # somehow in this case we do not actually need to transpose
   colnames(fit) <- colnames(mod$Y)
   fit
 }
@@ -199,7 +200,7 @@ diagnostics_plot.bigtime.VAR <- function(mod, variable = 1, dates=NULL){
   fit <- fitted.bigtime.VAR(mod)
   res <- residuals.bigtime.VAR(mod)
   s <- dim(mod$Y)[1] - dim(fit)[1]
-  Y <- mod$Y[-c(1:s), ]
+  Y <- mod$Y[-(1:s), , drop = FALSE]
 
   .diagnostics_plot(Y, fit, res, s, variable, dates)
 }
@@ -213,10 +214,11 @@ diagnostics_plot.bigtime.VAR <- function(mod, variable = 1, dates=NULL){
 #' @export
 diagnostics_plot.bigtime.VARX <- function(mod, variable = 1, dates = NULL){
   if (!"bigtime.VARX" %in% class(mod)) stop("Only implemented for VARX models")
+  if (mod$selection == "none") stop("Cannot be used with selection='none'. Choose other selection procedure in sparseVAR or call ic_selection on model first.")
   fit <- fitted.bigtime.VARX(mod)
   res <- residuals.bigtime.VARX(mod)
   s <- nrow(mod$Y) - nrow(fit)
-  Y <- mod$Y[-c(1:s), ]
+  Y <- mod$Y[-c(1:s), , drop = FALSE]
   .diagnostics_plot(Y, fit, res, s, variable, dates)
 }
 
@@ -232,7 +234,7 @@ diagnostics_plot.bigtime.VARMA <- function(mod, variable = 1, dates = NULL){
   fit <- fitted.bigtime.VARMA(mod)
   res <- residuals.bigtime.VARMA(mod)
   s <- nrow(mod$Y) - nrow(fit)
-  Y <- mod$Y[-c(1:s), ]
+  Y <- mod$Y[-c(1:s), , drop = FALSE]
   .diagnostics_plot(Y, fit, res, s, variable, dates)
 }
 

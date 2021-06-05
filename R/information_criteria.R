@@ -78,7 +78,8 @@ get_ic_vals.bigtime.VARX <- function(mod, verbose = TRUE){
   res <- residuals.bigtime.VARX(mod_tmp)
   for (i in 1:n3){
     df <- sum(mod$Phihat != 0) + sum(mod$Bhat != 0)
-    ics[i, ] <- .get_ic_vals(res[, , i], tt, df)
+    r <- matrix(res[, , i], nrow = dim(res)[1], ncol = dim(res)[2])
+    ics[i, ] <- .get_ic_vals(r, tt, df)
   }
   colnames(ics) <-  c("AIC", "BIC", "HQ")
   lambdaPhi <- mod$lambdaPhi
@@ -208,6 +209,7 @@ get_ic_vals.bigtime.VAR <- function(mod, verbose = TRUE){
 #' @param df degrees of freedom
 #' @keywords internal
 .get_ic_vals <- function(res, tt, df){
+
   Omega <- cov(res)
   log_det_omega <- log(det(Omega))
 
