@@ -71,6 +71,10 @@ sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL,
   ######################################
   #### Checking and Preparing Input ####
   ######################################
+  VARselection <- match.arg(VARselection)
+  VARMAselection <- match.arg(VARMAselection)
+
+
   if(!is.matrix(Y)){
     if(is.vector(Y) & length(Y)>1){
       Y <- matrix(Y, ncol=1)
@@ -125,14 +129,19 @@ sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL,
       stop("The maximum moving average order of the VARMA needs to be a strictly positive integer")
     }
   }
-  if( (!is.vector(VARMAlPhiseq) & !is.null(VARMAlPhiseq)) | length(VARMAlPhiseq)==1){
-    stop("The regularization parameter grid VARMAlPhiseq needs to be a vector of length > 1 or NULL otherwise")
+  if((!is.vector(VARMAlPhiseq) & !is.null(VARMAlPhiseq))){
+    stop("The regularization parameter grid VARMAlPhiseq needs to be a vector of length >= 1 or NULL otherwise")
+  }
+  if (length(VARMAlPhiseq) == 1){
+    if (length(VARMAlThetaseq) == 1 & VARMAselection != 'none'){
+      stop("If both penalty sequences are of length one, then only selection='none' is supported")
+    }
   }
   if(any((VARMAPhigran<=0)==T)){
     stop("The granularity parameters need to be a strictly positive integer")
   }
-  if((!is.vector(VARMAlThetaseq) & !is.null(VARMAlThetaseq)) | length(VARMAlThetaseq)==1){
-    stop("The regularization parameter VARMAlThetaseq needs to be a vector of length >1 or NULL otherwise")
+  if((!is.vector(VARMAlThetaseq) & !is.null(VARMAlThetaseq))){
+    stop("The regularization parameter VARMAlThetaseq needs to be a vector of length >=1 or NULL otherwise")
   }
   if(any((VARMAThetagran<=0)==T)){
     stop("The granularity parameters need to be a strictly positive integer")
@@ -184,7 +193,6 @@ sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL,
   #######################
   #### START PHASE I ####
   #######################
-  VARselection <- match.arg(VARselection)
   # Determine maximum order of VAR as function of sample size
   if(is.null(VARp)){
     VARp <- floor(1.5*sqrt(nrow(Y)))
@@ -244,8 +252,6 @@ sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL,
   ########################
   #### START PHASE II ####
   ########################
-  VARMAselection <- match.arg(VARMAselection)
-
   ### Determine maximum AR and MA order of VARMA as a function of time series length T
   if(is.null(VARMAp)){
     VARMAp <- floor(1.5*sqrt(nrow(Y))/2)
