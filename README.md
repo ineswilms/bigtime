@@ -73,16 +73,16 @@ plot_series(X)
 
 ### Vector AutoRegressive (VAR) Models
 
-While we could use the example data provided, *bigtime* also support
+While we could use the example data provided, *bigtime* also supports
 simulation of VAR models using both lasso and elementwise type sparsity
 patterns. Since lasso is the most widely known one, we will start off
 with lasso. To simulate a VAR model having lasso type of sparsity, use
 the `simVAR` function and set `sparsity_pattern="lasso"`. The lasso
-sparsity patterns the addional `num_zero` options which determines the
-number of zeros in the VAR coefficient matrix (excluding intercepts).
-*Note: we also set a seed so that the simulation is replicatable*. We
-can then use the `summary` function to obtain a summary of the simulated
-data.
+sparsity pattern has the additional `num_zero` option which determines
+the number of zeros in the VAR coefficient matrix (excluding
+intercepts). *Note: we also set a seed so that the simulation is
+replicatable*. We can then use the `summary` function to obtain a
+summary of the simulated data.
 
 ``` r
 periods <- 200
@@ -203,7 +203,7 @@ order coefficients (i.e., large values in the lagmatrix).
 
 To circumvent this problem, we advise using a lag-based hierarchically
 sparse estimation procedure, which boils down to using the default
-option HLag for the `VARpen` argument. This estimation procedures
+option HLag for the `VARpen` argument. This estimation procedure
 encourages low maximum lag orders, often results in sparser lagmatrices,
 and hence more interpretable models.
 
@@ -284,11 +284,12 @@ summary(sim_data) # Obtaining a summary of the simulation
 #> Y5.L5  0.000000e+00 -6.013512e-09 -8.495736e-09  0.000000e+00  0.000000e+00
 ```
 
-![](man/figures/README-unnamed-chunk-6-1.png)<!-- --> Models can be
-estimated using the hierarchical penalisation by using the default
-argument to `VARpen`, namely `HLag`. Model selection can again be done
-by either setting `selection="none"` and obtaining a whole sequence of
-models, or by using any of `cv, bic, aic, hq`.
+![](man/figures/README-unnamed-chunk-6-1.png)<!-- -->
+
+Models can be estimated using the hierarchical penalisation by using the
+default argument to `VARpen`, namely `HLag`. Model selection can again
+be done by either setting `selection="none"` and obtaining a whole
+sequence of models, or by using any of `cv, bic, aic, hq`.
 
 ``` r
 VARHLag_none <- sparseVAR(Y=scale(Y), selection = "none") # HLag is the dafault VARpen option
@@ -320,7 +321,7 @@ VARHLag_bic <- sparseVAR(Y=scale(Y), selection = "bic") # This will also give a 
 Depending on which selection procedure was used, various diagnostics can
 be produced. Former and foremost, all selection procedures support the
 `fitted` and `residuals` functions to obtain the fitted and residual
-values respective. Both functions return a 3D array if the model used
+values respectively. Both functions return a 3D array if the model used
 `selection="none"` correpoding to the fitted/residual values for each
 model in the penalisation sequence.
 
@@ -376,7 +377,7 @@ autoregressive coefficients are returned.
 data.
 
 ``` r
-VARXfit_cv <- sparseVARX(Y=scale(Y), X=scale(X), selection = "cv") # VARX models always to Cross-Validation
+VARXfit_cv <- sparseVARX(Y=scale(Y), X=scale(X), selection = "cv")
 LhatVARX <- lagmatrix(fit=VARXfit_cv, returnplot=TRUE)
 ```
 
@@ -410,14 +411,14 @@ dim(VARXfit_none$Bhat)
 #> [1] 10 70 10
 ```
 
-Other functions such as `residuals`, `fitted`, and `diagnosticsplot` are
-also supported.
+Other functions such as `residuals`, `fitted`, and `diagnostics_plot`
+are also supported.
 
 ### Vector AutoRegressive Moving Average (VARMA) Models
 
-VARMA models generalized VAR models and often allow for more
-parsimonious representations of the data generating process. To estimate
-a VARMA model to a multivariate time series data set, use the function
+VARMA models generalise VAR models and often allow for more parsimonious
+representations of the data generating process. To estimate a VARMA
+model to a multivariate time series data set, use the function
 `sparseVARMA`, and choose a desired selection method. As a default,
 `sparseVARMA` uses CV in the first stage and `none` in the second stage.
 **The first stage does not support `none`: A selection needs to be
