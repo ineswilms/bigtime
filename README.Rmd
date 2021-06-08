@@ -64,7 +64,7 @@ plot_series(X)
 
 ### Vector AutoRegressive (VAR) Models
 
-While we could use the example data provided, *bigtime* also support simulation of VAR models using both lasso and elementwise type sparsity patterns. Since lasso is the most widely known one, we will start off with lasso. To simulate a VAR model having lasso type of sparsity, use the `simVAR` function and set `sparsity_pattern="lasso"`. The lasso sparsity patterns the addional `num_zero` options which determines the number of zeros in the VAR coefficient matrix (excluding intercepts). *Note: we also set a seed so that the simulation is replicatable*. We can then use the `summary` function to obtain a summary of the simulated data.
+While we could use the example data provided, *bigtime* also supports simulation of VAR models using both lasso and elementwise type sparsity patterns. Since lasso is the most widely known one, we will start off with lasso. To simulate a VAR model having lasso type of sparsity, use the `simVAR` function and set `sparsity_pattern="lasso"`. The lasso sparsity pattern has the additional `num_zero` option which determines the number of zeros in the VAR coefficient matrix (excluding intercepts). *Note: we also set a seed so that the simulation is replicatable*. We can then use the `summary` function to obtain a summary of the simulated data.
 
 ```{r}
 periods <- 200
@@ -105,7 +105,7 @@ LhatL1 <- lagmatrix(fit=VARL1, returnplot=TRUE)
 The lag matrix is typically sparse as it contains some empty (i.e., zero) cells. However, VAR models estimated with a standard L1-penalty are typically not easily interpretable as they select many high lag order coefficients (i.e., large values in the lagmatrix). 
 
 To circumvent this problem, we advise using a lag-based hierarchically sparse estimation procedure, which boils down to using the default option HLag for the `VARpen` argument.
-This estimation procedures encourages low maximum lag orders, often results in sparser lagmatrices, and hence more interpretable models.
+This estimation procedure encourages low maximum lag orders, often results in sparser lagmatrices, and hence more interpretable models.
 
 A VAR with HLag (elementwise) type of sparsity can be simulated using `simVAR` and by setting `sparsity_pattern="hvar"`. Three extra options exist: (1) `zero_min` determines the minimum number of zero coefficients of each variable in each equation, (2) `zero_max` determines the maximum number of zero coefficients of each variable in each equation, and (3) `zeroes_in_self` is a boolean option that if TRUE, zero coefficients of the $i$th variable can exist in the $i$th equation.
 
@@ -124,6 +124,7 @@ sim_data <- simVAR(periods = periods, k = k, p = p,
 Y <- sim_data$Y
 summary(sim_data) # Obtaining a summary of the simulation
 ```
+
 Models can be estimated using the hierarchical penalisation by using the default argument to `VARpen`, namely `HLag`. Model selection can again be done by either setting `selection="none"` and obtaining a whole sequence of models, or by using any of `cv, bic, aic, hq`. 
 
 
@@ -132,7 +133,7 @@ VARHLag_none <- sparseVAR(Y=scale(Y), selection = "none") # HLag is the dafault 
 VARHLag_cv <- sparseVAR(Y=scale(Y), selection = "cv")
 VARHLag_bic <- sparseVAR(Y=scale(Y), selection = "bic") # This will also give a table for IC comparison
 ```
-Depending on which selection procedure was used, various diagnostics can be produced. Former and foremost, all selection procedures support the `fitted` and `residuals` functions to obtain the fitted and residual values respective. Both functions return a 3D array if the model used `selection="none"` correpoding to the fitted/residual values for each model in the penalisation sequence.
+Depending on which selection procedure was used, various diagnostics can be produced. Former and foremost, all selection procedures support the `fitted` and `residuals` functions to obtain the fitted and residual values respectively. Both functions return a 3D array if the model used `selection="none"` correpoding to the fitted/residual values for each model in the penalisation sequence.
 
 ```{r}
 res_VARHLag_none <- residuals(VARHLag_none) # This is a 3D array
@@ -168,7 +169,7 @@ When applying the `lagmatrix` function to an estimated sparse VARX model, the la
 `sparseVARX` supports the same `selection` arguments as `sparseVAR`: `none, cv, bic, aic, hq`, and it is again recommended to standardise the data.
 
 ```{r}
-VARXfit_cv <- sparseVARX(Y=scale(Y), X=scale(X), selection = "cv") # VARX models always to Cross-Validation
+VARXfit_cv <- sparseVARX(Y=scale(Y), X=scale(X), selection = "cv")
 LhatVARX <- lagmatrix(fit=VARXfit_cv, returnplot=TRUE)
 ```
 
@@ -190,11 +191,11 @@ dim(VARXfit_none$Phihat) # This is a 3D array
 dim(VARXfit_none$Bhat) 
 ```
 
-Other functions such as `residuals`, `fitted`, and `diagnosticsplot` are also supported.
+Other functions such as `residuals`, `fitted`, and `diagnostics_plot` are also supported.
 
 ### Vector AutoRegressive Moving Average (VARMA) Models
 
-VARMA models generalized VAR models and often allow for more parsimonious representations of the data generating process. To estimate a VARMA model to a multivariate time series data set, use the function `sparseVARMA`, and choose a desired selection method. As a default, `sparseVARMA` uses CV in the first stage and `none` in the second stage. **The first stage does not support `none`: A selection needs to be made.**
+VARMA models generalise VAR models and often allow for more parsimonious representations of the data generating process. To estimate a VARMA model to a multivariate time series data set, use the function `sparseVARMA`, and choose a desired selection method. As a default, `sparseVARMA` uses CV in the first stage and `none` in the second stage. **The first stage does not support `none`: A selection needs to be made.**
 
 Now lag matrices are obtained for the autoregressive (AR) coefficients and the moving average (MAs) coefficients.
 ```{r}
