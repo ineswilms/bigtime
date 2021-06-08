@@ -101,14 +101,24 @@ sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, V
   if(!((cvcut<1) & (cvcut>0))){
     stop("cvcut needs to be a number between 0 and 1")
   }
-  if( (!is.vector(VARXlPhiseq) & !is.null(VARXlPhiseq)) | length(VARXlPhiseq)==1){
-    stop("The regularization parameter grid VARXlPhiseq needs to be a vector of length > 1 or NULL otherwise")
+  if( (!is.vector(VARXlPhiseq) & !is.null(VARXlPhiseq))){
+    stop("The regularization parameter grid VARXlPhiseq needs to be a vector of length >= 1 or NULL otherwise")
+  }
+  if (!is.null(VARXlPhiseq) & length(VARXlPhiseq)==1 & selection!="none"){
+    if (!is.null(VARXlBseq) & length(VARXlBseq)==1){
+      stop("When providing a single penalisation parameter, selection must be 'none'")
+    }
   }
   if(any((VARXPhigran<=0)==T)){
     stop("The granularity parameters need to be a strictly positive integer")
   }
-  if((!is.vector(VARXlBseq) & !is.null(VARXlBseq)) | length(VARXlBseq)==1){
-    stop("The regularization parameter VARXlBseq needs to be a vector of length >1 or NULL otherwise")
+  if((!is.vector(VARXlBseq) & !is.null(VARXlBseq))){
+    stop("The regularization parameter VARXlBseq needs to be a vector of length >=1 or NULL otherwise")
+  }
+  if (!is.null(VARXlBseq) & length(VARXlBseq)==1 & selection!="none"){
+    if (!is.null(VARXlPhiseq) & length(VARXlPhiseq)==1){
+      stop("When providing a single penalisation parameter, selection must be 'none'")
+    }
   }
   if(any((VARXBgran<=0)==T)){
     stop("The granularity parameters need to be a strictly positive integer")
