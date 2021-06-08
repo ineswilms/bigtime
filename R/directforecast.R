@@ -91,6 +91,19 @@ directforecast <- function(fit, h=1){
       Theta <- fit$Bhat
       phi0 <- fit$phi0hat
 
+      if (fit$selection == "none"){
+        dir_fcst <- array(dim = c(1, ncol(Y), dim(Phi)[3]))
+        for (i in 1:dim(Phi)[3]){
+          mod_tmp <- fit
+          mod_tmp$Phihat <- fit$Phihat[,,i]
+          mod_tmp$phi0hat <- fit$phi0hat[,,i]
+          mod_tmp$Bhat <- fit$Bhat[,,i]
+          mod_tmp$selection = "tmp"
+          dir_fcst[,,i] <- directforecast(mod_tmp, h = h)
+        }
+        return(dir_fcst)
+      }
+
       if(is.null(Phi) | is.null(Theta) | is.null(phi0)){
         stop("Please provide a fitted VARX model")
       }
@@ -108,7 +121,7 @@ directforecast <- function(fit, h=1){
 
       if (fit$VARMAselection == "none"){
         # If no selection was done, then fitted values are tensors
-        dir_fcst <- array(dim = c(1, m, dim(Phi)[3]))
+        dir_fcst <- array(dim = c(1, ncol(Y), dim(Phi)[3]))
         for (i in 1:length(fit$PhaseII_lambdaPhi)){
           mod_tmp <- fit
           mod_tmp$Phihat <- fit$Phihat[, , i]
