@@ -1,6 +1,6 @@
 #' Plot the Cross Validation Error Curve for a Sparse VAR or VARX
-#' @param fit Fitted VAR or VARX model.
-#' returned by \code{\link{sparseVAR}} or \code{\link{sparseVARX}}.
+#' @param fit Fitted VAR, VARMA or VARX model.
+#' returned by \code{\link{sparseVAR}}, \code{\link{sparseVARMA}} or \code{\link{sparseVARX}}.
 #' @param ... Not currently used
 #' @export
 plot_cv <- function(fit, ...) {

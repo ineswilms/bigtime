@@ -7,8 +7,8 @@
 plot_cv(fit, ...)
 }
 \arguments{
-\item{fit}{Fitted VAR or VARX model.
-returned by \code{\link{sparseVAR}} or \code{\link{sparseVARX}}.}
+\item{fit}{Fitted VAR, VARMA or VARX model.
+returned by \code{\link{sparseVAR}}, \code{\link{sparseVARMA}} or \code{\link{sparseVARX}}.}
 
 \item{...}{Not currently used}
 }
