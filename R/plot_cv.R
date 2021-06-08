@@ -27,7 +27,18 @@ plot_cv <- function(fit, ...) {
   else if ("bigtime.VARX" %in% class(fit)) {
     if (fit$selection != "cv") stop("No cross-validation was used in model estimation. Set selection='cv' in sparseVAR")
     image_cv(fit)
-  } else stop("Unsupported type.")
+  } else if ("bigtime.VARMA" %in% class(fit)) {
+    if (fit$VARMAselection != "cv") stop("No cross-validation was used during model building.")
+    fit_tmp <- fit
+    fit_tmp$lambdaB <- fit$PhaseII_lambdaTheta
+    fit_tmp$lambdaPhi <- fit$PhaseII_lambdaPhi
+    fit_tmp$MSFEcv <- fit$PhaseII_MSFEcv
+    fit_tmp$lambdaPhi_SEopt <- fit$PhaseII_lambdaPhi_SEopt
+    fit_tmp$lambdaB_SEopt <- fit$PhaseII_lambdaTheta_SEopt
+    image_cv(fit_tmp, xlab = "lambda_Theta")
+  }
+
+  else stop("Unsupported type.")
   invisible()
 }
 
@@ -41,11 +52,11 @@ error_bars <- function (x, upper, lower, width = 0.02, ...) {
   range(upper, lower)
 }
 
-image_cv <- function(fit) {
+image_cv <- function(fit, xlab = "lambda_B", ylab = "lambda_Phi") {
   o <- order(unique(fit$lambdaB))
   graphics::image(x = unique(fit$lambdaB)[o],
         y = unique(fit$lambdaPhi),
         z = matrix(fit$MSFEcv, nrow = length(o))[o, ],
-        xlab = "lambda_B", ylab="lambda_Phi", col = heat.colors(40))
+        xlab = xlab, ylab=ylab, col = heat.colors(40))
   points(fit$lambdaB_SEopt, fit$lambdaPhi_SEopt, pch = 19)
 }
