@@ -207,13 +207,13 @@ sim_dat <- simVAR(periods = periods, k = k, p = p, e_dist = e_dist,
 
 
 hvar <- sparseVAR(scale(sim_dat$Y), selection = "none")
-plot_cv(hvar) # Should give an error because model did not use cv
-diagnostics_plot(hvar) # This should not work and should give an error
+try({plot_cv(hvar)}) # Should give an error because model did not use cv
+try({diagnostics_plot(hvar)}) # This should not work and should give an error
 res <- residuals(hvar)
 dim(res) # Should be a 3d array
 fit <- fitted(hvar)
 dim(fit) # Should have same dimensions as res
-lagmat <- lagmatrix(hvar, returnplot = TRUE) # This should not work
+try({lagmat <- lagmatrix(hvar, returnplot = TRUE)}) # This should not work
 
 hvar <- sparseVAR(scale(sim_dat$Y), selection = "cv")
 plot_cv(hvar) # This should work
@@ -225,19 +225,19 @@ dim(fit) # Should have same dimensions as res
 lagmat <- lagmatrix(hvar, returnplot = TRUE) # This should work just fine.
 
 hvar <- sparseVAR(scale(sim_dat$Y), selection = "bic")
-plot_cv(hvar) # Should not work
+try({plot_cv(hvar)}) # Should not work
 diagnostics_plot(hvar, variable = 2) # This should work and plot for the second series
 lagmat <- lagmatrix(hvar, returnplot = TRUE) # This should work just fine. If it works here, it also works for the followign
 
 hvar <- sparseVAR(scale(sim_dat$Y), selection = "aic")
-plot_cv(hvar) # Should not work
+try({plot_cv(hvar)}) # Should not work
 diagnostics_plot(hvar, variable = 3) # This should work and plot for the third series
 
 hvar <- sparseVAR(scale(sim_dat$Y), selection = "hq")
-plot_cv(hvar) # Should not work
+try({plot_cv(hvar)}) # Should not work
 diagnostics_plot(hvar, variable = 'Y2') # This should work and plot for the second series
-diagnostics_plot(hvar, variable = 4) # This should not work since only 3 series are estimated
-diagnostics_plot(hvar, variable = "Y4") # This should not work since only 3 series are estimated
+try({diagnostics_plot(hvar, variable = 4)}) # This should not work since only 3 series are estimated
+try({diagnostics_plot(hvar, variable = "Y4")}) # This should not work since only 3 series are estimated
 
 # It should also all work if we use lasso instead
 hvar <- sparseVAR(scale(sim_dat$Y), selection = "cv", VARpen = "L1")
@@ -313,8 +313,8 @@ dim(fit)
 res <- residuals(mod)
 dim(res)
 max(abs(fit + res - mod$Y[-(1:mod$p), ])) # this should be zero
-plot_cv(mod) # this should throw an error
-diagnostics_plot(mod) # this should also throw an error
+try({plot_cv(mod)}) # this should throw an error
+try({diagnostics_plot(mod)}) # this should also throw an error
 
 ## Estimation using cv
 mod <- sparseVAR(scale(sim_dat$Y), selection = "cv")
@@ -335,10 +335,5 @@ mod <- sparseVAR(scale(sim_dat$Y), selection = "aic")
 mod <- sparseVAR(scale(sim_dat$Y), selection = "hq")
 mod$selection
 mod$lambda_opt
-plot_cv(mod) # This should throw an error
+try({plot_cv(mod)}) # This should throw an error
 diagnostics_plot(mod)
-
-
-
-
-
