@@ -357,6 +357,7 @@ data(example)
 Y <- example[-nrow(example), 1:10] # endogenous time series
 colnames(Y) <- paste0("Y", 1:ncol(Y)) # Assigning column names
 Ytest <- example[nrow(example), 1:10]
+Ytest <- (Ytest-apply(Y, 2, mean))/apply(Y, 2, sd) # Needed because we standardise data
 X <- example[-nrow(example), 11:15] # exogenous time series
 colnames(X) <- paste0("X", 1:ncol(X)) # Assinging column names
 ```
@@ -438,24 +439,49 @@ Other functions such as `plot_cv`, `residuals`, `fitted` and
 ## Evaluating Forecast Performance
 
 To obtain forecasts from the estimated models, you can use the
-`directforecast` function. The default forecast horizon (argument `h`)
-is set to one such that one-step ahead forecasts are obtained, but you
-can specify your desired forecast horizon. Finally, we compare the
-forecast accuracy of the different models by comparing their forecasts
-to the actual time series values. In this example, the VARMA model has
-the best forecast performance (i.e., lowest mean squared prediction
-error). This is no surprise as the multivariate time series \(Y\) was
-generated from a VARMA model.
+`directforecast` function for VAR, VARMA, and VARX, or the
+`recursiveforecast` function for VAR models. The default forecast
+horizon (argument `h`) is set to one such that one-step ahead forecasts
+are obtained, but you can specify your desired forecast horizon.
+
+Finally, we compare the forecast accuracy of the different models by
+comparing their forecasts to the actual time series values. We will
+estimate all models using CV.
+
+In this example, the VARMA model has the best forecast performance
+(i.e., lowest mean squared prediction error). This is no surprise as the
+multivariate time series \(Y\) was generated from a VARMA model.
 
 ``` r
-# VARf <- directforecast(VARHLag) # default is h=1
-# VARXf <- directforecast(VARXfit)
-# VARMAf <- directforecast(VARMAfit)
-# 
-# mean((VARf-Ytest)^2)
-# mean((VARXf-Ytest)^2)
-# mean((VARMAf-Ytest)^2) # lowest=best
+VARcv <- sparseVAR(Y = scale(Y), selection = "cv")
+VARMAcv <- sparseVARMA(Y = scale(Y), VARMAselection = "cv")
+VARXcv <- sparseVARX(Y = scale(Y), X = scale(X), selection = "cv")
+
+VARf <- directforecast(VARcv) # default is h=1
+VARXf <- directforecast(VARXcv)
+VARMAf <- directforecast(VARMAcv)
+
+mean((VARf-Ytest)^2)
+#> [1] 0.5000718
+mean((VARXf-Ytest)^2)
+#> [1] 0.4441901
+mean((VARMAf-Ytest)^2) # lowest=best
+#> [1] 0.372068
 ```
+
+Note that we could easily obtain longer horizon forecasts for the VAR
+model by using the `recursiveforecast` function. It is recommended to
+call `is.stable` first though, to check whether the obtained VAR model
+is stable.
+
+``` r
+is.stable(VARcv)
+#> [1] TRUE
+rec_fcst <- recursiveforecast(VARcv, h = 10)
+plot(rec_fcst, series = "Y2", last_n = 50) # Plotting of a recursive forecast
+```
+
+![](man/figures/README-unnamed-chunk-16-1.png)<!-- -->
 
 ## Univariate Models
 
@@ -469,21 +495,56 @@ procedure as automatic lag selection procedures.
 We start by generating a time series of length \(n=50\) from a
 stationary AR model and by plotting it. The `sparseVAR` function can
 also be used in the univariate case as it allows the argument `Y` to be
-a vector. The `lagmatrix` function gives the selected autoregressive
-order of the sparse AR model. The true order is one.
+a vector.
+
+The `lagmatrix` function gives the selected autoregressive order of the
+sparse AR model. The true order is one.
 
 ``` r
-# n <- 50
-# y <- rep(NA, n)
-# y[1] <- rnorm(1, sd=0.1)
-# for(i in 2:n){
-#   y[i] <- 0.5*y[i-1] + rnorm(1, sd=0.1)
-# }
-# par(mfrow=c(1,1))
-# plot(y, type="l", xlab="Time", ylab="")
-# ARfit <- sparseVAR(Y=y, selection = "cv")
-# lagmatrix(fit=ARfit)
+periods <- 50
+k <- 1
+p <- 1
+sim_data <- simVAR(periods, k, p, 
+                   sparsity_pattern = "none", 
+                   max_abs_eigval = 0.5, 
+                   seed = 123456)
+summary(sim_data)
+#> #### General Information #### 
+#> 
+#> Seed                      123456 
+#> Periods Simulated             50 
+#> Periods used as burnin            50 
+#> Variables Simulated           1 
+#> Number of Lags                1 
+#> Coefficients were randomly created?   TRUE 
+#> Maximum Eigenvalue of Companion Matrix    0.5 
+#> Sparsity Pattern              none 
+#> 
+#> 
+#> #### Sparsity Options #### 
+#> 
+#> NULL
+#> 
+#> 
+#> #### Coefficient Matrix #### 
+#> 
+#>           [,1]
+#> [1,] 0.4998982
 ```
+
+![](man/figures/README-unnamed-chunk-17-1.png)<!-- -->
+
+``` r
+y <- scale(sim_data$Y)
+ARfit <- sparseVAR(Y=y, selection = "cv")
+lagmatrix(ARfit)
+#> $LPhi
+#>      [,1]
+#> [1,]    1
+```
+
+*Note that all diagnostics functions discussed for the VAR, VARMA, VARX
+cases also work for univariate cases; so do the forecasting functions*
 
 ### AutoRegressive with Exogenous Variables (ARX) Models
 
@@ -495,18 +556,34 @@ endogenous (under `LPhi`) and exogenous autoregressive (under `LB`)
 orders of the sparse ARX model. The true orders are one.
 
 ``` r
-# n <- 50
-# y  <- x <- rep(NA, n)
-# x[1] <- rnorm(1, sd=0.1)
-# y[1]  <- rnorm(1, sd=0.1)
-# for(i in 2:n){
-#   x[i] <- 0.8*x[i-1] + rnorm(1, sd=0.1)
-#   y[i] <- 0.5*y[i-1] + 0.2*x[i-1] + rnorm(1, sd=0.1)
-# }
-# par(mfrow=c(1,1))
-# plot(y, type="l", xlab="Time", ylab="")
-# ARXfit <- sparseVARX(Y=y, X=x, selection = "cv") 
-# lagmatrix(fit=ARXfit)
+
+periods <- 50
+k <- 1
+p <- 1
+burnin <- 100
+Xsim <- simVAR(periods+burnin, k, p, max_abs_eigval = 0.8, seed = 123)
+edist <- Xsim$Y + rnorm(periods + burnin, sd = 0.1)
+Ysim <- simVAR(periods, k , p, max_abs_eigval = 0.5, seed = 789, 
+               e_dist = t(edist), burnin = burnin)
+plot(Ysim)
+```
+
+![](man/figures/README-unnamed-chunk-18-1.png)<!-- -->
+
+``` r
+
+x <- scale(Xsim$Y[-(1:burnin)])
+y <- scale(Ysim$Y)
+
+ARXfit <- sparseVARX(Y=y, X=x, selection = "cv")
+lagmatrix(fit=ARXfit)
+#> $LPhi
+#>      [,1]
+#> [1,]    0
+#> 
+#> $LB
+#>      [,1]
+#> [1,]    2
 ```
 
 ### AutoRegressive Moving Average (ARMA) Models
@@ -519,18 +596,58 @@ a vector. The `lagmatrix` function gives the selected autoregressive
 ARMA model. The true orders are one.
 
 ``` r
-# n <- 50
-# y <- u <- rep(NA, n)
-# y[1] <- rnorm(1, sd=0.1)
-# u[1] <- rnorm(1, sd=0.1)
-# for(i in 2:n){
-#   u[i] <- rnorm(1, sd=0.1)
-#   y[i] <- 0.5*y[i-1] + 0.2*u[i-1] + u[i]
-# }
-# par(mfrow=c(1,1))
-# plot(y, type="l", xlab="Time", ylab="")
-# ARMAfit <- sparseVARMA(Y=y, VARMAselection = "cv") 
-# lagmatrix(fit=ARMAfit)
+
+periods <- 50
+k <- 1
+p.u <- 1
+p.y <- 1
+burnin <- 100
+
+u <- rnorm(periods + 1 + burnin, sd = 0.1)
+u <- embed(u, dimension = p.u + 1)
+u <- u * matrix(rep(c(1, 0.2), nrow(u)), nrow =  nrow(u), byrow = TRUE) # Second column is lagged, first is current error
+edist <- rowSums(u)
+
+Ysim <- simVAR(periods, k, p, e_dist = t(edist), 
+               max_abs_eigval = 0.5, seed = 789, 
+               burnin = burnin)
+summary(Ysim)
+#> #### General Information #### 
+#> 
+#> Seed                      789 
+#> Periods Simulated             50 
+#> Periods used as burnin            100 
+#> Variables Simulated           1 
+#> Number of Lags                1 
+#> Coefficients were randomly created?   TRUE 
+#> Maximum Eigenvalue of Companion Matrix    0.5 
+#> Sparsity Pattern              none 
+#> 
+#> 
+#> #### Sparsity Options #### 
+#> 
+#> NULL
+#> 
+#> 
+#> #### Coefficient Matrix #### 
+#> 
+#>           [,1]
+#> [1,] 0.4989384
+```
+
+![](man/figures/README-unnamed-chunk-19-1.png)<!-- -->
+
+``` r
+
+ARMAfit <- sparseVARMA(Y=y, VARMAselection = "cv")
+lagmatrix(fit=ARMAfit)
+#> $LPhi
+#>      [,1]
+#> [1,]    0
+#> 
+#> $LTheta
+#>      [,1]
+#> [1,]    3
 ```
 
 ## Additional Resources
