@@ -169,7 +169,8 @@ sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL,
   }
 
   if(selection == "cv"){
-    out <- list("k"=k, "Y"=Y, "p"=p, "Phihat"=VARmodel$Phi, "phi0hat"=VARmodel$phi,
+    Phihat <- if (ncol(Y) == 1) matrix(VARmodel$Phi, nrow = 1) else VARmodel$Phi
+    out <- list("k"=k, "Y"=Y, "p"=p, "Phihat"=Phihat, "phi0hat"=VARmodel$phi,
                 "series_names"=series_names, "lambdas"=VARcv$lambda,
                 "MSFEcv"=VARcv$MSFE_avg, "MSFE_all"=VARcv$MSFE_all,
                 "lambda_SEopt"=VARcv$lambda_opt_oneSE,"lambda_opt"=VARcv$lambda_opt, "h"=h,
@@ -184,7 +185,11 @@ sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL,
   class(out) <- "bigtime.VAR"
 
   # If user wants to use IC for selection
-  if (selection %in% c("bic", "aic", "hq")) out <- ic_selection(out, ic = selection, verbose = TRUE)
+  if (selection %in% c("bic", "aic", "hq")) {
+    out <- ic_selection(out, ic = selection, verbose = TRUE)
+    Phihat <- if (ncol(Y) == 1) matrix(out$Phihat, nrow = 1) else out$Phihat
+    out$Phihat <- Phihat
+  }
 
   out
 }
