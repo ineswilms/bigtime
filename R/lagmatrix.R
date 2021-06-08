@@ -191,7 +191,9 @@ plotlagmat <- function(lagmat){
   lmat <- tidyr::as_tibble(lagmat)
   lmat <- lmat %>%
     dplyr::mutate(Response = rownames(lagmat)) %>%
-    tidyr::pivot_longer(-Response, names_to = "Predictor", values_to = "Lags")
+    tidyr::pivot_longer(-Response, names_to = "Predictor", values_to = "Lags") %>%
+    mutate(Response = factor(Response, levels = sort(unique(Response), decreasing = TRUE)),
+           Predictor = factor(Predictor, levels = sort(unique(Predictor), decreasing = FALSE)))
 
   p <- ggplot2::ggplot(data = lmat,
                   ggplot2::aes(x = Predictor, y = Response, fill = Lags)) +
