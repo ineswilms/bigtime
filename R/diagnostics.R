@@ -73,7 +73,12 @@ residuals.bigtime.VARMA <- function(object, ...){
   mod <- object
   fit <- fitted.bigtime.VARMA(mod, ...)
   s <- nrow(mod$Y) - nrow(fit)
-  res <- mod$Y[-(1:s), ] - fit
+  # Note: if VARMAselection=none then fit is tensor
+  res <- if (mod$VARMAselection=="none") {
+    sapply(1:dim(fit)[3], function(i) mod$Y[-(1:s), ] - fit[,,i], simplify = 'array')
+    }else{
+    mod$Y[-(1:s), ] - fit
+    }
   colnames(res) <- colnames(mod$Y)
   res
 }
@@ -166,6 +171,8 @@ fitted.bigtime.VARMA <- function(object, ...){
   mod_tmp$X <- mod$U
   mod_tmp$p <- mod$VARMAp
   mod_tmp$s <- mod$VARMAq
+  mod_tmp$lambdaPhi <- mod$PhaseII_lambdaPhi
+  mod_tmp$selection <- mod$VARMAselection
   fitted.bigtime.VARX(mod_tmp)
 }
 
@@ -231,6 +238,7 @@ diagnostics_plot.bigtime.VARX <- function(mod, variable = 1, dates = NULL){
 #' @export
 diagnostics_plot.bigtime.VARMA <- function(mod, variable = 1, dates = NULL){
   if (!"bigtime.VARMA" %in% class(mod)) stop("Only implemented for VARMA models")
+  if (mod$VARMAselection == "none") stop("No selection procedure was used.")
   fit <- fitted.bigtime.VARMA(mod)
   res <- residuals.bigtime.VARMA(mod)
   s <- nrow(mod$Y) - nrow(fit)

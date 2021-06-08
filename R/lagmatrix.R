@@ -79,6 +79,7 @@ lagmatrix <- function(fit, returnplot=F){
       coef1 <- fit$Phihat
       coef2 <- fit$Bhat
 
+      if(fit$selection == "none") stop("No selection procedure was used.")
       if(is.null(coef1)|is.null(coef2)){
         stop("Please provide a fitted VARX model")
       }
@@ -93,6 +94,7 @@ lagmatrix <- function(fit, returnplot=F){
       coef1 <- fit$Phihat
       coef2 <- fit$Thetahat
 
+      if (fit$VARMAselection == "none") stop("No selection procedure was used.")
       if(is.null(coef1)|is.null(coef2)){
         stop("Please provide a fitted VARMA model")
       }

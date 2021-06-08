@@ -11,6 +11,7 @@ sparseVARMA(
   VARpen = "HLag",
   VARlseq = NULL,
   VARgran = NULL,
+  VARselection = c("cv", "bic", "aic", "hq"),
   VARMAp = NULL,
   VARMAq = NULL,
   VARMApen = "HLag",
@@ -19,9 +20,11 @@ sparseVARMA(
   VARMAlThetaseq = NULL,
   VARMAThetagran = NULL,
   VARMAalpha = 0,
+  VARMAselection = c("none", "cv", "bic", "aic", "hq"),
   h = 1,
   cvcut = 0.9,
-  eps = 10^-3
+  eps = 10^-3,
+  check_std = TRUE
 )
 }
 \arguments{
@@ -38,6 +41,8 @@ its own grid. Supplying a grid of values overrides this. WARNING: use with care.
 
 \item{VARgran}{User-specified vector of granularity specifications for the penalty parameter grid of the PhaseI VAR:  First element specifies
 how deep the grid should be constructed. Second element specifies how many values the grid should contain.}
+
+\item{VARselection}{Selection procedure for the first stage. Default is time series Cross-Validation. Alternatives are BIC, AIC, HQ}
 
 \item{VARMAp}{User-specified maximum autoregressive lag order of the VARMA. Typical usage is to have the program compute its own maximum lag order based on the time series length.}
 
@@ -59,11 +64,15 @@ how deep the grid should be constructed. Second element specifies how many value
 
 \item{VARMAalpha}{a small positive regularization parameter value corresponding to squared Frobenius penalty in  VARMA. The default is zero.}
 
+\item{VARMAselection}{selection procedure in the second stage. Default is "none"; Alternatives are cv, bic, aic, hq}
+
 \item{h}{Desired forecast horizon in time-series cross-validation procedure.}
 
 \item{cvcut}{Proportion of observations used for model estimation in the time series cross-validation procedure. The remainder is used for forecast evaluation.}
 
 \item{eps}{a small positive numeric value giving the tolerance for convergence in the proximal gradient algorithms.}
+
+\item{check_std}{Check whether data is standardised. Default is TRUE and is not recommended to be changed}
 }
 \value{
 A list with the following components

@@ -17,6 +17,7 @@
 #' @param VARXalpha a small positive regularization parameter value corresponding to squared Frobenius penalty. The default is zero.
 #' @param VARXpen "HLag" (hierarchical sparse penalty) or "L1" (standard lasso penalty) penalization in VARX.
 #' @param selection Model selection method to be used. Default is none, which will return all values for all penalisations.
+#' @param check_std Check whether data is standardised. Default is TRUE and is not recommended to be changed
 #' @export
 #' @return A list with the following components
 #' \item{Y}{\eqn{T} by \eqn{k} matrix of endogenous time series.}
@@ -47,103 +48,81 @@
 #' ARXfit <- sparseVARX(Y=y, X=X) # sparse ARX
 sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, VARXPhigran=NULL,
                        VARXlBseq=NULL,  VARXBgran=NULL, VARXalpha=0, h=1, cvcut=0.9, eps=10^-3,
-                       selection = c("none", "cv", "bic", "aic", "hq")){
+                       selection = c("none", "cv", "bic", "aic", "hq"),
+                       check_std = TRUE){
 
-  # Check Inputs
+  ######################################
+  #### Check Inputs and Preparation ####
+  ######################################
   selection = match.arg(selection)
   if(!is.matrix(Y)){
-
     if(is.vector(Y) & length(Y)>1){
       Y <- matrix(Y, ncol=1)
     }else{
       stop("Y needs to be a matrix of dimension T by k")
     }
-
   }
-
   if(nrow(Y)<10){
     stop("The time series length is too small.")
   }
-
   if(!is.matrix(X)){
-
     if(is.vector(X) & length(X)>1){
       X <- matrix(X, ncol=1)
     }else{
       stop("X needs to be a matrix of dimension T by m")
     }
-
   }
-
   if(nrow(X)!=nrow(Y)){
     stop("Y and X need to have the same number of rows (observations).")
   }
-
   if(!is.null(colnames(Y))){ # time series names
     endogenous_series_names <- colnames(Y)
   } else {
     endogenous_series_names <- NULL
   }
-
   if(!is.null(colnames(X))){ # time series names
     exogenous_series_names <- colnames(X)
   } else {
     exogenous_series_names <- NULL
   }
-
   if(!is.null(p)){
     if(p<=0){
       stop("The maximum endogenous autoregressive order needs to be a strictly positive integer")
     }
   }
-
   if(!is.null(s)){
     if(s<=0){
       stop("The maximum exogenous autoregressive order needs to be a strictly positive integer")
     }
   }
-
-
   if(h<=0){
     stop("The forecast horizon h needs to be a strictly positive integer")
   }
-
-
   if(!((cvcut<1) & (cvcut>0))){
     stop("cvcut needs to be a number between 0 and 1")
   }
-
   if( (!is.vector(VARXlPhiseq) & !is.null(VARXlPhiseq)) | length(VARXlPhiseq)==1){
     stop("The regularization parameter grid VARXlPhiseq needs to be a vector of length > 1 or NULL otherwise")
   }
-
   if(any((VARXPhigran<=0)==T)){
     stop("The granularity parameters need to be a strictly positive integer")
   }
-
-
   if((!is.vector(VARXlBseq) & !is.null(VARXlBseq)) | length(VARXlBseq)==1){
     stop("The regularization parameter VARXlBseq needs to be a vector of length >1 or NULL otherwise")
   }
-
   if(any((VARXBgran<=0)==T)){
     stop("The granularity parameters need to be a strictly positive integer")
   }
-
   if(VARXalpha<0){
     stop("The regularization paramter VARXalpha needs to be a equal to zero or a small positive number")
   }
-
   if(!is.element(VARXpen, c("HLag", "L1"))){
     stop("The type of penalization VARXpen needs to be either HLag (hierarchical sparse penalization) or L1 (standard lasso penalization)")
   }
-
   if(!is.null(p) | !is.null(s)){
-
     if(is.null(p)){
       p <- floor(1.5*sqrt(nrow(Y)))
     }
-
     if(is.null(s)){
       s <- floor(1.5*sqrt(nrow(Y)))
     }
@@ -151,20 +130,16 @@ sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, V
       stop("HLag penalization in VARX is only supported for p and s larger than 1. Use L1 as VARXpen instead")
     }
   }
-
-
   if(eps<=0){
     stop("The convergence tolerance parameter eps needs to be a small positive number")
   }
-
-  .check_if_standardised(Y)
-  .check_if_standardised(X)
+  if (check_std) .check_if_standardised(Y)
+  if (check_std) .check_if_standardised(X)
 
   # Set maximum orders
   if(is.null(p)){
     p <- floor(1.5*sqrt(nrow(Y)))
   }
-
   if(is.null(s)){
     s <- floor(1.5*sqrt(nrow(Y)))
   }
@@ -177,12 +152,10 @@ sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, V
     VARXPhigran1 <- VARXPhigran[1]
     VARXPhigran2 <- VARXPhigran[2]
   }
-
   if(!is.null(VARXlPhiseq)){
     VARXPhigran1 <- max(VARXlPhiseq)/min(VARXlPhiseq)
     VARXPhigran2 <- length(VARXlPhiseq)
   }
-
   if(is.null(VARXBgran)){
     VARXBgran1 <- 10^2
     VARXBgran2 <- 10
@@ -190,7 +163,6 @@ sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, V
     VARXBgran1 <- VARXBgran[1]
     VARXBgran2 <- VARXBgran[2]
   }
-
   if(!is.null(VARXlBseq)){
     VARXBgran1 <- max(VARXlBseq)/min(VARXlBseq)
     VARXBgran2 <- length(VARXlBseq)
@@ -208,6 +180,9 @@ sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, V
   phi0hat <- NULL
   Bhat <- NULL
 
+  ############################
+  #### END Check and Prep ####
+  ############################
 
   if (selection == "cv"){
     # Get optimal sparsity parameter via time series cross-validation

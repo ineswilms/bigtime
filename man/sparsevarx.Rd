@@ -18,7 +18,8 @@ sparseVARX(
   h = 1,
   cvcut = 0.9,
   eps = 10^-3,
-  selection = c("none", "cv", "bic", "aic", "hq")
+  selection = c("none", "cv", "bic", "aic", "hq"),
+  check_std = TRUE
 )
 }
 \arguments{
@@ -53,6 +54,8 @@ how deep the grid should be constructed. Second element specifies how many value
 \item{eps}{a small positive numeric value giving the tolerance for convergence in the proximal gradient algorithm.}
 
 \item{selection}{Model selection method to be used. Default is none, which will return all values for all penalisations.}
+
+\item{check_std}{Check whether data is standardised. Default is TRUE and is not recommended to be changed}
 }
 \value{
 A list with the following components

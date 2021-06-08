@@ -13,7 +13,8 @@ sparseVAR(
   selection = c("none", "cv", "bic", "aic", "hq"),
   cvcut = 0.9,
   h = 1,
-  eps = 0.001
+  eps = 0.001,
+  check_std = TRUE
 )
 }
 \arguments{
@@ -36,6 +37,8 @@ how deep the grid should be constructed. Second element specifies how many value
 \item{h}{Desired forecast horizon in time-series cross-validation procedure.}
 
 \item{eps}{a small positive numeric value giving the tolerance for convergence in the proximal gradient algorithm.}
+
+\item{check_std}{Check whether data is standardised. Default is TRUE and is not recommended to be changed}
 }
 \value{
 A list with the following components

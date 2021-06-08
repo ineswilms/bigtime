@@ -10,6 +10,7 @@
 #' @param eps a small positive numeric value giving the tolerance for convergence in the proximal gradient algorithm.
 #' @param VARpen "HLag" (hierarchical sparse penalty) or "L1" (standard lasso penalty) penalization.
 #' @param selection One of "none" (default), "cv" (Time Series Cross-Validation), "bic", "aic", "hq". Used to select the optimal penalization.
+#' @param check_std Check whether data is standardised. Default is TRUE and is not recommended to be changed
 #' @export
 #' @return A list with the following components
 #' \item{Y}{\eqn{T} by \eqn{k} matrix of time series.}
@@ -33,7 +34,7 @@
 #' ARfit <- sparseVAR(Y[,2]) # sparse AR
 sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL,
                       selection = c("none", "cv", "bic", "aic", "hq"),
-                      cvcut=0.9, h=1,  eps=1e-3){
+                      cvcut=0.9, h=1,  eps=1e-3, check_std = TRUE){
 
   # Check Inputs
   if(!is.matrix(Y)){
@@ -46,7 +47,7 @@ sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL,
 
   }
 
-  .check_if_standardised(Y)
+  if (check_std) .check_if_standardised(Y)
   selection = match.arg(selection)
 
   if(nrow(Y)<10){
@@ -304,7 +305,11 @@ HVAR_cv<-function(Y, p, h=1, lambdaPhiseq=NULL, gran1 = 10^2, gran2=10, T1.cutof
 
 
   # Output
-  out <- list("lambda" = lambdaPhiseq, "lambda_opt_oneSE" = lambda_opt_oneSE, "MSFE_all" = MSFEmatrix, "MSFE_avg" = MSFE_avg, "flag_oneSE" = gridflag_oneSE,
+  out <- list("lambda" = lambdaPhiseq,
+              "lambda_opt_oneSE" = lambda_opt_oneSE,
+              "MSFE_all" = MSFEmatrix,
+              "MSFE_avg" = MSFE_avg,
+              "flag_oneSE" = gridflag_oneSE,
               "lambda_opt" = lambda_opt)
 
 }
