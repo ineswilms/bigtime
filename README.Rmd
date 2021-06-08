@@ -35,20 +35,29 @@ We will use the time series contained in the `example` data set. The first ten c
 
 ```{r}
 library(bigtime)
+suppressMessages(library(tidyverse)) # Will be used for nicer visualisations
+
 data(example)
 Y <- example[-nrow(example), 1:10] # endogenous time series
+colnames(Y) <- paste0("Y", 1:ncol(Y)) # Assigning column names
 Ytest <- example[nrow(example), 1:10]
 X <- example[-nrow(example), 11:15] # exogenous time series
+colnames(X) <- paste0("X", 1:ncol(X)) # Assinging column names
 
-par(mfrow=c(5,2), mar=c(2.5, 2.5, 1, 1))
-for(i in 1:ncol(Y)){
-  plot(Y[,i], type="l", ylab="", xlab="Time", main=paste("Endogenous Time series", i))
+
+plot_series <- function(Y){
+  as_tibble(Y) %>%
+  mutate(Time = 1:n()) %>%
+  pivot_longer(-Time, names_to = "Series", values_to = "vals") %>%
+  ggplot() +
+  geom_line(aes(Time, vals)) + 
+  facet_wrap(facets = vars(Series), nrow = floor(ncol(Y)/2)) + 
+  ylab("") +
+  theme_bw()
 }
 
-par(mfrow=c(3,2), mar=c(2.5, 2.5, 1, 1))
-for(i in 1:ncol(X)){
-  plot(X[,i], type="l", ylab="", xlab="Time", main=paste("Exogenous Time series", i))
-}
+plot_series(Y)
+plot_series(X)
 ```
 
 ## Multivariate Time Series Models
@@ -78,7 +87,7 @@ LhatHLag <- lagmatrix(fit=VARHLag, returnplot=T)
 Often practitioners are interested in incorparating the impact of unmodeled exogenous variables (X) into the VAR model. To do this, you can use the `sparseVARX` function which has an argument `X` where you can enter the data matrix of exogenous time series.
 When applying the `lagmatrix` function to an estimated sparse VARX model, the lag matrices of both the endogenous and exogenous autoregressive coefficients are returned.
 ```{r}
-VARXfit <- sparseVARX(Y=Y, X=X) # VARX models always to Cross-Validation 
+VARXfit <- sparseVARX(Y=Y, X=X, selection = "cv") # VARX models always to Cross-Validation 
 par(mfrow=c(1, 2))
 LhatVARX <- lagmatrix(fit=VARXfit, returnplot=T)
 ```
@@ -86,7 +95,7 @@ LhatVARX <- lagmatrix(fit=VARXfit, returnplot=T)
 ### Vector AutoRegressive Moving Average (VARMA) Models
 VARMA models generalized VAR models and often allow for more parsimonious representations of the data generating process. To estimate a VARMA model to a multivariate time series data set, use the function `sparseVARMA`. Now lag matrices are obtained for the autoregressive (AR) coefficients and the moving average (MAs) coefficients.
 ```{r}
-VARMAfit <- sparseVARMA(Y=Y)  # VARMA models always do Cross-Validation
+VARMAfit <- sparseVARMA(Y=Y, VARMAselection = "cv")  # VARMA models always do Cross-Validation
 par(mfrow=c(1, 2))
 LhatVARMA <- lagmatrix(fit=VARMAfit, returnplot=T)
 ```
@@ -136,7 +145,7 @@ for(i in 2:n){
 }
 par(mfrow=c(1,1))
 plot(y, type="l", xlab="Time", ylab="")
-ARXfit <- sparseVARX(Y=y, X=x) 
+ARXfit <- sparseVARX(Y=y, X=x, selection = "cv") 
 lagmatrix(fit=ARXfit)
 ```
 
@@ -154,7 +163,7 @@ for(i in 2:n){
 }
 par(mfrow=c(1,1))
 plot(y, type="l", xlab="Time", ylab="")
-ARMAfit <- sparseVARMA(Y=y) 
+ARMAfit <- sparseVARMA(Y=y, VARMAselection = "cv") 
 lagmatrix(fit=ARMAfit)
 ```
 

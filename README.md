@@ -37,25 +37,34 @@ data.
 
 ``` r
 library(bigtime)
+suppressMessages(library(tidyverse)) # Will be used for nicer visualisations
+
 data(example)
 Y <- example[-nrow(example), 1:10] # endogenous time series
+colnames(Y) <- paste0("Y", 1:ncol(Y)) # Assigning column names
 Ytest <- example[nrow(example), 1:10]
 X <- example[-nrow(example), 11:15] # exogenous time series
+colnames(X) <- paste0("X", 1:ncol(X)) # Assinging column names
 
-par(mfrow=c(5,2), mar=c(2.5, 2.5, 1, 1))
-for(i in 1:ncol(Y)){
-  plot(Y[,i], type="l", ylab="", xlab="Time", main=paste("Endogenous Time series", i))
+
+plot_series <- function(Y){
+  as_tibble(Y) %>%
+  mutate(Time = 1:n()) %>%
+  pivot_longer(-Time, names_to = "Series", values_to = "vals") %>%
+  ggplot() +
+  geom_line(aes(Time, vals)) + 
+  facet_wrap(facets = vars(Series), nrow = floor(ncol(Y)/2)) + 
+  ylab("") +
+  theme_bw()
 }
+
+plot_series(Y)
 ```
 
 ![](man/figures/README-unnamed-chunk-1-1.png)<!-- -->
 
 ``` r
-
-par(mfrow=c(3,2), mar=c(2.5, 2.5, 1, 1))
-for(i in 1:ncol(X)){
-  plot(X[,i], type="l", ylab="", xlab="Time", main=paste("Exogenous Time series", i))
-}
+plot_series(X)
 ```
 
 ![](man/figures/README-unnamed-chunk-1-2.png)<!-- -->
@@ -78,6 +87,10 @@ periods.
 
 ``` r
 VARL1 <- sparseVAR(Y=Y, VARpen="L1", selection = "cv") # default forecast horizon is h=1; using cross-validation
+#> Warning in .check_if_standardised(Y): It is recommended to standardise your data
+#> such that all variables have unit standard deviation
+#> Warning in .check_if_standardised(Y): It is recommended to standardise your data
+#> such that all variables have zero mean.
 par(mfrow=c(1, 1))
 LhatL1 <- lagmatrix(fit=VARL1, returnplot=T)
 ```
@@ -97,6 +110,10 @@ and hence more interpretable models:
 
 ``` r
 VARHLag <- sparseVAR(Y=Y, selection = "cv") # VARpen="HLag" is the default
+#> Warning in .check_if_standardised(Y): It is recommended to standardise your data
+#> such that all variables have unit standard deviation
+#> Warning in .check_if_standardised(Y): It is recommended to standardise your data
+#> such that all variables have zero mean.
 par(mfrow=c(1, 1))
 LhatHLag <- lagmatrix(fit=VARHLag, returnplot=T)
 ```
@@ -114,12 +131,20 @@ of both the endogenous and exogenous autoregressive coefficients are
 returned.
 
 ``` r
-VARXfit <- sparseVARX(Y=Y, X=X) # VARX models always to Cross-Validation 
+VARXfit <- sparseVARX(Y=Y, X=X, selection = "cv") # VARX models always to Cross-Validation 
+#> Warning in .check_if_standardised(Y): It is recommended to standardise your data
+#> such that all variables have unit standard deviation
+#> Warning in .check_if_standardised(Y): It is recommended to standardise your data
+#> such that all variables have zero mean.
+#> Warning in .check_if_standardised(X): It is recommended to standardise your data
+#> such that all variables have unit standard deviation
+#> Warning in .check_if_standardised(X): It is recommended to standardise your data
+#> such that all variables have zero mean.
 par(mfrow=c(1, 2))
 LhatVARX <- lagmatrix(fit=VARXfit, returnplot=T)
 ```
 
-![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-4-1.png)<!-- -->![](man/figures/README-unnamed-chunk-4-2.png)<!-- -->
 
 ### Vector AutoRegressive Moving Average (VARMA) Models
 
@@ -130,12 +155,16 @@ a VARMA model to a multivariate time series data set, use the function
 coefficients and the moving average (MAs) coefficients.
 
 ``` r
-VARMAfit <- sparseVARMA(Y=Y)  # VARMA models always do Cross-Validation
+VARMAfit <- sparseVARMA(Y=Y, VARMAselection = "cv")  # VARMA models always do Cross-Validation
+#> Warning in .check_if_standardised(Y): It is recommended to standardise your data
+#> such that all variables have unit standard deviation
+#> Warning in .check_if_standardised(Y): It is recommended to standardise your data
+#> such that all variables have zero mean.
 par(mfrow=c(1, 2))
 LhatVARMA <- lagmatrix(fit=VARMAfit, returnplot=T)
 ```
 
-![](man/figures/README-unnamed-chunk-5-1.png)<!-- -->
+![](man/figures/README-unnamed-chunk-5-1.png)<!-- -->![](man/figures/README-unnamed-chunk-5-2.png)<!-- -->
 
 ## Evaluating Forecast Performance
 
@@ -192,6 +221,10 @@ plot(y, type="l", xlab="Time", ylab="")
 
 ``` r
 ARfit <- sparseVAR(Y=y, selection = "cv")
+#> Warning in .check_if_standardised(Y): It is recommended to standardise your data
+#> such that all variables have unit standard deviation
+#> Warning in .check_if_standardised(Y): It is recommended to standardise your data
+#> such that all variables have zero mean.
 lagmatrix(fit=ARfit)
 #> $LPhi
 #>      [,1]
@@ -223,15 +256,23 @@ plot(y, type="l", xlab="Time", ylab="")
 ![](man/figures/README-unnamed-chunk-8-1.png)<!-- -->
 
 ``` r
-ARXfit <- sparseVARX(Y=y, X=x) 
+ARXfit <- sparseVARX(Y=y, X=x, selection = "cv") 
+#> Warning in .check_if_standardised(Y): It is recommended to standardise your data
+#> such that all variables have unit standard deviation
+#> Warning in .check_if_standardised(Y): It is recommended to standardise your data
+#> such that all variables have zero mean.
+#> Warning in .check_if_standardised(X): It is recommended to standardise your data
+#> such that all variables have unit standard deviation
+#> Warning in .check_if_standardised(X): It is recommended to standardise your data
+#> such that all variables have zero mean.
 lagmatrix(fit=ARXfit)
 #> $LPhi
 #>      [,1]
-#> [1,]    1
+#> [1,]    0
 #> 
 #> $LB
 #>      [,1]
-#> [1,]    0
+#> [1,]    2
 ```
 
 ### AutoRegressive Moving Average (ARMA) Models
@@ -259,7 +300,11 @@ plot(y, type="l", xlab="Time", ylab="")
 ![](man/figures/README-unnamed-chunk-9-1.png)<!-- -->
 
 ``` r
-ARMAfit <- sparseVARMA(Y=y) 
+ARMAfit <- sparseVARMA(Y=y, VARMAselection = "cv") 
+#> Warning in .check_if_standardised(Y): It is recommended to standardise your data
+#> such that all variables have unit standard deviation
+#> Warning in .check_if_standardised(Y): It is recommended to standardise your data
+#> such that all variables have zero mean.
 lagmatrix(fit=ARMAfit)
 #> $LPhi
 #>      [,1]
@@ -267,7 +312,7 @@ lagmatrix(fit=ARMAfit)
 #> 
 #> $LTheta
 #>      [,1]
-#> [1,]    0
+#> [1,]    1
 ```
 
 ## Additional Resources
