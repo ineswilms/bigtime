@@ -166,8 +166,8 @@ lagmatrix <- function(fit, returnplot=F){
           rownames(Lhat2) <- paste0("Resp.", 1:nrow(Lhat2))
         }
         else {
-          colnames(Lhat1) <- fit$series_names
-          colnames(Lhat2) <- fit$series_names
+          colnames(Lhat1) <- paste0("AR.", fit$series_names)
+          colnames(Lhat2) <- paste0("MA.", fit$series_names)
           rownames(Lhat1) <- fit$series_names
           rownames(Lhat2) <- fit$series_names
         }
