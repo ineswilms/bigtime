@@ -14,8 +14,8 @@
 #' if coefficient matrix is being simulated
 #' @param burnin Number of periods to be used for burnin
 #' @param sparsity_pattern The sparsity pattern that should be simulated.
-#' Options are: none for a dense VAR, lasso for a VAR with random zeroes,
-#' and HVAR for an elementwise hirichical sparsity pattern
+#' Options are: none for a dense VAR, lasso (or L1) for a VAR with random zeroes,
+#' and hvar (or HLag) for an elementwise hierarchical sparsity pattern
 #' @param sparsity_options Named list of additional options for
 #' when sparsity pattern is lasso or hvar. For lasso the option num_zero
 #' determines the number of zeros. For hvar, the options zero_min (zero_max)
@@ -46,7 +46,7 @@
 #' \item{seed}{seed used for the simulation}
 simVAR <- function(periods, k, p, coef_mat = NULL, const = rep(0, k), e_dist = rnorm,
                    init_y = rep(0, k*p), max_abs_eigval = 0.8, burnin = periods,
-                   sparsity_pattern = c("none", "lasso", "hvar"),
+                   sparsity_pattern = c("none", "lasso", "L1", "hvar", "HLag"),
                    sparsity_options = NULL, decay = 1/p,
                    seed = NULL,
                    ...){
@@ -75,6 +75,8 @@ simVAR <- function(periods, k, p, coef_mat = NULL, const = rep(0, k), e_dist = r
 
   # Which sparsity pattern was chosen?
   sparsity_pattern <- match.arg(sparsity_pattern)
+  if (sparsity_pattern == "L1") sparsity_pattern <- "lasso"
+  if (sparsity_pattern == "HLag") sparsity_pattern <- "hvar"
 
   # Creating coef_mat if needed
   is_coef_mat_simulated <- is.null(coef_mat)
@@ -239,14 +241,14 @@ plot.bigtime.simVAR <- function(x, ...){
 summary.bigtime.simVAR <- function(object, plot = TRUE, ...){
   sim_data <- object
   cat("#### General Information #### \n\n")
-  cat("Seed \t\t\t\t\t", sim_data$seed, "\n")
-  cat("Periods Simulated \t\t\t", sim_data$periods, "\n")
-  cat("Periods used as burnin \t\t\t", sim_data$burnin, "\n")
-  cat("Variables Simulated \t\t\t", sim_data$k, "\n")
-  cat("Number of Lags \t\t\t\t", sim_data$p, "\n")
-  cat("Coefficients were randomly created? \t", sim_data$is_coef_mat_simulated, "\n")
-  cat("Maximum Eigenvalue of Companion Matrix \t", sim_data$max_abs_eigval, "\n")
-  cat("Sparsity Pattern \t\t\t", sim_data$sparsity_pattern, "\n")
+  cat("Seed                                       ", sim_data$seed, "\n")
+  cat("Time series length                         ", sim_data$periods, "\n")
+  cat("Burnin                                     ", sim_data$burnin, "\n")
+  cat("Variables Simulated                        ", sim_data$k, "\n")
+  cat("Number of Lags                             ", sim_data$p, "\n")
+  cat("Coefficients were randomly created?        ", sim_data$is_coef_mat_simulated, "\n")
+  cat("Maximum Eigenvalue of Companion Matrix     ", sim_data$max_abs_eigval, "\n")
+  cat("Sparsity Pattern                           ", sim_data$sparsity_pattern, "\n")
 
   cat("\n\n#### Sparsity Options #### \n\n")
   print(sim_data$sparsity_options)
