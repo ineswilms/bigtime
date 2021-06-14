@@ -17,8 +17,8 @@ plot_cv <- function(fit, ...) {
     error_bars(fit$lambdas, m - se, m + se, width = 0.01,
                col = "darkgrey")
     # graphics::abline(v = c(fit$lambda_opt, fit$lambda_SEopt), lty = 3)
-    graphics::abline(v = c(fit$lambda_opt), lty = 3, lwd = 2)
-    graphics::abline(v = c(fit$lambda_SEopt), lty = 3, lwd = 2, col = 2)
+    graphics::abline(v = c(fit$lambda_opt), lty = 'dashed', lwd = 2)
+    graphics::abline(v = c(fit$lambda_SEopt), lty = 'dotted', lwd = 2, col = 2)
     graphics::legend("top", xpd = TRUE,
                      inset = c(0.05, -0.25),
                      legend = c("Opt. lambda", "SE Opt. lambda"),
