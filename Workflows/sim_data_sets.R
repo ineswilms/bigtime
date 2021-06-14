@@ -82,7 +82,7 @@ save(X, Y, file = "./data/varx.example.rda")
 # 1. Simulate Errors
 # 2. embed errors in right dimension and form e_dist
 # 3. simulate VAR with custom e_dist
-set.seed(6150533)
+set.seed(14315)
 k <- 3
 p <- 4
 p.e <- 1
