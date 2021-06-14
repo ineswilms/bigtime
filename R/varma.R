@@ -286,6 +286,7 @@ sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL,
     VARMAThetagran2 <- length(VARMAlThetaseq)
   }
 
+  if (VARMAselection %in% c("bic", "aic", "hq")) warning("IC selection is not recommended for VARMA models.")
   HVARXFIT <- sparseVARX(Y = Y, X = U, p = VARMAp, s = VARMAq,
                          VARXpen = VARMApen, VARXlPhiseq = VARMAlPhiseq,
                          VARXPhigran = c(VARMAPhigran1, VARMAPhigran2),
