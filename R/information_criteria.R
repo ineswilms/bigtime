@@ -171,7 +171,7 @@ get_ic_vals.bigtime.VAR <- function(mod, verbose = TRUE){
   names(selected_lam) <- names(mins)
 
   if (verbose){
-    cat("\n\n#### Selected the following ####\n\n")
+    cat("\n\n#### Selected the following lambda ####\n\n")
     print(selected_lam)
 
     selected_aic <- rep("   ", nrow(ics))
