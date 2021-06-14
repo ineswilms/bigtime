@@ -7,15 +7,12 @@
 \method{summary}{bigtime.simVAR}(object, plot = TRUE, ...)
 }
 \arguments{
-\item{object}{Simulated data of class bigtime.simVAR obtained
-from the simVAR function}
-
-\item{plot}{Should the VAR be plotted. Default is TRUE}
+\item{plot}{Should the VAR be plotted. Default is \code{TRUE}}
 
 \item{...}{Not currently used}
 }
 \value{
-If plot=TRUE, then a ggplot2 plot will be returned
+If `plot=TRUE`, then a ggplot2 plot will be returned
 }
 \description{
 Gives a small summary of a VAR simulation

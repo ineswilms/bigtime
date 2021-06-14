@@ -7,9 +7,6 @@
 \method{plot}{bigtime.simVAR}(x, ...)
 }
 \arguments{
-\item{x}{Simulated data of class bigtime.simVAR obtained
-from the simVAR function}
-
 \item{...}{Not currently used}
 }
 \value{

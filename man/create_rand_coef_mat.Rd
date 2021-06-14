@@ -15,29 +15,29 @@ create_rand_coef_mat(
 )
 }
 \arguments{
-\item{k}{number of time series}
+\item{k}{Number of time series}
 
-\item{p}{number of lags}
+\item{p}{Number of lags}
 
-\item{max_abs_eigval}{if < 1, then var will be stable}
+\item{max_abs_eigval}{if < 1, then the VAR will be stable}
 
 \item{sparsity_pattern}{The sparsity pattern that should be simulated.
-Options are: none for a dense VAR, lasso for a VAR with random zeroes,
-and HVAR for an elementwise hirichical sparsity pattern}
+Options are: \code{"none"} for a dense VAR, \code{"lasso"} for a VAR with random zeroes,
+and \code{"hvar"} for an elementwise hierarchical sparsity pattern}
 
 \item{sparsity_options}{Named list of additional options for
-when sparsity pattern is lasso or hvar. For lasso the option num_zero
-determines the number of zeros. For hvar, the options zero_min (zero_max)
+when sparsity pattern is lasso or hvar. For lasso the option \code{num_zero}
+determines the number of zeros. For hvar, the options \code{zero_min} (\code{zero_max})
 give the minimum (maximum) of zeroes for each variable in each equation,
-and the option zeroes_in_self (boolean) determines if any of the
-cofficients of a variable on itself should be zero.}
+and the option \code{zeroes_in_self} (boolean) determines if any of the
+coefficients of a variable on itself should be zero.}
 
-\item{decay}{How fast should coefficient shrink when the lag increases.}
+\item{decay}{How fast should coefficients shrink when the lag increases.}
 
-\item{...}{additional arguments forwarded to dist}
+\item{...}{Not currently used}
 }
 \value{
-Returns a coefficient matrix in companion form.
+Returns a coefficient matrix in companion form of dimension \code{kp}x\code{kp}.
 }
 \description{
 Creates a random coefficient matrix

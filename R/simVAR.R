@@ -1,39 +1,44 @@
 #' Simulates a VAR(p) with various sparsity patterns
 #'
-#' @param periods Number of periods to simulate
+#' @param periods Scalar indicating the desired time series length
 #' @param k Number of time series
-#' @param p Maximum lag number. In case of sparsity_patter="none" this will be
+#' @param p Maximum lag number. In case of \code{sparsity_patter="none"} this will be
 #' the actual number of lags for all variables
 #' @param coef_mat Coefficient matrix in companion form. If not provided,
 #' one will be simulated
-#' @param const constent term of VAR. Default is zero
+#' @param const Constant term of VAR. Default is zero. Must be either a scalar,
+#' in which case it will be broadcasted to a k-vector, or a k-vector
 #' @param e_dist Either a function taking argument n indicating the number of
 #' variables in the system, or a matrix of dimensions k x (periods+burnin)
-#' @param init_y Initial values. Defaults to zero
-#' @param max_abs_eigval Maximum Eigenvalue of companion matrix. Only applicable
-#' if coefficient matrix is being simulated
-#' @param burnin Number of periods to be used for burnin
+#' @param init_y Initial values. Defaults to zero. Expects either a scalar or
+#' a vector of length (k*p)
+#' @param max_abs_eigval Maximum allowed eigenvalue of companion matrix.
+#' Only applicable if coefficient matrix is being simulated
+#' @param burnin Number of time points to be used for burnin
 #' @param sparsity_pattern The sparsity pattern that should be simulated.
-#' Options are: none for a dense VAR, lasso (or L1) for a VAR with random zeroes,
-#' and hvar (or HLag) for an elementwise hierarchical sparsity pattern
+#' Options are: \code{"none"} for a dense VAR, \code{"lasso"} (or \code{"L1"})
+#' for a VAR with random zeroes,
+#' and \code{"hvar"} (or \code{"HLag"}) for an elementwise hierarchical sparsity pattern
 #' @param sparsity_options Named list of additional options for
-#' when sparsity pattern is lasso or hvar. For lasso the option num_zero
-#' determines the number of zeros. For hvar, the options zero_min (zero_max)
+#' when sparsity pattern is lasso (L1) or hvar (HLag). For lasso (L1) the option \code{num_zero}
+#' determines the number of zeros. For hvar (HLag), the options \code{zero_min} (\code{zero_max})
 #' give the minimum (maximum) of zeroes for each variable in each equation,
-#' and the option zeroes_in_self (boolean) determines if any of the
-#' cofficients of a variable on itself should be zero.
-#' @param decay How much smaller should parameters for laters lags be. The
+#' and the option \code{zeroes_in_self} (boolean) determines if any of the
+#' coefficients of a variable on itself should be zero.
+#' @param decay How much smaller should parameters for later lags be. The
 #' smaller, the larger will early parameters be w.r.t. later ones.
 #' @param seed Seed to be used for the simulation
-#' @param ... additional arguments passed to e_dist
+#' @param ... Additional arguments passed to \code{e_dist}
 #' @export
-#' @return Returns an object of S3 class bigtime.simVAR containing the following
+#' @return Returns an object of S3 class \code{bigtime.simVAR} containing the following
 #' \item{Y}{Simulated Data}
-#' \item{periods}{Number of periods of simulation}
+#' \item{periods}{Time series length}
 #' \item{k}{Number of endogenous variables}
-#' \item{p}{Maximum lag length; might be shorter due to sparsity patterns}
-#' \item{coef_mat}{Coefficient Matrix used}
-#' \item{is_coef_mat_simulated}{TRUE if the coef_mat was simulted, FALSE if
+#' \item{p}{Maximum lag length; effective lag length might be shorter due to sparsity patterns}
+#' \item{coef_mat}{Companion form of the coefficient matrix. Will be of
+#' dimensions (\code{k}\code{p})x(\code{k}\code{p}). First \code{k} rows correspond
+#' to the actual coefficient matrix.}
+#' \item{is_coef_mat_simulated}{\code{TRUE} if the \code{coef_mat} was simulated, \code{FALSE} if
 #' it was user provided}
 #' \item{const}{Constant term}
 #' \item{e_dist}{Errors used in the construction of the data}
@@ -41,15 +46,19 @@
 #' \item{max_abs_eigval}{Maximum eigenvalue to which the companion matrix
 #' was constraint}
 #' \item{burnin}{Burnin period used}
-#' \item{sparsity_pattern}{Which sparsity pattern was used}
-#' \item{sparsity_options}{Extra options for the sparsity patterns that were used}
-#' \item{seed}{seed used for the simulation}
+#' \item{sparsity_pattern}{Sparsity pattern used}
+#' \item{sparsity_options}{Extra options for the sparsity patterns used}
+#' \item{seed}{Seed used for the simulation}
 simVAR <- function(periods, k, p, coef_mat = NULL, const = rep(0, k), e_dist = rnorm,
                    init_y = rep(0, k*p), max_abs_eigval = 0.8, burnin = periods,
                    sparsity_pattern = c("none", "lasso", "L1", "hvar", "HLag"),
                    sparsity_options = NULL, decay = 1/p,
                    seed = NULL,
                    ...){
+
+  ##################################
+  #### Check and Prep ##############
+  ##################################
 
   if (is.null(seed)) warning("No seed is being used. Replication might be infeasible")
   if (!is.null(seed)) set.seed(seed)
@@ -93,6 +102,10 @@ simVAR <- function(periods, k, p, coef_mat = NULL, const = rep(0, k), e_dist = r
   # constructing the intial values
   if (length(init_y) == 1) init_y <- rep(init_y, k*p)
 
+  ######################################
+  #### END Check and Prep ##############
+  ######################################
+
 
   Y <- simVAR_cpp(periods, k, p, coef_mat, const, e_dist, init_y, burnin)
   colnames(Y) <- paste0("Y", 1:k)
@@ -120,28 +133,34 @@ simVAR <- function(periods, k, p, coef_mat = NULL, const = rep(0, k), e_dist = r
 
 #' Creates a random coefficient matrix
 #'
-#' @param k number of time series
-#' @param p number of lags
-#' @param max_abs_eigval if < 1, then var will be stable
+#' @param k Number of time series
+#' @param p Number of lags
+#' @param max_abs_eigval if < 1, then the VAR will be stable
 #' @param sparsity_pattern The sparsity pattern that should be simulated.
-#' Options are: none for a dense VAR, lasso for a VAR with random zeroes,
-#' and HVAR for an elementwise hirichical sparsity pattern
+#' Options are: \code{"none"} for a dense VAR, \code{"lasso"} for a VAR with random zeroes,
+#' and \code{"hvar"} for an elementwise hierarchical sparsity pattern
 #' @param sparsity_options Named list of additional options for
-#' when sparsity pattern is lasso or hvar. For lasso the option num_zero
-#' determines the number of zeros. For hvar, the options zero_min (zero_max)
+#' when sparsity pattern is lasso or hvar. For lasso the option \code{num_zero}
+#' determines the number of zeros. For hvar, the options \code{zero_min} (\code{zero_max})
 #' give the minimum (maximum) of zeroes for each variable in each equation,
-#' and the option zeroes_in_self (boolean) determines if any of the
-#' cofficients of a variable on itself should be zero.
-#' @param decay How fast should coefficient shrink when the lag increases.
-#' @param ... additional arguments forwarded to dist
+#' and the option \code{zeroes_in_self} (boolean) determines if any of the
+#' coefficients of a variable on itself should be zero.
+#' @param decay How fast should coefficients shrink when the lag increases.
+#' @param ... Not currently used
 #' @export
-#' @return Returns a coefficient matrix in companion form.
+#' @return Returns a coefficient matrix in companion form of dimension \code{kp}x\code{kp}.
 create_rand_coef_mat <- function(k, p,
                                  max_abs_eigval = 0.8,
                                  sparsity_pattern = c("none", "lasso", "hvar"),
                                  sparsity_options = NULL,
                                  decay = 0.5,
                                  ...){
+
+  ##################################
+  #### Check and Prep ##############
+  ##################################
+
+
   if (max_abs_eigval <= 0) stop("max_abs_eigval must be strictly postive, max_abs_eigval > 0")
   if (k < 1) stop("Model must have at least one variable: k>=1")
   if (p < 1) stop("Model must contain at least one lag: p > 1")
@@ -194,6 +213,10 @@ create_rand_coef_mat <- function(k, p,
     }
   }
 
+  ######################################
+  #### END Check and Prep ##############
+  ######################################
+
 
   I <- diag(1, nrow = k*(p-1), k*(p-1))
   O <- matrix(0, nrow = k*(p-1), ncol = k)
@@ -209,8 +232,8 @@ create_rand_coef_mat <- function(k, p,
 }
 
 #' Plots a simulated VAR
-#' @param x Simulated data of class bigtime.simVAR obtained
-#' from the simVAR function
+#' @param x Simulated data of class \code{bigtime.simVAR} obtained
+#' from the \code{simVAR}} function
 #' @param ... Not currently used
 #' @export
 #' @return Returns a ggplot2 plot
@@ -232,12 +255,12 @@ plot.bigtime.simVAR <- function(x, ...){
 
 
 #' Gives a small summary of a VAR simulation
-#' @param object Simulated data of class bigtime.simVAR obtained
-#' from the simVAR function
-#' @param plot Should the VAR be plotted. Default is TRUE
+#' @param object Simulated data of class \code{bigtime.simVAR} obtained
+#' from the \code\link{simVAR}} function
+#' @param plot Should the VAR be plotted. Default is \code{TRUE}
 #' @param ... Not currently used
 #' @export
-#' @return If plot=TRUE, then a ggplot2 plot will be returned
+#' @return If `plot=TRUE`, then a ggplot2 plot will be returned
 summary.bigtime.simVAR <- function(object, plot = TRUE, ...){
   sim_data <- object
   cat("#### General Information #### \n\n")

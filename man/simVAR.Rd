@@ -22,54 +22,59 @@ simVAR(
 )
 }
 \arguments{
-\item{periods}{Number of periods to simulate}
+\item{periods}{Scalar indicating the desired time series length}
 
 \item{k}{Number of time series}
 
-\item{p}{Maximum lag number. In case of sparsity_patter="none" this will be
+\item{p}{Maximum lag number. In case of \code{sparsity_patter="none"} this will be
 the actual number of lags for all variables}
 
 \item{coef_mat}{Coefficient matrix in companion form. If not provided,
 one will be simulated}
 
-\item{const}{constent term of VAR. Default is zero}
+\item{const}{Constant term of VAR. Default is zero. Must be either a scalar,
+in which case it will be broadcasted to a k-vector, or a k-vector}
 
 \item{e_dist}{Either a function taking argument n indicating the number of
 variables in the system, or a matrix of dimensions k x (periods+burnin)}
 
-\item{init_y}{Initial values. Defaults to zero}
+\item{init_y}{Initial values. Defaults to zero. Expects either a scalar or
+a vector of length (k*p)}
 
-\item{max_abs_eigval}{Maximum Eigenvalue of companion matrix. Only applicable
-if coefficient matrix is being simulated}
+\item{max_abs_eigval}{Maximum allowed eigenvalue of companion matrix.
+Only applicable if coefficient matrix is being simulated}
 
-\item{burnin}{Number of periods to be used for burnin}
+\item{burnin}{Number of time points to be used for burnin}
 
 \item{sparsity_pattern}{The sparsity pattern that should be simulated.
-Options are: none for a dense VAR, lasso (or L1) for a VAR with random zeroes,
-and hvar (or HLag) for an elementwise hierarchical sparsity pattern}
+Options are: \code{"none"} for a dense VAR, \code{"lasso"} (or \code{"L1"})
+for a VAR with random zeroes,
+and \code{"hvar"} (or \code{"HLag"}) for an elementwise hierarchical sparsity pattern}
 
 \item{sparsity_options}{Named list of additional options for
-when sparsity pattern is lasso or hvar. For lasso the option num_zero
-determines the number of zeros. For hvar, the options zero_min (zero_max)
+when sparsity pattern is lasso (L1) or hvar (HLag). For lasso (L1) the option \code{num_zero}
+determines the number of zeros. For hvar (HLag), the options \code{zero_min} (\code{zero_max})
 give the minimum (maximum) of zeroes for each variable in each equation,
-and the option zeroes_in_self (boolean) determines if any of the
-cofficients of a variable on itself should be zero.}
+and the option \code{zeroes_in_self} (boolean) determines if any of the
+coefficients of a variable on itself should be zero.}
 
-\item{decay}{How much smaller should parameters for laters lags be. The
+\item{decay}{How much smaller should parameters for later lags be. The
 smaller, the larger will early parameters be w.r.t. later ones.}
 
 \item{seed}{Seed to be used for the simulation}
 
-\item{...}{additional arguments passed to e_dist}
+\item{...}{Additional arguments passed to \code{e_dist}}
 }
 \value{
-Returns an object of S3 class bigtime.simVAR containing the following
+Returns an object of S3 class \code{bigtime.simVAR} containing the following
 \item{Y}{Simulated Data}
-\item{periods}{Number of periods of simulation}
+\item{periods}{Time series length}
 \item{k}{Number of endogenous variables}
-\item{p}{Maximum lag length; might be shorter due to sparsity patterns}
-\item{coef_mat}{Coefficient Matrix used}
-\item{is_coef_mat_simulated}{TRUE if the coef_mat was simulted, FALSE if
+\item{p}{Maximum lag length; effective lag length might be shorter due to sparsity patterns}
+\item{coef_mat}{Companion form of the coefficient matrix. Will be of
+dimensions (\code{k}\code{p})x(\code{k}\code{p}). First \code{k} rows correspond
+to the actual coefficient matrix.}
+\item{is_coef_mat_simulated}{\code{TRUE} if the \code{coef_mat} was simulated, \code{FALSE} if
 it was user provided}
 \item{const}{Constant term}
 \item{e_dist}{Errors used in the construction of the data}
@@ -77,9 +82,9 @@ it was user provided}
 \item{max_abs_eigval}{Maximum eigenvalue to which the companion matrix
 was constraint}
 \item{burnin}{Burnin period used}
-\item{sparsity_pattern}{Which sparsity pattern was used}
-\item{sparsity_options}{Extra options for the sparsity patterns that were used}
-\item{seed}{seed used for the simulation}
+\item{sparsity_pattern}{Sparsity pattern used}
+\item{sparsity_options}{Extra options for the sparsity patterns used}
+\item{seed}{Seed used for the simulation}
 }
 \description{
 Simulates a VAR(p) with various sparsity patterns
