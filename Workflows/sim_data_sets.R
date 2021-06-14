@@ -22,8 +22,8 @@ VAR <- bigtime::simVAR(periods, k, p,
 summary(VAR)
 mod <- bigtime::sparseVAR(scale(VAR$Y), selection = "bic")
 lagmatrix(mod, returnplot = TRUE)
-Y <- VAR$Y
-save(Y, file = "./data/var.example.rda")
+Y.var <- VAR$Y
+save(Y.var, file = "./data/var.example.rda")
 
 
 # VARX data simulation
@@ -68,14 +68,14 @@ Y.sim <- simVAR(periods, k, p,
                 sparsity_options = sparsity_options,
                 seed = seed)
 summary(Y.sim)
-Y <- Y.sim$Y
-X <- X.sim$Y[-(1:(burnin+1)), ]
-mod <- sparseVARX(Y = scale(Y), X = scale(X), selection = "cv")
+Y.varx <- Y.sim$Y
+X.varx <- X.sim$Y[-(1:(burnin+1)), ]
+mod <- sparseVARX(Y = scale(Y.varx), X = scale(X.varx), selection = "cv")
 plot_cv(mod)
 lagmatrix(mod, returnplot = TRUE)
 
-colnames(X) <- paste0("X", 1:ncol(X))
-save(X, Y, file = "./data/varx.example.rda")
+colnames(X.varx) <- paste0("X", 1:ncol(X.varx))
+save(X.varx, Y.varx, file = "./data/varx.example.rda")
 
 
 # VARMA data simulation
@@ -107,11 +107,11 @@ Y.sim <- simVAR(periods, k, p, e_dist = e_dist,
                 burnin = burnin,
                 seed = 6150533)
 summary(Y.sim)
-Y <- Y.sim$Y
-save(Y, file = "./data/varma.example.rda")
+Y.varma <- Y.sim$Y
+save(Y.varma, file = "./data/varma.example.rda")
 
 
-mod <- sparseVARMA(scale(Y), VARMAselection = "cv")
+mod <- sparseVARMA(scale(Y.varma), VARMAselection = "cv")
 lagmatrix(mod, returnplot = TRUE)
 diagnostics_plot(mod)
 plot_cv(mod)
