@@ -21,7 +21,7 @@ plot_cv <- function(fit, ...) {
     graphics::abline(v = c(fit$lambda_SEopt), lty = 'dotted', lwd = 2, col = 2)
     graphics::legend("top", xpd = TRUE,
                      inset = c(0.05, -0.25),
-                     legend = c("Opt. lambda", "SE Opt. lambda"),
+                     legend = c("Opt. lambda", "one-SE lambda"),
                      col = c(1, 2), lty = c(3, 3), bty = "n", horiz = TRUE, lwd = c(2, 2))
   }
   else if ("bigtime.VARX" %in% class(fit)) {
