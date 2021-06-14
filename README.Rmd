@@ -31,83 +31,62 @@ devtools::install_github("ineswilms/bigtime")
 ```
 
 ## Plotting the data
-We will use the time series contained in the `example` data set. The first ten columns in our dataset are used as endogenous time series in the VAR and VARMA models, and the  last five columns are used as exogenous time series in the VARX model. Note that we remove the last observation from our dataset as we will use this one to illustrate how to evaluate prediction performance. We start by making a plot of our data.
+<!-- We will use the time series contained in the `example` data set. The first ten columns in our dataset are used as endogenous time series in the VAR and VARMA models, and the  last five columns are used as exogenous time series in the VARX model. Note that we remove the last observation from our dataset as we will use this one to illustrate how to evaluate prediction performance. We start by making a plot of our data. -->
+
+Bigtime comes with example data sets created from a VAR, VARMA and VARX GDP. These data sets are called `var.example`, `varma.example`, and `varx.example` respectively and can be loaded into the environment by calling `data(var.example)` and similarly for the others. We can have a look at the `varx.example` data set by first loading it into the environment and then, using a little utility function, plotting it.
 
 ```{r}
 library(bigtime)
 suppressMessages(library(tidyverse)) # Will be used for nicer visualisations
+data(varx.example) # loading the varx example data
 
-data(example)
-Y <- example[-nrow(example), 1:10] # endogenous time series
-colnames(Y) <- paste0("Y", 1:ncol(Y)) # Assigning column names
-Ytest <- example[nrow(example), 1:10]
-X <- example[-nrow(example), 11:15] # exogenous time series
-colnames(X) <- paste0("X", 1:ncol(X)) # Assinging column names
+# data(example)
+# Y <- example[-nrow(example), 1:10] # endogenous time series
+# colnames(Y) <- paste0("Y", 1:ncol(Y)) # Assigning column names
+# Ytest <- example[nrow(example), 1:10]
+# X <- example[-nrow(example), 11:15] # exogenous time series
+# colnames(X) <- paste0("X", 1:ncol(X)) # Assinging column names
 
 
 plot_series <- function(Y){
   as_tibble(Y) %>%
   mutate(Time = 1:n()) %>%
   pivot_longer(-Time, names_to = "Series", values_to = "vals") %>%
+  mutate(Series = factor(Series, levels = colnames(Y))) %>%
   ggplot() +
   geom_line(aes(Time, vals)) + 
-  facet_wrap(facets = vars(Series), ncol = 2) + 
+  facet_wrap(facets = vars(Series), ncol = 1) + 
   ylab("") +
   theme_bw()
 }
 
-plot_series(Y)
-plot_series(X)
+plot_series(Y.varx)
+plot_series(X.varx)
 ```
 
 ## Multivariate Time Series Models
 
 ### Vector AutoRegressive (VAR) Models
 
-While we could use the example data provided, *bigtime* also supports simulation of VAR models using both lasso and elementwise type sparsity patterns. Since lasso is the most widely known one, we will start off with lasso. To simulate a VAR model having lasso type of sparsity, use the `simVAR` function and set `sparsity_pattern="lasso"`. The lasso sparsity pattern has the additional `num_zero` option which determines the number of zeros in the VAR coefficient matrix (excluding intercepts). *Note: we also set a seed so that the simulation is replicatable*. We can then use the `summary` function to obtain a summary of the simulated data.
+#### Simulation
+
+While we could use the example data provided, *bigtime* also supports simulation of VAR models using both lasso and elementwise type sparsity patterns. Since lasso is the most widely known one, we will start off with lasso. To simulate a VAR model having lasso type of sparsity, use the `simVAR` function and set `sparsity_pattern="lasso"`. The lasso sparsity pattern has the additional `num_zero` option which determines the number of zeros in the VAR coefficient matrix (excluding intercepts). *Note: we also set a seed so that the simulation is replicable*. We can then use the `summary` function to obtain a summary of the simulated data.
 
 ```{r}
-periods <- 200
-k <- 5 # Number of time series
-p <- 5 # Maximum lag 
-sparsity_options <- list(num_zero = 15)
+periods <- 200 # time series length
+k <- 5 # number of time series
+p <- 8 # maximum lag 
+sparsity_options <- list(num_zero = 15) # 15 zeros across the k=5 VAR coefficient matrices
 sim_data <- simVAR(periods = periods, k = k, p = p, 
                    sparsity_pattern = "lasso", 
                    sparsity_options = sparsity_options,
                    seed = 123456, 
                    decay = 0.01) # the smaller decay the larger early coefs w.r.t. to later ones
-Y <- sim_data$Y
-summary(sim_data) # Obtaining a summary of the simulation
+Y.lasso <- sim_data$Y
+summary(sim_data) # obtaining a summary of the simulated time series data
 ```
 
-The above simulated data (and truly any other data) could then be estimated using an L1-penalty (lasso penalty) on the autoregressive coefficients. To this end, set the `VARpen` argument in the `sparseVAR` function equal to L1. 
-
-For the selection of the penalisation parameter, we can either set the `selection` argument to `"none"`, which would return a model for a sequence of penalisations, or use time series cross-validation by setting `selection="cv"`, or finally we could also use any of BIC, AIC, or HQ information criteria by setting the `selection` arguments to any of `"bic"`, `"aic"`, or `"hq"` respectively. We will start of by using time series cross-validation and will therefore set `selection="cv"`. The default  is to use a cross-validation score based on one-step ahead predictions but you can change the default forecast horizon under the argument `h`. *Note: it is recommended to standardise the data. Bigtime will give a warning if the data is not standardised but will not stop you from continuing.*
-
-```{r}
-VARL1 <- sparseVAR(Y=scale(Y), 
-                   selection = "cv", 
-                   VARpen = "L1") # Using scale() to standardise data
-```
-
-The `plot_cv` function can be used to investigate the cross-validation procedure. The black line indicates the penalty parameter choice that lead to the smallest MSFE in the CV procedure. The red line, on the other hand, shows the one SE optimal penalisation. The latter is the one that is chosen by `sparseVAR`.
-
-```{r}
-plot_cv(VARL1)
-```
-
-Further investigation into the model can be done by using the function `lagmatrix`, which returns the lagmatrix of the estimated autoregressive coefficients. If entry $(i,j)=x$, this means that the sparse estimator indicates the effect of time series $j$ on time series $i$ to last for $x$ periods. Setting the `returnplot` argument to `TRUE` will return a heatmap for better visual inspection. 
-
-```{r}
-LhatL1 <- lagmatrix(fit=VARL1, returnplot=TRUE)
-```
-
-The lag matrix is typically sparse as it contains some empty (i.e., zero) cells. However, VAR models estimated with a standard L1-penalty are typically not easily interpretable as they select many high lag order coefficients (i.e., large values in the lagmatrix). 
-
-To circumvent this problem, we advise using a lag-based hierarchically sparse estimation procedure, which boils down to using the default option HLag for the `VARpen` argument.
-This estimation procedure encourages low maximum lag orders, often results in sparser lagmatrices, and hence more interpretable models.
-
-A VAR with HLag (elementwise) type of sparsity can be simulated using `simVAR` and by setting `sparsity_pattern="hvar"`. Three extra options exist: (1) `zero_min` determines the minimum number of zero coefficients of each variable in each equation, (2) `zero_max` determines the maximum number of zero coefficients of each variable in each equation, and (3) `zeroes_in_self` is a boolean option that if TRUE, zero coefficients of the $i$th variable can exist in the $i$th equation.
+A VAR with HLag (elementwise) type of sparsity can be simulated using `simVAR` and by setting `sparsity_pattern="HLag"`. Three extra options exist: (1) `zero_min` determines the minimum number of zero coefficients of each variable in each equation, (2) `zero_max` determines the maximum number of zero coefficients of each variable in each equation, and (3) `zeroes_in_self` is a boolean option that if TRUE, zero coefficients of the $i$th variable can exist in the $i$th equation.
 
 ```{r}
 periods <- 200
@@ -117,23 +96,67 @@ sparsity_options <- list(zero_min = 0,
                          zero_max = 5, 
                          zeroes_in_self = TRUE)
 sim_data <- simVAR(periods = periods, k = k, p = p, 
-                   sparsity_pattern = "hvar", 
+                   sparsity_pattern = "HLag", 
                    sparsity_options = sparsity_options,
                    seed = 123456, 
                    decay = 0.01)
-Y <- sim_data$Y
+Y.hlag <- sim_data$Y
 summary(sim_data) # Obtaining a summary of the simulation
 ```
 
-Models can be estimated using the hierarchical penalisation by using the default argument to `VARpen`, namely `HLag`. Model selection can again be done by either setting `selection="none"` and obtaining a whole sequence of models, or by using any of `cv, bic, aic, hq`. 
+#### Lasso estimation
 
+The above simulated data (and truly any other data) could then be estimated using an L1-penalty (lasso penalty) on the autoregressive coefficients. To this end, set the `VARpen` argument in the `sparseVAR` function equal to L1. *Note: it is recommended to standardise the data. Bigtime will give a warning if the data is not standardised but will not stop you from continuing.*. Setting `selection="none"`, the default, allows us to specify the penalization we want. Furthermore, we can predefine the maximum lag-order by changing the `p` argument to the desired value. However, we do not recommend this, as the bigtime will, by default, choose a maximum lag-order that is well suited in many scenarios.
 
 ```{r}
-VARHLag_none <- sparseVAR(Y=scale(Y), selection = "none") # HLag is the dafault VARpen option
-VARHLag_cv <- sparseVAR(Y=scale(Y), selection = "cv")
-VARHLag_bic <- sparseVAR(Y=scale(Y), selection = "bic") # This will also give a table for IC comparison
+VAR.L1 <- sparseVAR(Y = scale(Y.lasso), # standardising the data
+                    VARpen = "L1", # using lasso penalty
+                    VARlseq = 1.5) # Specifying the penalty to be used. selection="none" is the default.
 ```
-Depending on which selection procedure was used, various diagnostics can be produced. Former and foremost, all selection procedures support the `fitted` and `residuals` functions to obtain the fitted and residual values respectively. Both functions return a 3D array if the model used `selection="none"` correpoding to the fitted/residual values for each model in the penalisation sequence.
+
+#### Tuning parameter selection
+
+For the selection of the penalization parameter, we can either set the `selection` argument to `"none"`, which would return a model for a sequence of penalizations, or use time series cross-validation by setting `selection="cv"`, or finally we could also use any of BIC, AIC, or HQ information criteria by setting the `selection` arguments to any of `"bic"`, `"aic"`, or `"hq"` respectively. We will start of by using time series cross-validation and will therefore set `selection="cv"`. The default is to use a cross-validation score based on one-step ahead predictions but you can change the default forecast horizon under the argument `h`.
+
+```{r}
+VAR.L1 <- sparseVAR(Y=scale(Y.lasso),  # standardising the data
+                   selection = "cv", # using time series cross-validation
+                   VARpen = "L1") # using the lasso penalty
+```
+
+The `plot_cv` function can be used to investigate the cross-validation procedure. The returned plot shows the mean MSFE for each penalization together with error bars for plus-minus one standard deviation. The black dashed line indicates the penalty parameter choice that lead to the smallest MSFE in the CV procedure. The red dotted line, on the other hand, shows the one-standard-error solution. It picks the most parsimonious model within one standard error of the best cross-validation score. The latter is the one that is chosen by default in `sparseVAR`.
+
+```{r}
+plot_cv(VAR.L1)
+```
+
+Further investigation into the model can be done by using the function `lagmatrix`, which returns the lagmatrix of the estimated autoregressive coefficients. If entry $(i,j)=x$, this means that the sparse estimator indicates the effect of time series $j$ on time series $i$ to last for $x$ periods. Setting the `returnplot` argument to `TRUE` will return a heatmap for better visual inspection. 
+
+```{r}
+LhatL1 <- lagmatrix(fit=VAR.L1, returnplot=TRUE)
+```
+
+The lag matrix is typically sparse as it contains some empty (i.e., zero) cells. However, VAR models estimated with a standard L1-penalty are typically not easily interpretable as they select many high lag order coefficients (i.e., large values in the lagmatrix). 
+
+To circumvent this problem, we advise using a lag-based hierarchically sparse estimation procedure, which boils down to using the default option HLag for the `VARpen` argument.
+This estimation procedure encourages low maximum lag orders, often results in sparser lagmatrices, and hence more interpretable models.
+
+#### Hlag estimation
+
+Models can be estimated using the hierarchical penalization by using the default argument to `VARpen`, namely `HLag`. Model selection can again be done by either setting `selection="none"` and obtaining a whole sequence of models, or by using any of `cv, bic, aic, hq`. 
+
+```{r}
+VARHLag_none <- sparseVAR(Y=scale(Y.hlag), 
+                          selection = "none") # HLag is the default VARpen option
+VARHLag_cv <- sparseVAR(Y=scale(Y.hlag), 
+                        selection = "cv")
+VARHLag_bic <- sparseVAR(Y=scale(Y.hlag), 
+                         selection = "bic") # This will also give a table for IC comparison showing the selected lambda for each IC
+```
+
+#### Diagnostics
+
+Depending on which selection procedure was used, various diagnostics can be produced. Former and foremost, all selection procedures support the `fitted` and `residuals` functions to obtain the fitted and residual values respectively. Both functions return a 3D array if the model used `selection="none"` corresponding to the fitted/residual values for each model in the penalization sequence.
 
 ```{r}
 res_VARHLag_none <- residuals(VARHLag_none) # This is a 3D array
@@ -152,41 +175,34 @@ plot(p_cv)
 
 ### Vector AutoRegressive with Exogenous Variables (VARX) Models
 
-```{r}
-data(example)
-Y <- example[-nrow(example), 1:10] # endogenous time series
-colnames(Y) <- paste0("Y", 1:ncol(Y)) # Assigning column names
-Ytest <- example[nrow(example), 1:10]
-Ytest <- (Ytest-apply(Y, 2, mean))/apply(Y, 2, sd) # Needed because we standardise data
-X <- example[-nrow(example), 11:15] # exogenous time series
-colnames(X) <- paste0("X", 1:ncol(X)) # Assinging column names
-```
+Often practitioners are interested in incorporating the impact of unmodeled exogenous variables (X) into the VAR model. To do this, you can use the `sparseVARX` function which has an argument `X` where you can enter the data matrix of exogenous time series. For demonstration purposes, we will use the `varx.example` data set that is part of bigtime.
 
-Often practitioners are interested in incorparating the impact of unmodeled exogenous variables (X) into the VAR model. To do this, you can use the `sparseVARX` function which has an argument `X` where you can enter the data matrix of exogenous time series.
+```{r}
+data(varx.example)
+```
 
 When applying the `lagmatrix` function to an estimated sparse VARX model, the lag matrices of both the endogenous and exogenous autoregressive coefficients are returned.
 
 `sparseVARX` supports the same `selection` arguments as `sparseVAR`: `none, cv, bic, aic, hq`, and it is again recommended to standardise the data.
 
 ```{r}
-VARXfit_cv <- sparseVARX(Y=scale(Y), X=scale(X), selection = "cv")
+VARXfit_cv <- sparseVARX(Y=scale(Y.varx), X=scale(X.varx), selection = "cv")
 LhatVARX <- lagmatrix(fit=VARXfit_cv, returnplot=TRUE)
 ```
 
-VARX models also support `plot_cv` if estimated using CV. The big black dot in the plot below indicates the SE optimal choice, while the contours indicate the mean MSFE in the CV procedure.
+VARX models also support `plot_cv` if estimated using CV. The returned plot shows the mean MSFE for each combination of penalizations in a heatmap. The x-axis show the penalizations for the exogenous variables, and the y-axis shows the penalizations for the endogenous variables. The big black dot in the plot below indicates the one-SE optimal choice, while the contours indicate the mean MSFE in the CV procedure.
 
 ```{r}
 plot_cv(VARXfit_cv)
 ```
 
-
-If `selection="none"` a 3D array will be returned again. Although not mentioned previously, when setting `selection` to `none`, or any of the IC, one can also easily provide a penalisation sequence, or even just ask for a single penalisation setting. For example, below we intentionally choose a single, small penalisation for the exogenous variables.
+If `selection="none"` a 3D array will be returned again. Although not mentioned previously, when setting `selection` to `none`, or any of the IC, one can also easily provide a penalization sequence, or even just ask for a single penalization setting. For example, below we intentionally choose a single, small penalization for the exogenous variables.
 
 ```{r}
-VARXfit_none <- sparseVARX(Y=scale(Y), X=scale(X), VARXlBseq = 0.001, selection = "none")
+VARXfit_none <- sparseVARX(Y=scale(Y.varx), X=scale(X.varx), VARXlBseq = 0.001, selection = "none")
 dim(VARXfit_none$Phihat) # This is a 3D array
 # This is also 3D but third dimension is equal to ten 
-# --> one penalisation was chosen for B and 10 automatically for Phi
+# --> one penalization was chosen for B and 10 automatically for Phi
 # --> Cross product makes 10
 dim(VARXfit_none$Bhat) 
 ```
@@ -195,11 +211,13 @@ Other functions such as `residuals`, `fitted`, and `diagnostics_plot` are also s
 
 ### Vector AutoRegressive Moving Average (VARMA) Models
 
-VARMA models generalise VAR models and often allow for more parsimonious representations of the data generating process. To estimate a VARMA model to a multivariate time series data set, use the function `sparseVARMA`, and choose a desired selection method. As a default, `sparseVARMA` uses CV in the first stage and `none` in the second stage. **The first stage does not support `none`: A selection needs to be made.**
+VARMA models generalise VAR models and often allow for more parsimonious representations of the data generating process. To estimate a VARMA model to a multivariate time series data set, use the function `sparseVARMA`, and choose a desired selection method. The sparse VARMA estimation procedures consists of two stages: in the first stage a VAR model is estimated from which the residuals are retrieved. In the second stage these residuals are used as approximated error terms to estimate the VARMA model. As a default, `sparseVARMA` uses CV in the first stage and `none` in the second stage. **The first stage does not support `none`: A selection needs to be made.**
 
 Now lag matrices are obtained for the autoregressive (AR) coefficients and the moving average (MAs) coefficients.
+
 ```{r}
-VARMAfit <- sparseVARMA(Y=scale(Y), VARMAselection = "cv") # VARselection="cv" as default.  
+data(varma.example)
+VARMAfit <- sparseVARMA(Y=scale(Y.varma), VARMAselection = "cv") # VARselection="cv" as default.  
 LhatVARMA <- lagmatrix(fit=VARMAfit, returnplot=T)
 ```
 
@@ -209,21 +227,32 @@ Other functions such as `plot_cv`, `residuals`, `fitted` and `diagnosticsplot` a
 
 To obtain forecasts from the estimated models, you can use the `directforecast` function for VAR, VARMA, and VARX, or the `recursiveforecast` function for VAR models. The default forecast horizon (argument `h`) is set to one such that one-step ahead forecasts are obtained, but you can specify your desired forecast horizon. 
 
-Finally, we compare the forecast accuracy of the different models by comparing their forecasts to the actual time series values. We will estimate all models using CV.
+Finally, we compare the forecast accuracy of the different models by comparing their forecasts to the actual time series values of the `var.example` data set that comes with bigtime. We will estimate all models using CV.
 
-In this example, the VARMA model has the best forecast performance (i.e., lowest mean squared prediction error). This is no surprise as the multivariate time series  $Y$ was generated from a VARMA model.
+In this example, the VARMA model has the best forecast performance (i.e., lowest mean squared prediction error). This is somewhat surprising given the data comes from a VAR model.
+
 ```{r}
+data(var.example)
+dim(Y.var)
+Y <- Y.var[-nrow(Y.var), ] # leaving the last observation for comparison
+Ytest <- Y.var[nrow(Y.var), ]
+
 VARcv <- sparseVAR(Y = scale(Y), selection = "cv")
 VARMAcv <- sparseVARMA(Y = scale(Y), VARMAselection = "cv")
+
+Y <- Y.var[-nrow(Y.var), 1:3] # considering first three variables as endogenous
+X <- Y.var[-nrow(Y.var), 4:5] # and last two as exogenous
 VARXcv <- sparseVARX(Y = scale(Y), X = scale(X), selection = "cv")
 
 VARf <- directforecast(VARcv) # default is h=1
 VARXf <- directforecast(VARXcv)
 VARMAf <- directforecast(VARMAcv)
 
-mean((VARf-Ytest)^2)
-mean((VARXf-Ytest)^2)
-mean((VARMAf-Ytest)^2) # lowest=best
+# We can only compare forecasts for the first three variables
+# because VARX models only forecast endogenously modelled variables
+mean((VARf[1:3]-Ytest[1:3])^2)
+mean((VARXf[1:3]-Ytest[1:3])^2)
+mean((VARMAf[1:3]-Ytest[1:3])^2) # lowest=best
 ```
 
 Note that we could easily obtain longer horizon forecasts for the VAR model by using the `recursiveforecast` function. It is recommended to call `is.stable` first though, to check whether the obtained VAR model is stable.
@@ -268,13 +297,13 @@ periods <- 50
 k <- 1
 p <- 1
 burnin <- 100
-Xsim <- simVAR(periods+burnin, k, p, max_abs_eigval = 0.8, seed = 123)
-edist <- Xsim$Y + rnorm(periods + burnin, sd = 0.1)
+Xsim <- simVAR(periods+burnin+1, k, p, max_abs_eigval = 0.8, seed = 123)
+edist <- lag(Xsim$Y)[-1, ] + rnorm(periods + burnin, sd = 0.1)
 Ysim <- simVAR(periods, k , p, max_abs_eigval = 0.5, seed = 789, 
                e_dist = t(edist), burnin = burnin)
 plot(Ysim)
 
-x <- scale(Xsim$Y[-(1:burnin)])
+x <- scale(Xsim$Y[-(1:(burnin+1))])
 y <- scale(Ysim$Y)
 
 ARXfit <- sparseVARX(Y=y, X=x, selection = "cv")
@@ -310,13 +339,14 @@ lagmatrix(fit=ARMAfit)
 
 ## Additional Resources
 
-For a non-technical introduction to VAR models see this interactive [notebook](https://mybinder.org/v2/gh/enweg/SnT_VARS/main?urlpath=shiny/App/) and for an interactive notebook demonstrating the use of BigTime for high-dimensional VARs, see this  [notebook](https://mybinder.org/v2/gh/enweg/SnT_BigTime/main?urlpath=shiny/App/). *Note: Loading these notebooks sometimes can take quite some time. Please be patient or try another time.*
+For a non-technical introduction to VAR models see this interactive [notebook](https://mybinder.org/v2/gh/enweg/SnT_VARS/main?urlpath=shiny/App/) and for an interactive notebook demonstrating the use of bigtime for high-dimensional VARs, see this  [notebook](https://mybinder.org/v2/gh/enweg/SnT_BigTime/main?urlpath=shiny/App/). *Note: Loading these notebooks sometimes can take quite some time. Please be patient or try another time.*
 
 
 ## References:
 
-* Nicholson William B., Bien Jacob and Matteson David S. (2020), "High-dimensional forecasting via interpretable vector autoregression", Journal of Machine Learning Research, 21(166), 1-52.
+* Nicholson William B., Wilms Ines, Bien Jacob and Matteson David S. (2020), “High-dimensional forecasting via interpretable vector autoregression”, Journal of Machine Learning Research, 21(166), 1-52.
 
-* Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2017), "Sparse Identification and Estimation of High-Dimensional Vector AutoRegressive Moving Averages", arXiv:1707.09208.
+* Wilms Ines, Basu Sumanta, Bien Jacob and Matteson David S. (2021), “Sparse Identification and Estimation of Large-Scale Vector AutoRegressive Moving Averages”, Journal of the American Statistical Association,
+doi: 10.1080/01621459.2021.1942013.
 
-* Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2017), "Interpretable Vector AutoRegressions with Exogenous Time Series", arXiv.
+* Wilms Ines, Basu Sumanta, Bien Jacob and Matteson David S. (2017), “Interpretable Vector AutoRegressions with Exogenous Time Series”, NIPS 2017 Symposium on Interpretable Machine Learning, arXiv:1711.03623

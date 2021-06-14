@@ -12,3 +12,4 @@
 * `is.stable` was implemented for VAR models
 * in `plot_cv`, `directforecast`, and `lagmatrix` the model argument was removed. Functions know  automatically what model was used. **WARNING: This can break old code!** 
 * All model functions will give warnings if the given data is not standardised
+* added example data for VAR, VARMA, and VARX

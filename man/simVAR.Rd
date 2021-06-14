@@ -14,7 +14,7 @@ simVAR(
   init_y = rep(0, k * p),
   max_abs_eigval = 0.8,
   burnin = periods,
-  sparsity_pattern = c("none", "lasso", "hvar"),
+  sparsity_pattern = c("none", "lasso", "L1", "hvar", "HLag"),
   sparsity_options = NULL,
   decay = 1/p,
   seed = NULL,
@@ -45,8 +45,8 @@ if coefficient matrix is being simulated}
 \item{burnin}{Number of periods to be used for burnin}
 
 \item{sparsity_pattern}{The sparsity pattern that should be simulated.
-Options are: none for a dense VAR, lasso for a VAR with random zeroes,
-and HVAR for an elementwise hirichical sparsity pattern}
+Options are: none for a dense VAR, lasso (or L1) for a VAR with random zeroes,
+and hvar (or HLag) for an elementwise hierarchical sparsity pattern}
 
 \item{sparsity_options}{Named list of additional options for
 when sparsity pattern is lasso or hvar. For lasso the option num_zero
