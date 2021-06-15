@@ -1,7 +1,8 @@
 
-#' Gives the residuals for VAR models estimated using sparseVAR
+#' Gives the residuals for VAR models estimated using
+#' \code{\link{sparseVAR}}
 #'
-#' @param object model estimated using sparseVAR
+#' @param object Model estimated using \code{\link{sparseVAR}}
 #' @param ... Not currently used
 #' @export
 #' @return Returns a matrix of residuals.
@@ -33,9 +34,10 @@ residuals.bigtime.VAR <- function(object, ...){
   res
 }
 
-#' Gives the residuals for VARX models estimated using sparseVARX
+#' Gives the residuals for VARX models estimated using
+#' \code{\link{sparseVARX}}
 #'
-#' @param object model estimated using sparseVARX
+#' @param object Model estimated using \code{\link{sparseVARX}}
 #' @param ... Not currently used
 #' @export
 #' @return Returns a matrix of residuals.
@@ -63,9 +65,10 @@ residuals.bigtime.VARX <- function(object, ...){
 }
 
 
-#' Gives the residuals for VARMA models estimated using sparseVARMA
+#' Gives the residuals for VARMA models estimated using
+#' \code{\link{sparseVARMA}}
 #'
-#' @param object model estimated using sparseVARMA
+#' @param object Model estimated using \code{\link{sparseVARMA}}
 #' @param ... Not currently used
 #' @export
 #' @return Returns a matrix of residuals.
@@ -84,9 +87,10 @@ residuals.bigtime.VARMA <- function(object, ...){
 }
 
 
-#' Gives the fitted values of a model estimated using sparseVAR
+#' Gives the fitted values of a model estimated using
+#' \code{\link{sparseVAR}}
 #'
-#' @param object model estimated using sparseVAR
+#' @param object Model estimated using \code{\link{sparseVAR}}
 #' @param ... Not currently used
 #' @export
 #' @return Returns a matrix of fitted values
@@ -119,9 +123,10 @@ fitted.bigtime.VAR <- function(object, ...){
   fit
 }
 
-#' Gives the fitted values of a model estimated using sparseVARX
+#' Gives the fitted values of a model estimated using
+#' \code{\link{sparseVARX}}
 #'
-#' @param object model estimated using sparseVARX
+#' @param object Model estimated using \code{\link{sparseVARX}}
 #' @param ... Not currently used
 #' @export
 #' @return Returns a matrix of fitted values
@@ -153,9 +158,10 @@ fitted.bigtime.VARX <- function(object, ...){
 }
 
 
-#' Gives the fitted values of a model estimated using sparseVARMA
+#' Gives the fitted values of a model estimated using
+#' \code{\link{sparseVARMA}}
 #'
-#' @param object model estimated using sparseVARMA
+#' @param object Model estimated using \code{\link{sparseVARMA}}
 #' @param ... Not currently used
 #' @export
 #' @return Returns a matrix of fitted values
@@ -177,9 +183,10 @@ fitted.bigtime.VARMA <- function(object, ...){
 }
 
 
-#' Creates a diagnostic Plot
+#' Creates a Diagnostic Plot
 #'
-#' @param mod VAR model estimated using sparseVAR
+#' @param mod VAR model estimated using \code{\link{sparseVAR}},
+#' \code{\link{sparseVARMA}}, or \code{\link{sparseVARX}}
 #' @param variable Variable to show. Either numeric (which column) or character
 #' (variable name)
 #' @param dates Optional Date vector.
@@ -196,7 +203,10 @@ diagnostics_plot <- function(mod, variable = 1, dates = NULL){
 
 
 #' diagnostics_plot function for VAR models
-#' @param mod VAR model estimated using sparseVAR
+#'
+#' Not supposed to be called directly. Rather call \code{\link{diagnostics_plot}}
+#'
+#' @param mod VAR model estimated using \code{\link{sparseVAR}}
 #' @param variable Variable to show. Either numeric (which column) or character
 #' (variable name)
 #' @param dates Optional Date vector.
@@ -214,7 +224,10 @@ diagnostics_plot.bigtime.VAR <- function(mod, variable = 1, dates=NULL){
 
 
 #' diagnostics_plot function for VARX models
-#' @param mod VAR model estimated using sparseVARX
+#'
+#' Not supposed to be called directly. Rather call \code{\link{diagnostics_plot}}
+#'
+#' @param mod VARX model estimated using \code{\link{sparseVARX}}
 #' @param variable Variable to show. Either numeric (which column) or character
 #' (variable name)
 #' @param dates Optional Date vector.
@@ -231,7 +244,10 @@ diagnostics_plot.bigtime.VARX <- function(mod, variable = 1, dates = NULL){
 
 
 #' diagnostics_plot function for VARMA models
-#' @param mod VAR model estimated using sparseVARMA
+#'
+#' Not supposed to be called directly. Rather call \code{\link{diagnostics_plot}}
+#'
+#' @param mod VAR model estimated using \code{\link{sparseVARMA}}
 #' @param variable Variable to show. Either numeric (which column) or character
 #' (variable name)
 #' @param dates Optional Date vector.
@@ -252,8 +268,8 @@ diagnostics_plot.bigtime.VARMA <- function(mod, variable = 1, dates = NULL){
 #' @param fit fitted values
 #' @param res residual values
 #' @param s how many observations were lost
-#' @param variable variable to plot: either numeric or colname
-#' @param dates vector of dates of length nrow(Y)
+#' @param variable variable to plot: either numeric or column name
+#' @param dates vector of dates of length \code{nrow(Y)}
 #' @keywords internal
 .diagnostics_plot <- function(Y, fit, res, s, variable, dates){
 
@@ -320,16 +336,19 @@ diagnostics_plot.bigtime.VARMA <- function(mod, variable = 1, dates = NULL){
 
 #' Checks whether a VAR is stable
 #'
-#' Using a model estimated by bigtime::sparseVAR, this function checks whether
-#' the resulting VAR is stable
+#' Using a model estimated by \code{\link{sparseVAR}}, this function checks whether
+#' the resulting VAR is stable. This is the case, whenever the maximum absolute
+#' eigenvalue of the companion matrix corresponding to the VAR is less than one.
+#' This is sometimes also referred to as that the root lies outside the unit circle.
 #'
-#' @param mod model estimated using sparseVAR. Can only be a model
-#' with one coefficient vector. Hence, the model must either be estimated using
-#' cv=TRUE or by giving a single lambda value
-#' @param verbose If TRUE, then the actual maximum eigenvalue of the companion
-#' matrix will be printed to the console. Default is FALSE
+#' @param mod Model estimated using \code{\link{sparseVAR}}. Can only be a model
+#' with one coefficient vector. Hence, the model must be estimated using a selection
+#' method. See \code{\link{sparseVAR}} for more details.
+#' @param verbose If \code{TRUE}, then the actual maximum absolute
+#' eigenvalue of the companion matrix will be printed to the console.
+#' Default is \code{FALSE}
 #' @export
-#' @return Returns TRUE if the VAR is stable and FALSE otherwise
+#' @return Returns \code{TRUE} if the VAR is stable and \code{FALSE} otherwise
 is.stable <- function(mod, verbose = FALSE){
   if (!("bigtime.VAR") %in% class(mod)) stop("Model is not a VAR model estimated using sparseVAR")
   if (mod$selection == "none") stop("Model did not use any selection procedure. It is not clear which model is meant. Please use a selection procedure in sparseVAR or calls ic_selection on model.")
@@ -347,6 +366,7 @@ is.stable <- function(mod, verbose = FALSE){
 }
 
 
+# Checks whether a data matrix is standardised up to machine precision.
 .check_if_standardised <- function(Y){
   Y_sd <- apply(Y, 2, sd)
   names(Y_sd) <- NULL
