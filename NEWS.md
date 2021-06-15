@@ -1,4 +1,4 @@
-# BigTime 0.2.0
+# bigtime 0.2.0
 
 * `sparseVAR`, `sparseVARMA`, `sparseVARX` are all more efficient and faster now
 * All estimation functions return corresponding S3 classes
@@ -13,3 +13,7 @@
 * in `plot_cv`, `directforecast`, and `lagmatrix` the model argument was removed. Functions know  automatically what model was used. **WARNING: This can break old code!** 
 * All model functions will give warnings if the given data is not standardised
 * added example data for VAR, VARMA, and VARX
+
+# bigtime 0.1.0
+
+* First release on CRAN
