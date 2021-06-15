@@ -8,16 +8,17 @@
 #' model estimation are used for forecasting, or a single value, in which case
 #' only the model using this lambda will be used for forecasting.
 #'
-#' @param mod VAR model estimated using bigtime::sparseVAR
-#' @param h forecast horizon: default=1
-#' @param lambda Either NULL in which case a forecast will be made for all
+#' @param mod VAR model estimated using \code{bigtime::sparseVAR}
+#' @param h Forecast horizon: default=1
+#' @param lambda Either \code{NULL} in which case a forecast will be made for all
 #' lambdas for which the model was estimated, or a single value in which
-#' case a forecast will only be made for the model using this lambda
+#' case a forecast will only be made for the model using this lambda.
+#' Choice is redundant if the model was estimated using a selection procedure.
 #' @export
-#' @return Returns an object of S3 class bigtime.recursiveforecast containing
+#' @return Returns an object of S3 class \code{bigtime.recursiveforecast} containing
 #' \item{fcst}{Matrix or 3D array of forecasts}
 #' \item{h}{Selected forecast horizon}
-#' \item{lambda}{list of lambdas for which the forecasts were made}
+#' \item{lambda}{List of lambdas for which the forecasts were made}
 #' \item{Y}{Data used for recursive forecasting}
 #' @example
 #' sim_data <- bigtime::simVAR(200, 5, 5)
@@ -83,11 +84,12 @@ recursiveforecast <- function(mod, h=1, lambda = NULL){
 #' This function is not meant to be directly called by the user
 #' and is only a helper function
 #'
-#' @param Y data matrix
-#' @param Phi_hat coefficient matrix
-#' @param phi_0 constent terms
-#' @param h forecast horizon
+#' @param Y Data matrix
+#' @param Phi_hat Coefficient matrix
+#' @param phi_0 Constant terms
+#' @param h Forecast horizon
 #' @return Returns a matrix of forecasts
+#' @keywords internal
 .recursiveforecast <- function(Y, Phi_hat, phi_0, h){
   # Constructing the companion form for quicker forecasting
   k <- nrow(Phi_hat)
@@ -113,23 +115,23 @@ recursiveforecast <- function(mod, h=1, lambda = NULL){
 
 #' Plots Recursive Forecasts
 #'
-#' Plots the recursive forecast obtained using bigtime::recursiveforecast
-#' When forecasts were made for multiple lambdas and lmbda is not a single
+#' Plots the recursive forecast obtained using \code{\link{recursiveforecast}}
+#' When forecasts were made for multiple lambdas and \code{lmbda} is not a single
 #' number, then a ribbon will be plotted that reaches from the minimum estimate
 #' of all lambdas to the maximum.
 #'
-#' If lmbda is of length one or forecsts were made using only one lambda,
+#' If \code{lmbda} is of length one or forecasts were made using only one lambda,
 #' then only a line will be plotted.
 #'
 #' Default names for series are Y1, Y2, ... if the original data does
-#' not have any column names
+#' not have any column names.
 #'
-#' @param x Recursive Forecast obtained using bigtime::recursiveforecast
-#' @param series Series name. If original data has not names, then use Y1 for
-#' the first series, Y2 for the second, and so on
-#' @param lmbda lambdas to be used for plotting. If forecast was done using only
+#' @param x Recursive Forecast obtained using \code{\link{recursiveforecast}}
+#' @param series Series name. If original data has no names, then use Y1 for
+#' the first series, Y2 for the second, and so on.
+#' @param lmbda Lambdas to be used for plotting. If forecast was done using only
 #' one lambda, then this will be ignored.
-#' @param last_n last n observations of the original data to include in the plot
+#' @param last_n Last \code{n} observations of the original data to include in the plot
 #' @param ... Not currently used
 #' @export
 #' @return Returns a ggplot
@@ -202,11 +204,12 @@ plot.bigtime.recursiveforecast <- function(x, series=NULL, lmbda=NULL,
 #' This is only meant to be a helper function and not meant to be called by
 #' the user itself
 #'
-#' @param cube some 3D array
-#' @param dim3_names vector of length dim(cube)[3] containing a name for
+#' @param cube Some 3D array
+#' @param dim3_names Vector of length dim(cube)[3] containing a name for
 #' each slice
-#' @param name what should the column containing the dim3_names be called?
-#' @return Returns a data frame contructed from the cube
+#' @param name What should the column containing the dim3_names be called?
+#' @return Returns a data frame constructed from the cube
+#' @keywords internal
 reduce_cube <- function(cube, dim3_names, name = deparse(substitute(dim3_names))){
   cnames <- colnames(cube)
   if (is.null(cnames)) {
