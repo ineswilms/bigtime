@@ -7,13 +7,14 @@
 get_ic_vals(mod, verbose = TRUE)
 }
 \arguments{
-\item{mod}{Model estimated using sparseVAR, sparseVARX, or sparseVARMA}
+\item{mod}{Model estimated Model estimated using \code{\link{sparseVAR}}, \code{sparseVARX},
+or \code{sparseVARMA}}
 
 \item{verbose}{Should information about the optimal selection be printed?}
 }
 \description{
 The number of non-zero coefficients are taken as the degrees of freedom.
-This is not valid in cases in which p>N
+This is not valid in all cases.
 }
 \examples{
 dat <- simVAR(200, 2, 5, decay = 0.01)

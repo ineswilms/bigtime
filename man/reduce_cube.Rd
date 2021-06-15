@@ -7,17 +7,18 @@
 reduce_cube(cube, dim3_names, name = deparse(substitute(dim3_names)))
 }
 \arguments{
-\item{cube}{some 3D array}
+\item{cube}{Some 3D array}
 
-\item{dim3_names}{vector of length dim(cube)[3] containing a name for
+\item{dim3_names}{Vector of length dim(cube)[3] containing a name for
 each slice}
 
-\item{name}{what should the column containing the dim3_names be called?}
+\item{name}{What should the column containing the dim3_names be called?}
 }
 \value{
-Returns a data frame contructed from the cube
+Returns a data frame constructed from the cube
 }
 \description{
 This is only meant to be a helper function and not meant to be called by
 the user itself
 }
+\keyword{internal}

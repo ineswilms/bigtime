@@ -7,15 +7,15 @@
 \method{plot}{bigtime.recursiveforecast}(x, series = NULL, lmbda = NULL, last_n = floor(nrow(fcst$Y) * 0.1), ...)
 }
 \arguments{
-\item{x}{Recursive Forecast obtained using bigtime::recursiveforecast}
+\item{x}{Recursive Forecast obtained using \code{\link{recursiveforecast}}}
 
-\item{series}{Series name. If original data has not names, then use Y1 for
-the first series, Y2 for the second, and so on}
+\item{series}{Series name. If original data has no names, then use Y1 for
+the first series, Y2 for the second, and so on.}
 
-\item{lmbda}{lambdas to be used for plotting. If forecast was done using only
+\item{lmbda}{Lambdas to be used for plotting. If forecast was done using only
 one lambda, then this will be ignored.}
 
-\item{last_n}{last n observations of the original data to include in the plot}
+\item{last_n}{Last \code{n} observations of the original data to include in the plot}
 
 \item{...}{Not currently used}
 }
@@ -23,15 +23,15 @@ one lambda, then this will be ignored.}
 Returns a ggplot
 }
 \description{
-Plots the recursive forecast obtained using bigtime::recursiveforecast
-When forecasts were made for multiple lambdas and lmbda is not a single
+Plots the recursive forecast obtained using \code{\link{recursiveforecast}}
+When forecasts were made for multiple lambdas and \code{lmbda} is not a single
 number, then a ribbon will be plotted that reaches from the minimum estimate
 of all lambdas to the maximum.
 }
 \details{
-If lmbda is of length one or forecsts were made using only one lambda,
+If \code{lmbda} is of length one or forecasts were made using only one lambda,
 then only a line will be plotted.
 
 Default names for series are Y1, Y2, ... if the original data does
-not have any column names
+not have any column names.
 }

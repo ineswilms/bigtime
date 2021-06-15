@@ -1,11 +1,13 @@
 
 #' Selects the optimal penalty parameter using information criteria
 #'
-#' @param mod Model estimated using sparseVAR, sparseVARX, or sparseVARMA
-#' @param ic Which information criteria should be used. Must be one of BIC, AIC, HQ
+#' @param mod Model estimated Model estimated using \code{\link{sparseVAR}},
+#' \code{\link{sparseVARX}}, or \code{\link{sparseVARMA}}
+#' @param ic Which information criteria should be used. Must be one of
+#' \code{"bic"}, \code{"aic"} or \code{"hq"}
 #' @param verbose If true, some useful information will be printed during the process
 #' @export
-#' @return returns a model that uses the optimal penalty
+#' @return Returns a model that uses the optimal penalty
 ic_selection <- function(mod, ic = c("bic", "aic", "hq"), verbose = FALSE){
   ics <- get_ic_vals(mod, verbose = verbose)
   ic <- match.arg(ic)
@@ -38,9 +40,10 @@ obtain_selected_model <- function(mod, selected){
 #' Calculates the Information Criteria for a VAR, VARX, VARMA model
 #'
 #' The number of non-zero coefficients are taken as the degrees of freedom.
-#' This is not valid in cases in which p>N
+#' This is not valid in all cases.
 #'
-#' @param mod Model estimated using sparseVAR, sparseVARX, or sparseVARMA
+#' @param mod Model estimated Model estimated using \code{\link{sparseVAR}},
+#' \code{\link{sparseVARX}}, or \code{\link{sparseVARMA}}
 #' @param verbose Should information about the optimal selection be printed?
 #' @export
 #'
@@ -53,16 +56,18 @@ get_ic_vals <- function(mod, verbose = TRUE){
 }
 
 
-#' Calculates the Information Criteria for a model estimated using sparseVARX
+#' Calculates the Information Criteria for a model estimated using
+#' \code{\link{sparseVARX}}
 #'
-#' The number of non-zero coefficients are taken as the degrees of freedom.
+#' The number of non-zero coefficients in both the \code{Phihat}
+#' and \code{Bhat} matrix are taken as the degrees of freedom.
 #'
-#' @param mod Model estimated using sparseVARX
+#' @param mod Model estimated using \code{\link{sparseVARX}}
 #' @param verbose Should information about the optimal selection be printed?
 #' @export
 #' @return Returns a list containing
 #' \item{ics}{Values of the ICs for all lambdas}
-#' \item{mins}{Which ic lead to the minimum (the row number)}
+#' \item{mins}{Which IC lead to the minimum (the row number)}
 #' \item{selected_lamPhi}{Which lambda Phi were selected}
 #' \item{selected_lamB}{Which lambda B were selected}
 get_ic_vals.bigtime.VARX <- function(mod, verbose = TRUE){
@@ -128,17 +133,17 @@ get_ic_vals.bigtime.VARX <- function(mod, verbose = TRUE){
 
 }
 
-#' Calculates the Information Criteria for a model estimated using sparseVAR
+#' Calculates the Information Criteria for a model estimated using
+#' \code{\link{sparseVAR}}
 #'
 #' The number of non-zero coefficients are taken as the degrees of freedom.
-#' This is not valid in cases in which p>N
 #'
-#' @param mod Model estimated using sparseVAR
+#' @param mod Model estimated using \code{\link{sparseVAR}}
 #' @param verbose Should information about the optimal selection be printed?
 #' @export
 #' @return Returns a list containing
 #' \item{ics}{Values of the ICs for all lambdas}
-#' \item{mins}{Which ic lead to the minimum (the row number)}
+#' \item{mins}{Which IC lead to the minimum (the row number)}
 #' \item{selected_lambdas}{Which lambdas were selected}
 #'
 #' @examples
@@ -205,8 +210,8 @@ get_ic_vals.bigtime.VAR <- function(mod, verbose = TRUE){
 #' Not meant to be called by the user
 #'
 #' @param res Matrix of residuals
-#' @param tt number of time periods
-#' @param df degrees of freedom
+#' @param tt Number of time periods
+#' @param df Degrees of freedom
 #' @keywords internal
 .get_ic_vals <- function(res, tt, df){
 

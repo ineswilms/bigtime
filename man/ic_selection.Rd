@@ -7,14 +7,16 @@
 ic_selection(mod, ic = c("bic", "aic", "hq"), verbose = FALSE)
 }
 \arguments{
-\item{mod}{Model estimated using sparseVAR, sparseVARX, or sparseVARMA}
+\item{mod}{Model estimated using \code{sparseVAR}, \code{sparseVARX},
+or \code{sparseVARMA}}
 
-\item{ic}{Which information criteria should be used. Must be one of BIC, AIC, HQ}
+\item{ic}{Which information criteria should be used. Must be one of
+\code{"bic"}, \code{"aic"} or \code{"hq"}}
 
 \item{verbose}{If true, some useful information will be printed during the process}
 }
 \value{
-returns a model that uses the optimal penalty
+Returns a model that uses the optimal penalty
 }
 \description{
 Selects the optimal penalty parameter using information criteria

@@ -7,13 +7,13 @@
 .recursiveforecast(Y, Phi_hat, phi_0, h)
 }
 \arguments{
-\item{Y}{data matrix}
+\item{Y}{Data matrix}
 
-\item{Phi_hat}{coefficient matrix}
+\item{Phi_hat}{Coefficient matrix}
 
-\item{phi_0}{constent terms}
+\item{phi_0}{Constant terms}
 
-\item{h}{forecast horizon}
+\item{h}{Forecast horizon}
 }
 \value{
 Returns a matrix of forecasts
@@ -22,3 +22,4 @@ Returns a matrix of forecasts
 This function is not meant to be directly called by the user
 and is only a helper function
 }
+\keyword{internal}

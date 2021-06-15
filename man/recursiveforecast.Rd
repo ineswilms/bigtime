@@ -7,19 +7,20 @@
 recursiveforecast(mod, h = 1, lambda = NULL)
 }
 \arguments{
-\item{mod}{VAR model estimated using bigtime::sparseVAR}
+\item{mod}{VAR model estimated using \code{bigtime::sparseVAR}}
 
-\item{h}{forecast horizon: default=1}
+\item{h}{Forecast horizon: default=1}
 
-\item{lambda}{Either NULL in which case a forecast will be made for all
+\item{lambda}{Either \code{NULL} in which case a forecast will be made for all
 lambdas for which the model was estimated, or a single value in which
-case a forecast will only be made for the model using this lambda}
+case a forecast will only be made for the model using this lambda.
+Choice is redundant if the model was estimated using a selection procedure.}
 }
 \value{
-Returns an object of S3 class bigtime.recursiveforecast containing
+Returns an object of S3 class \code{bigtime.recursiveforecast} containing
 \item{fcst}{Matrix or 3D array of forecasts}
 \item{h}{Selected forecast horizon}
-\item{lambda}{list of lambdas for which the forecasts were made}
+\item{lambda}{List of lambdas for which the forecasts were made}
 \item{Y}{Data used for recursive forecasting}
 }
 \description{
