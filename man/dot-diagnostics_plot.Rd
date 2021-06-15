@@ -15,9 +15,9 @@
 
 \item{s}{how many observations were lost}
 
-\item{variable}{variable to plot: either numeric or colname}
+\item{variable}{variable to plot: either numeric or column name}
 
-\item{dates}{vector of dates of length nrow(Y)}
+\item{dates}{vector of dates of length \code{nrow(Y)}}
 }
 \description{
 Internal function to plot the diagnostics plot

@@ -2,12 +2,13 @@
 % Please edit documentation in R/diagnostics.R
 \name{fitted.bigtime.VARMA}
 \alias{fitted.bigtime.VARMA}
-\title{Gives the fitted values of a model estimated using sparseVARMA}
+\title{Gives the fitted values of a model estimated using
+\code{\link{sparseVARMA}}}
 \usage{
 \method{fitted}{bigtime.VARMA}(object, ...)
 }
 \arguments{
-\item{object}{model estimated using sparseVARMA}
+\item{object}{Model estimated using \code{\link{sparseVARMA}}}
 
 \item{...}{Not currently used}
 }
@@ -15,5 +16,6 @@
 Returns a matrix of fitted values
 }
 \description{
-Gives the fitted values of a model estimated using sparseVARMA
+Gives the fitted values of a model estimated using
+\code{\link{sparseVARMA}}
 }

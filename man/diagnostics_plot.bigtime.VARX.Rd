@@ -7,7 +7,7 @@
 \method{diagnostics_plot}{bigtime.VARX}(mod, variable = 1, dates = NULL)
 }
 \arguments{
-\item{mod}{VAR model estimated using sparseVARX}
+\item{mod}{VARX model estimated using \code{\link{sparseVARX}}}
 
 \item{variable}{Variable to show. Either numeric (which column) or character
 (variable name)}
@@ -15,5 +15,5 @@
 \item{dates}{Optional Date vector.}
 }
 \description{
-diagnostics_plot function for VARX models
+Not supposed to be called directly. Rather call \code{\link{diagnostics_plot}}
 }

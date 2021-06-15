@@ -2,12 +2,13 @@
 % Please edit documentation in R/diagnostics.R
 \name{fitted.bigtime.VAR}
 \alias{fitted.bigtime.VAR}
-\title{Gives the fitted values of a model estimated using sparseVAR}
+\title{Gives the fitted values of a model estimated using
+\code{\link{sparseVAR}}}
 \usage{
 \method{fitted}{bigtime.VAR}(object, ...)
 }
 \arguments{
-\item{object}{model estimated using sparseVAR}
+\item{object}{Model estimated using \code{\link{sparseVAR}}}
 
 \item{...}{Not currently used}
 }
@@ -15,7 +16,8 @@
 Returns a matrix of fitted values
 }
 \description{
-Gives the fitted values of a model estimated using sparseVAR
+Gives the fitted values of a model estimated using
+\code{\link{sparseVAR}}
 }
 \examples{
 dat <- bigtime::simVAR(200, 2, 5, decay = 0.001, seed = 6150533)

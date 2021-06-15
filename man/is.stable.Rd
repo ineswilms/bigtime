@@ -7,17 +7,20 @@
 is.stable(mod, verbose = FALSE)
 }
 \arguments{
-\item{mod}{model estimated using sparseVAR. Can only be a model
-with one coefficient vector. Hence, the model must either be estimated using
-cv=TRUE or by giving a single lambda value}
+\item{mod}{Model estimated using \code{\link{sparseVAR}}. Can only be a model
+with one coefficient vector. Hence, the model must be estimated using a selection
+method. See \code{\link{sparseVAR}} for more details.}
 
-\item{verbose}{If TRUE, then the actual maximum eigenvalue of the companion
-matrix will be printed to the console. Default is FALSE}
+\item{verbose}{If \code{TRUE}, then the actual maximum absolute
+eigenvalue of the companion matrix will be printed to the console.
+Default is \code{FALSE}}
 }
 \value{
-Returns TRUE if the VAR is stable and FALSE otherwise
+Returns \code{TRUE} if the VAR is stable and \code{FALSE} otherwise
 }
 \description{
-Using a model estimated by bigtime::sparseVAR, this function checks whether
-the resulting VAR is stable
+Using a model estimated by \code{\link{sparseVAR}}, this function checks whether
+the resulting VAR is stable. This is the case, whenever the maximum absolute
+eigenvalue of the companion matrix corresponding to the VAR is less than one.
+This is sometimes also referred to as that the root lies outside the unit circle.
 }

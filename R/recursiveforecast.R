@@ -20,21 +20,21 @@
 #' \item{h}{Selected forecast horizon}
 #' \item{lambda}{List of lambdas for which the forecasts were made}
 #' \item{Y}{Data used for recursive forecasting}
-#' @example
-#' sim_data <- bigtime::simVAR(200, 5, 5)
+#' @examples
+#' sim_data <- simVAR(200, 5, 5, seed = 12345)
 #' summary(sim_data)
-#' mod <- bigtime::sparseVAR(sim_data$Y)
-#' bigtime::is.stable(mod)
-#' fcst_recursive <- bigtime::recursiveforecast(mod, h = 4)
+#' mod <- sparseVAR(scale(sim_data$Y), selection = "bic")
+#' is.stable(mod)
+#' fcst_recursive <- recursiveforecast(mod, h = 4)
 #' plot(fcst_recursive, series = "Y1")
-#' fcst_direct <- bigtime::directforecast(mod, "VAR")
+#' fcst_direct <- directforecast(mod)
 #' fcst_direct
 #' fcst_recursive$fcst
 recursiveforecast <- function(mod, h=1, lambda = NULL){
-  if (!("bigtime.VAR" %in% class(mod))) stop("Recursive Forecasting is only supported for VAR models estimated using bigtime::sparseVAR")
+  if (!("bigtime.VAR" %in% class(mod))) stop("Recursive Forecasting is only supported for VAR models estimated using sparseVAR")
   if (!is.null(lambda) & length(lambda) > 1) stop("Must either forecast using all lambdas or only one.")
 
-  # If CV was not run, then PHI will be a cube.
+  # If no selection procedure was used, then PHI will be a cube.
   # in this case we can either use one slice or forecast for multiple lambda
   Phi_hat <- mod$Phihat
   phi_0 <- mod$phi0hat
@@ -65,7 +65,8 @@ recursiveforecast <- function(mod, h=1, lambda = NULL){
 
   # Checking whether cv was performed. In this case mod$lambdas > 1 but only
   # one was truly used
-  if (!is.na(mod$lambda_SEopt)) lambda <- mod$lambda_SEopt
+  if (mod$selection == "cv") lambda <- mod$lambda_SEopt
+  else if (mod$selection %in% c("bic", "aic", "hq")) lambda <- mod$lambda_opt
   if (is.null(lambda)) lambda <- mod$lambdas
 
   out <- list(

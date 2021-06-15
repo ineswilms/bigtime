@@ -9,9 +9,9 @@
 \arguments{
 \item{res}{Matrix of residuals}
 
-\item{tt}{number of time periods}
+\item{tt}{Number of time periods}
 
-\item{df}{degrees of freedom}
+\item{df}{Degrees of freedom}
 }
 \description{
 Not meant to be called by the user

@@ -7,8 +7,8 @@
 get_ic_vals(mod, verbose = TRUE)
 }
 \arguments{
-\item{mod}{Model estimated Model estimated using \code{\link{sparseVAR}}, \code{sparseVARX},
-or \code{sparseVARMA}}
+\item{mod}{Model estimated Model estimated using \code{\link{sparseVAR}},
+\code{\link{sparseVARX}}, or \code{\link{sparseVARMA}}}
 
 \item{verbose}{Should information about the optimal selection be printed?}
 }

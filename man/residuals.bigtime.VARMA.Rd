@@ -2,12 +2,13 @@
 % Please edit documentation in R/diagnostics.R
 \name{residuals.bigtime.VARMA}
 \alias{residuals.bigtime.VARMA}
-\title{Gives the residuals for VARMA models estimated using sparseVARMA}
+\title{Gives the residuals for VARMA models estimated using
+\code{\link{sparseVARMA}}}
 \usage{
 \method{residuals}{bigtime.VARMA}(object, ...)
 }
 \arguments{
-\item{object}{model estimated using sparseVARMA}
+\item{object}{Model estimated using \code{\link{sparseVARMA}}}
 
 \item{...}{Not currently used}
 }
@@ -15,5 +16,6 @@
 Returns a matrix of residuals.
 }
 \description{
-Gives the residuals for VARMA models estimated using sparseVARMA
+Gives the residuals for VARMA models estimated using
+\code{\link{sparseVARMA}}
 }

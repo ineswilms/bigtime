@@ -2,12 +2,13 @@
 % Please edit documentation in R/diagnostics.R
 \name{residuals.bigtime.VARX}
 \alias{residuals.bigtime.VARX}
-\title{Gives the residuals for VARX models estimated using sparseVARX}
+\title{Gives the residuals for VARX models estimated using
+\code{\link{sparseVARX}}}
 \usage{
 \method{residuals}{bigtime.VARX}(object, ...)
 }
 \arguments{
-\item{object}{model estimated using sparseVARX}
+\item{object}{Model estimated using \code{\link{sparseVARX}}}
 
 \item{...}{Not currently used}
 }
@@ -15,5 +16,6 @@
 Returns a matrix of residuals.
 }
 \description{
-Gives the residuals for VARX models estimated using sparseVARX
+Gives the residuals for VARX models estimated using
+\code{\link{sparseVARX}}
 }

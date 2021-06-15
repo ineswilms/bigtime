@@ -7,6 +7,9 @@
 \method{summary}{bigtime.simVAR}(object, plot = TRUE, ...)
 }
 \arguments{
+\item{object}{Simulated data of class \code{bigtime.simVAR} obtained
+from the \code{\link{simVAR}} function}
+
 \item{plot}{Should the VAR be plotted. Default is \code{TRUE}}
 
 \item{...}{Not currently used}

@@ -2,12 +2,13 @@
 % Please edit documentation in R/diagnostics.R
 \name{residuals.bigtime.VAR}
 \alias{residuals.bigtime.VAR}
-\title{Gives the residuals for VAR models estimated using sparseVAR}
+\title{Gives the residuals for VAR models estimated using
+\code{\link{sparseVAR}}}
 \usage{
 \method{residuals}{bigtime.VAR}(object, ...)
 }
 \arguments{
-\item{object}{model estimated using sparseVAR}
+\item{object}{Model estimated using \code{\link{sparseVAR}}}
 
 \item{...}{Not currently used}
 }
@@ -15,7 +16,8 @@
 Returns a matrix of residuals.
 }
 \description{
-Gives the residuals for VAR models estimated using sparseVAR
+Gives the residuals for VAR models estimated using
+\code{\link{sparseVAR}}
 }
 \examples{
 dat <- simVAR(200, 2, 5, decay = 0.001, seed = 6150533)

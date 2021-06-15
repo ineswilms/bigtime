@@ -2,12 +2,13 @@
 % Please edit documentation in R/diagnostics.R
 \name{diagnostics_plot}
 \alias{diagnostics_plot}
-\title{Creates a diagnostic Plot}
+\title{Creates a Diagnostic Plot}
 \usage{
 diagnostics_plot(mod, variable = 1, dates = NULL)
 }
 \arguments{
-\item{mod}{VAR model estimated using sparseVAR}
+\item{mod}{VAR model estimated using \code{\link{sparseVAR}},
+\code{\link{sparseVARMA}}, or \code{\link{sparseVARX}}}
 
 \item{variable}{Variable to show. Either numeric (which column) or character
 (variable name)}
@@ -18,7 +19,7 @@ diagnostics_plot(mod, variable = 1, dates = NULL)
 Returns a ggplot2 plot
 }
 \description{
-Creates a diagnostic Plot
+Creates a Diagnostic Plot
 }
 \examples{
 dat <- simVAR(200, 2, 5, decay = 0.1, seed = 6150533,

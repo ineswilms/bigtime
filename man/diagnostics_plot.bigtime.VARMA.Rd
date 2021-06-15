@@ -7,7 +7,7 @@
 \method{diagnostics_plot}{bigtime.VARMA}(mod, variable = 1, dates = NULL)
 }
 \arguments{
-\item{mod}{VAR model estimated using sparseVARMA}
+\item{mod}{VAR model estimated using \code{\link{sparseVARMA}}}
 
 \item{variable}{Variable to show. Either numeric (which column) or character
 (variable name)}
@@ -15,5 +15,5 @@
 \item{dates}{Optional Date vector.}
 }
 \description{
-diagnostics_plot function for VARMA models
+Not supposed to be called directly. Rather call \code{\link{diagnostics_plot}}
 }

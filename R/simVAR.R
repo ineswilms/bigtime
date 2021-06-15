@@ -232,8 +232,9 @@ create_rand_coef_mat <- function(k, p,
 }
 
 #' Plots a simulated VAR
+#'
 #' @param x Simulated data of class \code{bigtime.simVAR} obtained
-#' from the \code{simVAR}} function
+#' from the \code{\link{simVAR}} function
 #' @param ... Not currently used
 #' @export
 #' @return Returns a ggplot2 plot
@@ -256,7 +257,7 @@ plot.bigtime.simVAR <- function(x, ...){
 
 #' Gives a small summary of a VAR simulation
 #' @param object Simulated data of class \code{bigtime.simVAR} obtained
-#' from the \code\link{simVAR}} function
+#' from the \code{\link{simVAR}} function
 #' @param plot Should the VAR be plotted. Default is \code{TRUE}
 #' @param ... Not currently used
 #' @export

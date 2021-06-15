@@ -2,12 +2,13 @@
 % Please edit documentation in R/diagnostics.R
 \name{fitted.bigtime.VARX}
 \alias{fitted.bigtime.VARX}
-\title{Gives the fitted values of a model estimated using sparseVARX}
+\title{Gives the fitted values of a model estimated using
+\code{\link{sparseVARX}}}
 \usage{
 \method{fitted}{bigtime.VARX}(object, ...)
 }
 \arguments{
-\item{object}{model estimated using sparseVARX}
+\item{object}{Model estimated using \code{\link{sparseVARX}}}
 
 \item{...}{Not currently used}
 }
@@ -15,5 +16,6 @@
 Returns a matrix of fitted values
 }
 \description{
-Gives the fitted values of a model estimated using sparseVARX
+Gives the fitted values of a model estimated using
+\code{\link{sparseVARX}}
 }

@@ -2,22 +2,24 @@
 % Please edit documentation in R/information_criteria.R
 \name{get_ic_vals.bigtime.VARX}
 \alias{get_ic_vals.bigtime.VARX}
-\title{Calculates the Information Criteria for a model estimated using sparseVARX}
+\title{Calculates the Information Criteria for a model estimated using
+\code{\link{sparseVARX}}}
 \usage{
 \method{get_ic_vals}{bigtime.VARX}(mod, verbose = TRUE)
 }
 \arguments{
-\item{mod}{Model estimated using sparseVARX}
+\item{mod}{Model estimated using \code{\link{sparseVARX}}}
 
 \item{verbose}{Should information about the optimal selection be printed?}
 }
 \value{
 Returns a list containing
 \item{ics}{Values of the ICs for all lambdas}
-\item{mins}{Which ic lead to the minimum (the row number)}
+\item{mins}{Which IC lead to the minimum (the row number)}
 \item{selected_lamPhi}{Which lambda Phi were selected}
 \item{selected_lamB}{Which lambda B were selected}
 }
 \description{
-The number of non-zero coefficients are taken as the degrees of freedom.
+The number of non-zero coefficients in both the \code{Phihat}
+and \code{Bhat} matrix are taken as the degrees of freedom.
 }

@@ -7,6 +7,9 @@
 \method{plot}{bigtime.simVAR}(x, ...)
 }
 \arguments{
+\item{x}{Simulated data of class \code{bigtime.simVAR} obtained
+from the \code{\link{simVAR}} function}
+
 \item{...}{Not currently used}
 }
 \value{

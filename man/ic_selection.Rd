@@ -7,8 +7,8 @@
 ic_selection(mod, ic = c("bic", "aic", "hq"), verbose = FALSE)
 }
 \arguments{
-\item{mod}{Model estimated using \code{sparseVAR}, \code{sparseVARX},
-or \code{sparseVARMA}}
+\item{mod}{Model estimated Model estimated using \code{\link{sparseVAR}},
+\code{\link{sparseVARX}}, or \code{\link{sparseVARMA}}}
 
 \item{ic}{Which information criteria should be used. Must be one of
 \code{"bic"}, \code{"aic"} or \code{"hq"}}
