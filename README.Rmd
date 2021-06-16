@@ -190,7 +190,7 @@ VARXfit_cv <- sparseVARX(Y=scale(Y.varx), X=scale(X.varx), selection = "cv")
 LhatVARX <- lagmatrix(fit=VARXfit_cv, returnplot=TRUE)
 ```
 
-VARX models also support `plot_cv` if estimated using CV. The returned plot shows the mean MSFE for each combination of penalizations in a heatmap. The x-axis show the penalizations for the exogenous variables, and the y-axis shows the penalizations for the endogenous variables. The big black dot in the plot below indicates the one-SE optimal choice, while the contours indicate the mean MSFE in the CV procedure.
+VARX models also support `plot_cv` if estimated using CV. The returned plot shows the mean MSFE for each combination of penalizations in a heatmap. The x-axis show the penalizations for the exogenous variables, and the y-axis shows the penalizations for the endogenous variables. The big black dot in the plot below indicates the one-SE optimal choice, while the contours indicate the mean MSFE in the CV procedure. The red colour indicates a high MSFE, and light-yellow to yellow regions indicate low MSFEs.
 
 ```{r}
 plot_cv(VARXfit_cv)
