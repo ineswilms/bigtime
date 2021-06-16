@@ -29,7 +29,7 @@ devtools::install_github("ineswilms/bigtime")
 
 <!-- We will use the time series contained in the `example` data set. The first ten columns in our dataset are used as endogenous time series in the VAR and VARMA models, and the  last five columns are used as exogenous time series in the VARX model. Note that we remove the last observation from our dataset as we will use this one to illustrate how to evaluate prediction performance. We start by making a plot of our data. -->
 
-Bigtime comes with example data sets created from a VAR, VARMA and VARX
+bigtime comes with example data sets created from a VAR, VARMA and VARX
 GDP. These data sets are called `var.example`, `varma.example`, and
 `varx.example` respectively and can be loaded into the environment by
 calling `data(var.example)` and similarly for the others. We can have a
@@ -39,6 +39,13 @@ environment and then, using a little utility function, plotting it.
 ``` r
 library(bigtime)
 suppressMessages(library(tidyverse)) # Will be used for nicer visualisations
+#> Warning: package 'tidyverse' was built under R version 4.0.5
+#> Warning: package 'ggplot2' was built under R version 4.0.3
+#> Warning: package 'readr' was built under R version 4.0.4
+#> Warning: package 'purrr' was built under R version 4.0.3
+#> Warning: package 'dplyr' was built under R version 4.0.5
+#> Warning: package 'stringr' was built under R version 4.0.3
+#> Warning: package 'forcats' was built under R version 4.0.4
 data(varx.example) # loading the varx example data
 
 # data(example)
@@ -173,7 +180,7 @@ exist: (1) `zero_min` determines the minimum number of zero coefficients
 of each variable in each equation, (2) `zero_max` determines the maximum
 number of zero coefficients of each variable in each equation, and (3)
 `zeroes_in_self` is a boolean option that if TRUE, zero coefficients of
-the \(i\)th variable can exist in the \(i\)th equation.
+the *i*th variable can exist in the *i*th equation.
 
 ``` r
 periods <- 200
@@ -303,9 +310,9 @@ plot_cv(VAR.L1)
 
 Further investigation into the model can be done by using the function
 `lagmatrix`, which returns the lagmatrix of the estimated autoregressive
-coefficients. If entry \((i,j)=x\), this means that the sparse estimator
-indicates the effect of time series \(j\) on time series \(i\) to last
-for \(x\) periods. Setting the `returnplot` argument to `TRUE` will
+coefficients. If entry (*i*, *j*) = *x*, this means that the sparse
+estimator indicates the effect of time series *j* on time series *i* to
+last for *x* periods. Setting the `returnplot` argument to `TRUE` will
 return a heatmap for better visual inspection.
 
 ``` r
@@ -548,13 +555,13 @@ plot(rec_fcst, series = "Y2", last_n = 50) # Plotting of a recursive forecast
 ## Univariate Models
 
 The functions `sparseVAR`, `sparseVARX`, `sparseVARMA` can also be used
-for the univariate setting where the response time series \(Y\) is
+for the univariate setting where the response time series *Y* is
 univariate. Below we illustrate the usefulness of the sparse estimation
 procedure as automatic lag selection procedures.
 
 ### AutoRegressive (AR) Models
 
-We start by generating a time series of length \(n=50\) from a
+We start by generating a time series of length *n* = 50 from a
 stationary AR model and by plotting it. The `sparseVAR` function can
 also be used in the univariate case as it allows the argument `Y` to be
 a vector.
@@ -610,7 +617,7 @@ cases also work for univariate cases; so do the forecasting functions*
 
 ### AutoRegressive with Exogenous Variables (ARX) Models
 
-We start by generating a time series of length \(n=50\) from a
+We start by generating a time series of length *n* = 50 from a
 stationary ARX model and by plotting it. The `sparseVARX` function can
 also be used in the univariate case as it allows the arguments `Y` and
 `X` to be vectors. The `lagmatrix` function gives the selected
@@ -618,7 +625,6 @@ endogenous (under `LPhi`) and exogenous autoregressive (under `LB`)
 orders of the sparse ARX model. The true orders are one.
 
 ``` r
-
 periods <- 50
 k <- 1
 p <- 1
@@ -633,7 +639,6 @@ plot(Ysim)
 ![](man/figures/README-unnamed-chunk-19-1.png)<!-- -->
 
 ``` r
-
 x <- scale(Xsim$Y[-(1:(burnin+1))])
 y <- scale(Ysim$Y)
 
@@ -650,7 +655,7 @@ lagmatrix(fit=ARXfit)
 
 ### AutoRegressive Moving Average (ARMA) Models
 
-We start by generating a time series of length \(n=50\) from a
+We start by generating a time series of length *n* = 50 from a
 stationary ARMA model and by plotting it. The `sparseVARMA` function can
 also be used in the univariate case as it allows the argument `Y` to be
 a vector. The `lagmatrix` function gives the selected autoregressive
@@ -658,7 +663,6 @@ a vector. The `lagmatrix` function gives the selected autoregressive
 ARMA model. The true orders are one.
 
 ``` r
-
 periods <- 50
 k <- 1
 p.u <- 1
@@ -700,7 +704,6 @@ summary(Ysim)
 ![](man/figures/README-unnamed-chunk-20-1.png)<!-- -->
 
 ``` r
-
 ARMAfit <- sparseVARMA(Y=y, VARMAselection = "cv")
 lagmatrix(fit=ARMAfit)
 #> $LPhi
@@ -724,17 +727,17 @@ Please be patient or try another time.*
 
 ## References:
 
-  - Nicholson William B., Wilms Ines, Bien Jacob and Matteson David S.
+-   Nicholson William B., Wilms Ines, Bien Jacob and Matteson David S.
     (2020), “High-dimensional forecasting via interpretable vector
     autoregression”, Journal of Machine Learning Research, 21(166),
     1-52.
 
-  - Wilms Ines, Basu Sumanta, Bien Jacob and Matteson David S. (2021),
+-   Wilms Ines, Basu Sumanta, Bien Jacob and Matteson David S. (2021),
     “Sparse Identification and Estimation of Large-Scale Vector
     AutoRegressive Moving Averages”, Journal of the American Statistical
     Association, doi: 10.1080/01621459.2021.1942013.
 
-  - Wilms Ines, Basu Sumanta, Bien Jacob and Matteson David S. (2017),
+-   Wilms Ines, Basu Sumanta, Bien Jacob and Matteson David S. (2017),
     “Interpretable Vector AutoRegressions with Exogenous Time Series”,
     NIPS 2017 Symposium on Interpretable Machine Learning,
     arXiv:1711.03623
