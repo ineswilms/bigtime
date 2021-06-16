@@ -57,6 +57,8 @@ image_cv <- function(fit, xlab = "lambda_B", ylab = "lambda_Phi") {
   graphics::image(x = unique(fit$lambdaB)[o],
         y = unique(fit$lambdaPhi),
         z = matrix(fit$MSFEcv, nrow = length(o))[o, ],
-        xlab = xlab, ylab=ylab, col = heat.colors(40))
+        xlab = xlab,
+        ylab=ylab,
+        col = heat.colors(40, rev = TRUE))
   points(fit$lambdaB_SEopt, fit$lambdaPhi_SEopt, pch = 19)
 }
