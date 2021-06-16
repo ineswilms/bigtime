@@ -30,7 +30,7 @@ devtools::install_github("ineswilms/bigtime")
 <!-- We will use the time series contained in the `example` data set. The first ten columns in our dataset are used as endogenous time series in the VAR and VARMA models, and the  last five columns are used as exogenous time series in the VARX model. Note that we remove the last observation from our dataset as we will use this one to illustrate how to evaluate prediction performance. We start by making a plot of our data. -->
 
 bigtime comes with example data sets created from a VAR, VARMA and VARX
-GDP. These data sets are called `var.example`, `varma.example`, and
+DGP. These data sets are called `var.example`, `varma.example`, and
 `varx.example` respectively and can be loaded into the environment by
 calling `data(var.example)` and similarly for the others. We can have a
 look at the `varx.example` data set by first loading it into the
@@ -260,7 +260,7 @@ estimated using an L1-penalty (lasso penalty) on the autoregressive
 coefficients. To this end, set the `VARpen` argument in the `sparseVAR`
 function equal to L1. *Note: it is recommended to standardise the data.
 Bigtime will give a warning if the data is not standardised but will not
-stop you from continuing.*. Setting `selection="none"`, the default,
+stop you from continuing.* Setting `selection="none"`, the default,
 allows us to specify the penalization we want. Furthermore, we can
 predefine the maximum lag-order by changing the `p` argument to the
 desired value. However, we do not recommend this, as the bigtime will,
@@ -613,7 +613,7 @@ lagmatrix(ARfit)
 ```
 
 *Note that all diagnostics functions discussed for the VAR, VARMA, VARX
-cases also work for univariate cases; so do the forecasting functions*
+cases also work for univariate cases; so do the forecasting functions*.
 
 ### AutoRegressive with Exogenous Variables (ARX) Models
 
