@@ -10,11 +10,11 @@
 #' The function \link{lagmatrix} returns the lag matrix of estimated coefficients of the estimated model.
 #' The function \link{directforecast} gives h-step ahead forecasts based on the estimated model.
 #'
-#' @author Ines Wilms <ines.wilms@kuleuven.be>, Jacob Bien, David S. Matteson, Sumanta Basu
-#' @references Nicholson William B., Bien Jacob and Matteson David S. (2017), "High Dimensional Forecasting via Interpretable Vector Autoregression"
-#' arXiv preprint <arXiv:1412.5250v2>.
-#' @references Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2017), "Sparse Identification and Estimation of High-Dimensional Vector AutoRegressive Moving Averages"
-#' arXiv preprint <arXiv:1707.09208>.
+#' @author Ines Wilms <i.wilms@maastrichtuniversity.nl>, Jacob Bien, David S. Matteson, Sumanta Basu, Will Nicholson, Enrico Wegner
+#' @references Nicholson William B., Wilms Ines, Bien Jacob and Matteson David S. (2020), “High-dimensional forecasting via
+#' interpretable vector autoregression”, Journal of Machine Learning Research, 21(166), 1-52.
+#' @references Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2021), “Sparse Identification and
+#' Estimation of Large-Scale Vector AutoRegressive Moving Averages”, Journal of the American Statistical Association, doi: 10.1080/01621459.2021.1942013.
 
 #' @docType package
 #' @name bigtime
