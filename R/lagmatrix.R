@@ -185,7 +185,7 @@ lagmatrix <- function(fit, returnplot=F){
 
 
 plotlagmat <- function(lagmat){
-  Response <- Predictor <- Lags <- NULL # Needed because otherwise cran complaines about lazy evaluation
+  Response <- Predictor <- Lags <- NULL # Needed because otherwise cran complains about lazy evaluation
 
 
   lmat <- tidyr::as_tibble(lagmat)
