@@ -1,4 +1,3 @@
-
 #' Selects the optimal penalty parameter using information criteria
 #'
 #' @param mod Model estimated Model estimated using \code{\link{sparseVAR}},
@@ -16,7 +15,7 @@ ic_selection <- function(mod, ic = c("bic", "aic", "hq"), verbose = FALSE){
   obtain_selected_model(mod, selected)
 }
 
-# Creates a model out of another model and a selected penalisation
+# Creates a model out of another model and a selected penalization
 obtain_selected_model <- function(mod, selected){
   mod_new <- mod
   if ("bigtime.VAR" %in% class(mod)){
@@ -40,7 +39,7 @@ obtain_selected_model <- function(mod, selected){
 #' Calculates the Information Criteria for a VAR, VARX, VARMA model
 #'
 #' The number of non-zero coefficients are taken as the degrees of freedom.
-#' This is not valid in all cases.
+#' Use with care for VARMA.
 #'
 #' @param mod Model estimated Model estimated using \code{\link{sparseVAR}},
 #' \code{\link{sparseVARX}}, or \code{\link{sparseVARMA}}

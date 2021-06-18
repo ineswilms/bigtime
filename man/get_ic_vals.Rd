@@ -14,7 +14,7 @@ get_ic_vals(mod, verbose = TRUE)
 }
 \description{
 The number of non-zero coefficients are taken as the degrees of freedom.
-This is not valid in all cases.
+Use with care for VARMA.
 }
 \examples{
 dat <- simVAR(200, 2, 5, decay = 0.01)
