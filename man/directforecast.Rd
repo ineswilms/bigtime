@@ -9,7 +9,7 @@ directforecast(fit, h = 1)
 \arguments{
 \item{fit}{Fitted sparse VAR, VARX or VARMA model.}
 
-\item{h}{Desired forecast horizon.}
+\item{h}{Desired forecast horizon. Default is h=1.}
 }
 \value{
 Vector of length k containing the h-step ahead forecasts for the k time series.

@@ -9,7 +9,7 @@ recursiveforecast(mod, h = 1, lambda = NULL)
 \arguments{
 \item{mod}{VAR model estimated using \code{bigtime::sparseVAR}}
 
-\item{h}{Forecast horizon: default=1}
+\item{h}{Desired forecast horizon. Default is h=1.}
 
 \item{lambda}{Either \code{NULL} in which case a forecast will be made for all
 lambdas for which the model was estimated, or a single value in which
