@@ -24,12 +24,12 @@ Lhat <- lagmatrix(fit=VARfit) # get estimated lagmatrix
 VARforecast <- directforecast(fit=VARfit, h=1) # get one-step ahead forecasts
 }
 \references{
-Nicholson William B., Bien Jacob and Matteson David S. (2017), "High Dimensional Forecasting via Interpretable Vector Autoregression"
-arXiv preprint <arXiv:1412.5250v2>.
+Nicholson William B., Wilms Ines, Bien Jacob and Matteson David S. (2020), “High-dimensional forecasting via
+interpretable vector autoregression”, Journal of Machine Learning Research, 21(166), 1-52.
 
-Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2017), "Sparse Identification and Estimation of High-Dimensional Vector AutoRegressive Moving Averages"
-arXiv preprint <arXiv:1707.09208>.
+Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2021), “Sparse Identification and
+Estimation of Large-Scale Vector AutoRegressive Moving Averages”, Journal of the American Statistical Association, doi: 10.1080/01621459.2021.1942013.
 }
 \author{
-Ines Wilms <ines.wilms@kuleuven.be>, Jacob Bien, David S. Matteson, Sumanta Basu
+Ines Wilms <i.wilms@maastrichtuniversity.nl>, Jacob Bien, David S. Matteson, Sumanta Basu, Will Nicholson, Enrico Wegner
 }
