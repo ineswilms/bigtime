@@ -1,7 +1,7 @@
 
 #' Function to obtain h-step ahead direct forecast based on estimated VAR, VARX or VARMA model
 #' @param fit Fitted sparse VAR, VARX or VARMA model.
-#' @param h Desired forecast horizon.
+#' @param h Desired forecast horizon. Default is h=1.
 #' @export
 #' @return Vector of length k containing the h-step ahead forecasts for the k time series.
 #' @examples

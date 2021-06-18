@@ -1,6 +1,3 @@
-
-
-
 #' Recursively Forecasts a VAR
 #'
 #' Recursively forecasts a VAR estimated using bigtime::sparseVAR.
@@ -9,7 +6,7 @@
 #' only the model using this lambda will be used for forecasting.
 #'
 #' @param mod VAR model estimated using \code{bigtime::sparseVAR}
-#' @param h Forecast horizon: default=1
+#' @param h Desired forecast horizon. Default is h=1.
 #' @param lambda Either \code{NULL} in which case a forecast will be made for all
 #' lambdas for which the model was estimated, or a single value in which
 #' case a forecast will only be made for the model using this lambda.
@@ -149,7 +146,7 @@ plot.bigtime.recursiveforecast <- function(x, series=NULL, lmbda=NULL,
 
   # Checking whether the forecast was done using multiple lambdas
   if (length(fcst$lambda) > 1){
-    # We forcasted for multiple lambdas
+    # We forecast for multiple lambdas
     fcast <- reduce_cube(fcst$fcst, fcst$lambda, "lambda")
   }else {
     fcast <- as.data.frame(fcst$fcst)
@@ -229,12 +226,3 @@ reduce_cube <- function(cube, dim3_names, name = deparse(substitute(dim3_names))
   }
   out
 }
-
-
-
-
-
-
-
-
-
