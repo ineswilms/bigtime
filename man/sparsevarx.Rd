@@ -89,6 +89,9 @@ VARXfit <- sparseVARX(Y=Y, X=X) # sparse VARX
 y <- matrix(Y[,1], ncol=1)
 ARXfit <- sparseVARX(Y=y, X=X) # sparse ARX
 }
+\references{
+Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2017), “Interpretable vector autoregressions with exogenous time series”, NIPS 2017 Symposium on Interpretable Machine Learning, arXiv:1711.03623.
+}
 \seealso{
 \link{lagmatrix} and \link{directforecast}
 }

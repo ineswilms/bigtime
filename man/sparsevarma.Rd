@@ -111,8 +111,8 @@ y <- matrix(Y[,1], ncol=1)
 ARMAfit <- sparseVARMA(y) # sparse ARMA
 }
 \references{
-Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2017), "Sparse Identification and Estimation of High-Dimensional Vector AutoRegressive Moving Averages"
-arXiv preprint <arXiv:1707.09208>.
+Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2021), “Sparse Identification and
+Estimation of Large-Scale Vector AutoRegressive Moving Averages”, Journal of the American Statistical Association, doi: 10.1080/01621459.2021.1942013.
 }
 \seealso{
 \link{lagmatrix} and \link{directforecast}

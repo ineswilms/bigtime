@@ -51,8 +51,8 @@
 #' \item{PhaseII_lambdaTheta_SEopt}{Phase II Optimal value of the sparsity parameter (corresponding to Theta parameters) as selected by the time-series cross-validation procedure and after applying the one-standard-error rule}
 #' \item{PhaseII_MSFEcv}{Phase II MSFE cross-validation scores for each value in the two-dimensional sparsity grid}
 #' \item{h}{Forecast horizon h}
-#' @references Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2017), "Sparse Identification and Estimation of High-Dimensional Vector AutoRegressive Moving Averages"
-#' arXiv preprint <arXiv:1707.09208>.
+#' @references Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2021), “Sparse Identification and
+#' Estimation of Large-Scale Vector AutoRegressive Moving Averages”, Journal of the American Statistical Association, doi: 10.1080/01621459.2021.1942013.
 #' @seealso \link{lagmatrix} and \link{directforecast}
 #' @examples
 #' data(Y)
@@ -322,9 +322,3 @@ sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL,
   class(out) <- "bigtime.VARMA"
   out
 }
-
-
-
-
-
-

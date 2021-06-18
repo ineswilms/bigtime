@@ -39,6 +39,7 @@
 #' \item{lambdaB_SEopt}{Optimal value of the sparsity parameter (corresponding to the exogenous autoregressive parameters) as selected by the time-series cross-validation procedure and after applying the one-standard-error rule}
 #' \item{MSFEcv}{MSFE cross-validation scores for each value in the two-dimensional sparsity grid}
 #' \item{h}{Forecast horizon h}
+#' @references Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2017), “Interpretable vector autoregressions with exogenous time series”, NIPS 2017 Symposium on Interpretable Machine Learning, arXiv:1711.03623.
 #' @seealso \link{lagmatrix} and \link{directforecast}
 #' @examples
 #' data(Y)
