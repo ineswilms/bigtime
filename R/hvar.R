@@ -26,7 +26,7 @@
 #' \item{lambda_SEopt}{Optimal value of the sparsity parameter as selected by the time-series cross-validation
 #'       procedure and after applying the one-standard-error rule.  This is the value used.}
 #' \item{h}{Forecast horizon h}
-#' @references Nicholson William B., Bien Jacob and Matteson David S. (2017), "High-dimensional forecasting via interpretable vector autoregression," Journal of Machine Learning Research, 21(166), 1-52.
+#' @references Nicholson William B., Wilms Ines, Bien Jacob and Matteson David S. (2020), “High-dimensional forecasting via interpretable vector autoregression”, Journal of Machine Learning Research, 21(166), 1-52.
 #' @seealso \link{lagmatrix} and \link{directforecast}
 #' @examples
 #' data(Y)

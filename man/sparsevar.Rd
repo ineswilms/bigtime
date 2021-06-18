@@ -65,7 +65,7 @@ VARfit <- sparseVAR(Y) # sparse VAR
 ARfit <- sparseVAR(Y[,2]) # sparse AR
 }
 \references{
-Nicholson William B., Bien Jacob and Matteson David S. (2017), "High-dimensional forecasting via interpretable vector autoregression," Journal of Machine Learning Research, 21(166), 1-52.
+Nicholson William B., Wilms Ines, Bien Jacob and Matteson David S. (2020), “High-dimensional forecasting via interpretable vector autoregression”, Journal of Machine Learning Research, 21(166), 1-52.
 }
 \seealso{
 \link{lagmatrix} and \link{directforecast}
