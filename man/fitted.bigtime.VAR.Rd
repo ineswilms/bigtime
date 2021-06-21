@@ -20,9 +20,7 @@ Gives the fitted values of a model estimated using
 \code{\link{sparseVAR}}
 }
 \examples{
-dat <- bigtime::simVAR(200, 2, 5, decay = 0.001, seed = 6150533)
-mod <- bigtime::sparseVAR(dat$Y)
+dat <- simVAR(periods=200, k=2, p=5, decay = 0.001, seed = 6150533)
+mod <- sparseVAR(Y=scale(dat$Y))
 f <- fitted(mod)
-res <- resid(mod)
-
 }

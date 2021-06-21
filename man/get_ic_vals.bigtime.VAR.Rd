@@ -22,7 +22,7 @@ Returns a list containing
 The number of non-zero coefficients are taken as the degrees of freedom.
 }
 \examples{
-dat <- simVAR(200, 2, 5, decay = 0.01)
-mod <- sparseVAR(scale(dat$Y))
+dat <- simVAR(periods = 200, k=2, p=5, decay = 0.01)
+mod <- sparseVAR(Y=scale(dat$Y))
 ics <- get_ic_vals(mod)
 }

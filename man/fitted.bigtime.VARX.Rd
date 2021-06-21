@@ -14,6 +14,9 @@
 }
 \value{
 Returns a matrix of fitted values
+data(varx.example)
+varx <- sparseVARX(Y=scale(Y.varx), X=scale(X.varx), selection="cv")
+fit <- fitted(varx)
 }
 \description{
 Gives the fitted values of a model estimated using

@@ -47,8 +47,8 @@ obtain_selected_model <- function(mod, selected){
 #' @export
 #'
 #' @examples
-#' dat <- simVAR(200, 2, 5, decay = 0.01)
-#' mod <- sparseVAR(scale(dat$Y))
+#' dat <- simVAR(periods=200, k=2, p=5, decay = 0.01)
+#' mod <- sparseVAR(Y=scale(dat$Y))
 #' ics <- get_ic_vals(mod)
 get_ic_vals <- function(mod, verbose = TRUE){
   UseMethod("get_ic_vals", mod)
@@ -146,8 +146,8 @@ get_ic_vals.bigtime.VARX <- function(mod, verbose = TRUE){
 #' \item{selected_lambdas}{Which lambdas were selected}
 #'
 #' @examples
-#' dat <- simVAR(200, 2, 5, decay = 0.01)
-#' mod <- sparseVAR(scale(dat$Y))
+#' dat <- simVAR(periods = 200, k=2, p=5, decay = 0.01)
+#' mod <- sparseVAR(Y=scale(dat$Y))
 #' ics <- get_ic_vals(mod)
 get_ic_vals.bigtime.VAR <- function(mod, verbose = TRUE){
   if (!("bigtime.VAR" %in% class(mod))) stop("Currently only implemented for VAR models")

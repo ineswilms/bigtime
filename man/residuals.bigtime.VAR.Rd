@@ -20,8 +20,7 @@ Gives the residuals for VAR models estimated using
 \code{\link{sparseVAR}}
 }
 \examples{
-dat <- simVAR(200, 2, 5, decay = 0.001, seed = 6150533)
-mod <- sparseVAR(dat$Y)
-f <- fitted(mod)
+dat <- simVAR(periods=200, k=2, p=5, decay = 0.001, seed = 6150533)
+mod <- sparseVAR(Y=scale(dat$Y))
 res <- resid(mod)
 }

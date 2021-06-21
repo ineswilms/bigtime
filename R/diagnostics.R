@@ -7,9 +7,8 @@
 #' @export
 #' @return Returns a matrix of residuals.
 #' @examples
-#' dat <- simVAR(200, 2, 5, decay = 0.001, seed = 6150533)
-#' mod <- sparseVAR(dat$Y)
-#' f <- fitted(mod)
+#' dat <- simVAR(periods=200, k=2, p=5, decay = 0.001, seed = 6150533)
+#' mod <- sparseVAR(Y=scale(dat$Y))
 #' res <- resid(mod)
 residuals.bigtime.VAR <- function(object, ...){
   mod <- object
@@ -41,6 +40,10 @@ residuals.bigtime.VAR <- function(object, ...){
 #' @param ... Not currently used
 #' @export
 #' @return Returns a matrix of residuals.
+#' @examples 
+#' data(varx.example)
+#' varx <- sparseVARX(Y=scale(Y.varx), X=scale(X.varx), selection="cv")
+#' res <- residuals(varx)
 residuals.bigtime.VARX <- function(object, ...){
   mod <- object
 
@@ -72,6 +75,10 @@ residuals.bigtime.VARX <- function(object, ...){
 #' @param ... Not currently used
 #' @export
 #' @return Returns a matrix of residuals.
+#' @examples
+#' data(varma.example)
+#' varma <- sparseVARMA(Y = scale(Y.varma), VARMAselection="cv")
+#' res <- residuals(varma)
 residuals.bigtime.VARMA <- function(object, ...){
   mod <- object
   fit <- fitted.bigtime.VARMA(mod, ...)
@@ -95,11 +102,9 @@ residuals.bigtime.VARMA <- function(object, ...){
 #' @export
 #' @return Returns a matrix of fitted values
 #' @examples
-#' dat <- bigtime::simVAR(200, 2, 5, decay = 0.001, seed = 6150533)
-#' mod <- bigtime::sparseVAR(dat$Y)
+#' dat <- simVAR(periods=200, k=2, p=5, decay = 0.001, seed = 6150533)
+#' mod <- sparseVAR(Y=scale(dat$Y))
 #' f <- fitted(mod)
-#' res <- resid(mod)
-#'
 fitted.bigtime.VAR <- function(object, ...){
   mod <- object
 
@@ -130,6 +135,9 @@ fitted.bigtime.VAR <- function(object, ...){
 #' @param ... Not currently used
 #' @export
 #' @return Returns a matrix of fitted values
+#' data(varx.example)
+#' varx <- sparseVARX(Y=scale(Y.varx), X=scale(X.varx), selection="cv")
+#' fit <- fitted(varx)
 fitted.bigtime.VARX <- function(object, ...){
   mod <- object
 
@@ -165,6 +173,9 @@ fitted.bigtime.VARX <- function(object, ...){
 #' @param ... Not currently used
 #' @export
 #' @return Returns a matrix of fitted values
+#' data(varma.example)
+#' varma <- sparseVARMA(Y = scale(Y.varma), VARMAselection="cv")
+#' f <- fitted(varma)
 fitted.bigtime.VARMA <- function(object, ...){
   mod <- object
 
@@ -193,10 +204,21 @@ fitted.bigtime.VARMA <- function(object, ...){
 #' @export
 #' @return Returns a ggplot2 plot
 #' @examples
-#' dat <- simVAR(200, 2, 5, decay = 0.1, seed = 6150533,
+#' # VAR example
+#' dat <- simVAR(periods=200, k=2, p=5, decay = 0.1, seed = 6150533,
 #'                        sparsity_pattern = "hvar")
-#' mod <- sparseVAR(dat$Y, selection = "bic", h = 1)
-#' diagnostics_plot(mod, variable = 1)
+#' mod <- sparseVAR(Y=scale(dat$Y), selection = "bic", h = 1)
+#' diagnostics_plot(mod, variable = 1) # Plotting the first variable
+#'
+#' # VARMA example
+#' data(varma.example)
+#' varma <- sparseVARMA(Y=scale(Y.varma), VARMAselection="cv")
+#' diagnostics_plot(varma, variable = 2) # Plotting the second variable
+#'
+#' # VARX example
+#' data(varx.example)
+#' varx <- sparseVARX(Y=scale(Y.varx), X=scale(X.varx), selection="cv")
+#' diagnostics_plot(varx, variable = 1) # Plotting the first variable
 diagnostics_plot <- function(mod, variable = 1, dates = NULL){
   UseMethod("diagnostics_plot", mod)
 }

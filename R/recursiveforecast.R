@@ -1,11 +1,11 @@
 #' Recursively Forecasts a VAR
 #'
-#' Recursively forecasts a VAR estimated using bigtime::sparseVAR.
+#' Recursively forecasts a VAR estimated using sparseVAR.
 #' lambda can either be NULL, in which case all lambdas that were used for
 #' model estimation are used for forecasting, or a single value, in which case
 #' only the model using this lambda will be used for forecasting.
 #'
-#' @param mod VAR model estimated using \code{bigtime::sparseVAR}
+#' @param mod VAR model estimated using \code{sparseVAR}
 #' @param h Desired forecast horizon. Default is h=1.
 #' @param lambda Either \code{NULL} in which case a forecast will be made for all
 #' lambdas for which the model was estimated, or a single value in which
@@ -18,9 +18,9 @@
 #' \item{lambda}{List of lambdas for which the forecasts were made}
 #' \item{Y}{Data used for recursive forecasting}
 #' @examples
-#' sim_data <- simVAR(200, 5, 5, seed = 12345)
+#' sim_data <- simVAR(periods=200, k=5, p=5, seed = 12345)
 #' summary(sim_data)
-#' mod <- sparseVAR(scale(sim_data$Y), selection = "bic")
+#' mod <- sparseVAR(Y=scale(sim_data$Y), selection = "bic")
 #' is.stable(mod)
 #' fcst_recursive <- recursiveforecast(mod, h = 4)
 #' plot(fcst_recursive, series = "Y1")

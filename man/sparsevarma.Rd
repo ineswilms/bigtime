@@ -108,7 +108,7 @@ Sparse Estimation of the Vector AutoRegressive Moving Average (VARMA) Model
 data(var.example)
 VARMAfit <- sparseVARMA(Y = scale(Y.var)) # sparse VARMA
 y <- matrix(Y.var[,1], ncol=1)
-ARMAfit <- sparseVARMA(scale(y)) # sparse ARMA
+ARMAfit <- sparseVARMA(Y=scale(y)) # sparse ARMA
 }
 \references{
 Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2021), “Sparse Identification and

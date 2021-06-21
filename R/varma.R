@@ -58,7 +58,7 @@
 #' data(var.example)
 #' VARMAfit <- sparseVARMA(Y = scale(Y.var)) # sparse VARMA
 #' y <- matrix(Y.var[,1], ncol=1)
-#' ARMAfit <- sparseVARMA(scale(y)) # sparse ARMA
+#' ARMAfit <- sparseVARMA(Y=scale(y)) # sparse ARMA
 sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL,
                         VARgran=NULL, VARselection = c("cv", "bic", "aic", "hq"),
                         VARMAp=NULL, VARMAq=NULL, VARMApen="HLag",

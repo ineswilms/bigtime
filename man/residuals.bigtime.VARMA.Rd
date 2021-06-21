@@ -19,3 +19,8 @@ Returns a matrix of residuals.
 Gives the residuals for VARMA models estimated using
 \code{\link{sparseVARMA}}
 }
+\examples{
+data(varma.example)
+varma <- sparseVARMA(Y = scale(Y.varma), VARMAselection="cv")
+res <- residuals(varma)
+}

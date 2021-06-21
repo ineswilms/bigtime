@@ -31,7 +31,7 @@
 #' @examples
 #' data(var.example)
 #' VARfit <- sparseVAR(Y = scale(Y.var)) # sparse VAR
-#' ARfit <- sparseVAR(scale(Y.var[,2])) # sparse AR
+#' ARfit <- sparseVAR(Y=scale(Y.var[,2])) # sparse AR
 sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL,
                       selection = c("none", "cv", "bic", "aic", "hq"),
                       cvcut=0.9, h=1,  eps=1e-3, check_std = TRUE){

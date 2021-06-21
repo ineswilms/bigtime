@@ -24,7 +24,7 @@ The function \link{simVAR} can be used to simulate a VAR model with various spar
 \examples{
 # Fit a sparse VAR model
 data(var.example)
-VARfit <- sparseVAR(scale(Y.var), selection = "cv") # sparse VAR using time series cross-validation
+VARfit <- sparseVAR(Y=scale(Y.var), selection = "cv") # using time series cross-validation
 Lhat <- lagmatrix(fit=VARfit) # get estimated lagmatrix
 VARforecast <- directforecast(fit=VARfit, h=1) # get one-step ahead forecasts
 }

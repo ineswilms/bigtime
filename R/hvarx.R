@@ -54,7 +54,7 @@ sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, V
   ######################################
   #### Check Inputs and Preparation ####
   ######################################
-  selection = match.arg(selection)
+  selection <- match.arg(selection)
   if(!is.matrix(Y)){
     if(is.vector(Y) & length(Y)>1){
       Y <- matrix(Y, ncol=1)

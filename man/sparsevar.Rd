@@ -62,7 +62,7 @@ Sparse Estimation of the Vector AutoRegressive (VAR) Model
 \examples{
 data(var.example)
 VARfit <- sparseVAR(Y = scale(Y.var)) # sparse VAR
-ARfit <- sparseVAR(scale(Y.var[,2])) # sparse AR
+ARfit <- sparseVAR(Y=scale(Y.var[,2])) # sparse AR
 }
 \references{
 Nicholson William B., Wilms Ines, Bien Jacob and Matteson David S. (2020), “High-dimensional forecasting via interpretable vector autoregression”, Journal of Machine Learning Research, 21(166), 1-52.
