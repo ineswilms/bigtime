@@ -41,12 +41,6 @@ library(bigtime)
 suppressMessages(library(tidyverse)) # Will be used for nicer visualisations
 data(varx.example) # loading the varx example data
 
-# data(example)
-# Y <- example[-nrow(example), 1:10] # endogenous time series
-# colnames(Y) <- paste0("Y", 1:ncol(Y)) # Assigning column names
-# Ytest <- example[nrow(example), 1:10]
-# X <- example[-nrow(example), 11:15] # exogenous time series
-# colnames(X) <- paste0("X", 1:ncol(X)) # Assinging column names
 
 
 plot_series <- function(Y){
