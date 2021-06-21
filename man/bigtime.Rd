@@ -15,6 +15,11 @@ To use the facilities of this package, start with a T by k time series matrix Y 
 Run \link{sparseVAR}, \link{sparseVARX} or \link{sparseVARMA} to get the estimated model.
 The function \link{lagmatrix} returns the lag matrix of estimated coefficients of the estimated model.
 The function \link{directforecast} gives h-step ahead forecasts based on the estimated model.
+The function \link{recursiveforecast} can be used to recursively forecast a VAR model.
+The function \link{is.stable} returns whether an estimated VAR model is stable.
+The function \link{diagnostics_plot} returns a plot of the fitted vs. observed values as well as of the residuals. 
+The functions \link{fitted} and \link{residuals} return the fitted, respectively the residuals of the estimated model.
+The function \link{simVAR} can be used to simulate a VAR model with various sparsity patterns.
 }
 \examples{
 # Fit a sparse VAR model
