@@ -1,7 +1,8 @@
 rm(list = ls())
 library(bigtime)
-data(Y)
-data(X)
+data(varx.example)
+Y <- Y.varx
+X <- X.varx
 
 ########## Simple Estimation ##################################################
 mod_hlag <- sparseVARX(Y = scale(Y), X = scale(X), selection = "none") # estimation using hlag and no selection

@@ -1,6 +1,7 @@
 library(bigtime)
 rm(list = ls())
-data(Y)
+data(varma.example)
+Y <- Y.varma
 
 ########## Checking functionality via workflows ##################################################
 mod <- sparseVARMA(Y) # This should return a tensor for phase II results and give a standardisation warning

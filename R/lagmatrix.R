@@ -4,9 +4,8 @@
 #' @export
 #' @return A list with estimated lag matrix of the VAR model, or lag matrices of the VARX or VARMA model. The rows contain the responses, the columns contain the predictors.
 #' @examples
-#' data(Y)
-#' data(X)
-#' VARXfit <- sparseVARX(Y=scale(Y), X=scale(X), selection = "cv") # sparse VARX
+#' data(varx.example)
+#' VARXfit <- sparseVARX(Y=scale(Y.varx), X=scale(X.varx), selection = "cv") # sparse VARX
 #' Lhats <- lagmatrix(fit=VARXfit)
 lagmatrix <- function(fit, returnplot=F){
 

@@ -18,7 +18,7 @@ Vector of length k containing the h-step ahead forecasts for the k time series.
 Function to obtain h-step ahead direct forecast based on estimated VAR, VARX or VARMA model
 }
 \examples{
-data(Y)
-VARfit <- sparseVAR(Y, selection = "cv") # sparse VAR
+data(var.example)
+VARfit <- sparseVAR(scale(Y.var), selection = "cv") # sparse VAR
 VARforecast <- directforecast(fit=VARfit, h=1)
 }

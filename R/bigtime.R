@@ -20,8 +20,8 @@
 #' @name bigtime
 #' @examples
 #' # Fit a sparse VAR model
-#' data(Y)
-#' VARfit <- sparseVAR(Y, selection = "cv") # sparse VAR using time series cross-validation
+#' data(var.example)
+#' VARfit <- sparseVAR(scale(Y.var), selection = "cv") # sparse VAR using time series cross-validation
 #' Lhat <- lagmatrix(fit=VARfit) # get estimated lagmatrix
 #' VARforecast <- directforecast(fit=VARfit, h=1) # get one-step ahead forecasts
 NULL

@@ -29,9 +29,9 @@
 #' @references Nicholson William B., Wilms Ines, Bien Jacob and Matteson David S. (2020), “High-dimensional forecasting via interpretable vector autoregression”, Journal of Machine Learning Research, 21(166), 1-52.
 #' @seealso \link{lagmatrix} and \link{directforecast}
 #' @examples
-#' data(Y)
-#' VARfit <- sparseVAR(Y) # sparse VAR
-#' ARfit <- sparseVAR(Y[,2]) # sparse AR
+#' data(var.example)
+#' VARfit <- sparseVAR(Y = scale(Y.var)) # sparse VAR
+#' ARfit <- sparseVAR(scale(Y.var[,2])) # sparse AR
 sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL,
                       selection = c("none", "cv", "bic", "aic", "hq"),
                       cvcut=0.9, h=1,  eps=1e-3, check_std = TRUE){
