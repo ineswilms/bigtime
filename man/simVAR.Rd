@@ -89,3 +89,15 @@ was constraint}
 \description{
 Simulates a VAR(p) with various sparsity patterns
 }
+\examples{
+periods <- 200 # time series length
+k <- 5 # number of variables
+p <- 10 # maximum lag
+sparsity_pattern <- "HLag" # HLag sparsity structure
+sparsity_options <- list(zero_min = 0, # variables can be included with all lags
+                         zero_max = 10, # but some could also include no lags
+                         zeroes_in_self = TRUE)
+sim <- simVAR(periods=periods, k=k, p=p, sparsity_pattern=sparsity_pattern,
+              sparsity_options=sparsity_options, seed = 12345)
+summary(sim)
+}

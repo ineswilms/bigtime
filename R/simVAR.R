@@ -49,6 +49,17 @@
 #' \item{sparsity_pattern}{Sparsity pattern used}
 #' \item{sparsity_options}{Extra options for the sparsity patterns used}
 #' \item{seed}{Seed used for the simulation}
+#' @examples
+#' periods <- 200 # time series length
+#' k <- 5 # number of variables
+#' p <- 10 # maximum lag
+#' sparsity_pattern <- "HLag" # HLag sparsity structure
+#' sparsity_options <- list(zero_min = 0, # variables can be included with all lags
+#'                          zero_max = 10, # but some could also include no lags
+#'                          zeroes_in_self = TRUE)
+#' sim <- simVAR(periods=periods, k=k, p=p, sparsity_pattern=sparsity_pattern,
+#'               sparsity_options=sparsity_options, seed = 12345)
+#' summary(sim)
 simVAR <- function(periods, k, p, coef_mat = NULL, const = rep(0, k), e_dist = rnorm,
                    init_y = rep(0, k*p), max_abs_eigval = 0.8, burnin = periods,
                    sparsity_pattern = c("none", "lasso", "L1", "hvar", "HLag"),
