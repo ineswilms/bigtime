@@ -27,14 +27,16 @@ dat <- simVAR(periods=200, k=2, p=5, decay = 0.1, seed = 6150533,
                        sparsity_pattern = "hvar")
 mod <- sparseVAR(Y=scale(dat$Y), selection = "bic", h = 1)
 diagnostics_plot(mod, variable = 1) # Plotting the first variable
-
+\dontrun{
 # VARMA example
 data(varma.example)
 varma <- sparseVARMA(Y=scale(Y.varma), VARMAselection="cv")
 diagnostics_plot(varma, variable = 2) # Plotting the second variable
-
+}
+\dontrun{
 # VARX example
 data(varx.example)
 varx <- sparseVARX(Y=scale(Y.varx), X=scale(X.varx), selection="cv")
 diagnostics_plot(varx, variable = 1) # Plotting the first variable
+}
 }

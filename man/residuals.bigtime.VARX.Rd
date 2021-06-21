@@ -20,7 +20,9 @@ Gives the residuals for VARX models estimated using
 \code{\link{sparseVARX}}
 }
 \examples{
+\dontrun{
 data(varx.example)
 varx <- sparseVARX(Y=scale(Y.varx), X=scale(X.varx), selection="cv")
 res <- residuals(varx)
+}
 }

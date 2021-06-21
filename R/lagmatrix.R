@@ -2,11 +2,13 @@
 #' @param fit Fitted VAR, VARX or VARMA model.
 #' @param returnplot TRUE or FALSE: return plot of lag matrix or not.
 #' @export
-#' @return A list with estimated lag matrix of the VAR model, or lag matrices of the VARX or VARMA model. The rows contain the responses, the columns contain the predictors.
+#' @return A list with estimated lag matrix of the VAR model, or lag matrices
+#' of the VARX or VARMA model. The rows contain the responses, the columns
+#' contain the predictors.
 #' @examples
-#' data(varx.example)
-#' VARXfit <- sparseVARX(Y=scale(Y.varx), X=scale(X.varx), selection = "cv") # sparse VARX
-#' Lhats <- lagmatrix(fit=VARXfit)
+#' data(var.example)
+#' mod <- sparseVAR(Y=scale(Y.var), selection="cv")
+#' Lhat <- lagmatrix(fit=mod)
 lagmatrix <- function(fit, returnplot=F){
 
   model <- "none"

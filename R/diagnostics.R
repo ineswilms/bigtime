@@ -40,10 +40,12 @@ residuals.bigtime.VAR <- function(object, ...){
 #' @param ... Not currently used
 #' @export
 #' @return Returns a matrix of residuals.
-#' @examples 
+#' @examples
+#' \dontrun{
 #' data(varx.example)
 #' varx <- sparseVARX(Y=scale(Y.varx), X=scale(X.varx), selection="cv")
 #' res <- residuals(varx)
+#' }
 residuals.bigtime.VARX <- function(object, ...){
   mod <- object
 
@@ -76,9 +78,11 @@ residuals.bigtime.VARX <- function(object, ...){
 #' @export
 #' @return Returns a matrix of residuals.
 #' @examples
+#' \dontrun{
 #' data(varma.example)
 #' varma <- sparseVARMA(Y = scale(Y.varma), VARMAselection="cv")
 #' res <- residuals(varma)
+#' }
 residuals.bigtime.VARMA <- function(object, ...){
   mod <- object
   fit <- fitted.bigtime.VARMA(mod, ...)
@@ -209,16 +213,18 @@ fitted.bigtime.VARMA <- function(object, ...){
 #'                        sparsity_pattern = "hvar")
 #' mod <- sparseVAR(Y=scale(dat$Y), selection = "bic", h = 1)
 #' diagnostics_plot(mod, variable = 1) # Plotting the first variable
-#'
+#' \dontrun{
 #' # VARMA example
 #' data(varma.example)
 #' varma <- sparseVARMA(Y=scale(Y.varma), VARMAselection="cv")
 #' diagnostics_plot(varma, variable = 2) # Plotting the second variable
-#'
+#' }
+#' \dontrun{
 #' # VARX example
 #' data(varx.example)
 #' varx <- sparseVARX(Y=scale(Y.varx), X=scale(X.varx), selection="cv")
 #' diagnostics_plot(varx, variable = 1) # Plotting the first variable
+#' }
 diagnostics_plot <- function(mod, variable = 1, dates = NULL){
   UseMethod("diagnostics_plot", mod)
 }
