@@ -55,7 +55,7 @@
 #' Estimation of Large-Scale Vector AutoRegressive Moving Averages”, Journal of the American Statistical Association, doi: 10.1080/01621459.2021.1942013.
 #' @seealso \link{lagmatrix} and \link{directforecast}
 #' @examples
-#' data(var.example)
+#' data(varma.example)
 #' VARMAfit <- sparseVARMA(Y = scale(Y.var)) # sparse VARMA
 #' y <- matrix(Y.var[,1], ncol=1)
 #' ARMAfit <- sparseVARMA(Y=scale(y)) # sparse ARMA
