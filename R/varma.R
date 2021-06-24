@@ -56,8 +56,8 @@
 #' @seealso \link{lagmatrix} and \link{directforecast}
 #' @examples
 #' data(varma.example)
-#' VARMAfit <- sparseVARMA(Y = scale(Y.var)) # sparse VARMA
-#' y <- matrix(Y.var[,1], ncol=1)
+#' VARMAfit <- sparseVARMA(Y = scale(Y.varma)) # sparse VARMA
+#' y <- matrix(Y.varma[,1], ncol=1)
 #' ARMAfit <- sparseVARMA(Y=scale(y)) # sparse ARMA
 sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL,
                         VARgran=NULL, VARselection = c("cv", "bic", "aic", "hq"),
