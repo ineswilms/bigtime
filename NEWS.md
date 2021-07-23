@@ -1,5 +1,9 @@
+# bigtime 0.2.1
+* Important note: Please update all R packages on which bigtime depends upon installing bigtime from CRAN. We have been informed on errors occuring when using older versions of the Rcpp package on which bigtime depends. In version 0.2.1 of bigtime (currently only available on github), we have therefore added the dependency on Rcpp version >=1.0.7
+
 # bigtime 0.2.0
 
+* Important starting note: Please update all R packages on which bigtime depends upon installing bigtime from CRAN. We have been informed on errors occurring when using older versions of the Rcpp package on which bigtime depends. In version 0.2.1 of bigtime (currently only available on github), we have therefore added the dependency on Rcpp version >=1.0.7
 * `sparseVAR`, `sparseVARMA`, `sparseVARX` are all more efficient and faster now
 * All estimation functions return corresponding S3 classes
 * `fitted` and `residuals` functions were implemented for VAR, VARMA, VARX 

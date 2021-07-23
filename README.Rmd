@@ -23,7 +23,13 @@ The goal of `bigtime` is to sparsely estimate large time series models such as t
 
 ## Installation
 
-You can install bigtime from github a follows:
+
+The package can be installed from CRAN using
+``` r
+install.packages("bigtime")
+```
+
+Please update all R packages on which bigtime depends upon installation. In particular, we have noticed that (at least) version 1.0.7 of Rcpp is required to use bigtime version 0.2.0, the version that is currently available on CRAN. We have added this dependency to the development version 0.2.1 of bigtime on github. You can install the development version (= the latest version) of bigtime from github as follows:
 
 ```{r gh-installation, eval = FALSE}
 # install.packages("devtools")
