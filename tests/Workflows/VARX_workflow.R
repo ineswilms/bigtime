@@ -44,6 +44,15 @@ dim(mod_hq$Phihat)
 mod_lasso <- sparseVARX(Y = Y, X = X, VARXpen = "L1") # estimation using lasso
 class(mod_hlag)
 
+# testing h > 1
+mod_h <- sparseVARX(Y = scale(Y), X = scale(X), h = 2)
+res <- residuals(mod_h)
+
+mod_h <- sparseVARX(Y = scale(Y), X = scale(X), h = 2, selection = "cv")
+res <- residuals(mod_h)
+diagnostics_plot(mod_h)
+
+
 ########## univariate case ###################################################
 Y <- Y[, 1, drop = FALSE]
 X <- X[, 1, drop = FALSE]

@@ -51,14 +51,15 @@ residuals.bigtime.VARX <- function(object, ...){
 
   # Must cover the case when model was estimated using multiple lambda
   if (mod$selection == "none"){
-    res <- array(NA, dim = c(nrow(mod$Y) - max(mod$p, mod$s), ncol(mod$Y), length(mod$lambdaPhi)))
+    res <- array(NA, dim = c(nrow(mod$Y) - max(mod$p, mod$s) - mod$h + 1, ncol(mod$Y), length(mod$lambdaPhi)))
     for (i in 1:length(mod$lambdaPhi)){
       mod_tmp <- mod
       mod_tmp$Phihat <- mod$Phihat[, , i]
       mod_tmp$phi0hat <- mod$phi0hat[, , i]
       mod_tmp$Bhat <- mod$Bhat[, , i]
       mod_tmp$selection <- "tmp"
-      res[, , i] <- residuals.bigtime.VARX(mod_tmp, ...)
+      res_tmp <- residuals.bigtime.VARX(mod_tmp, ...)
+      res[, , i] <- res_tmp
     }
     return(res)
   }
@@ -147,7 +148,7 @@ fitted.bigtime.VARX <- function(object, ...){
 
   # Must cover the case when model was estimated using multiple lambda
   if (mod$selection == "none"){
-    fit <- array(NA, dim = c(nrow(mod$Y) - max(mod$p, mod$s), ncol(mod$Y), length(mod$lambdaPhi)))
+    fit <- array(NA, dim = c(nrow(mod$Y) - max(mod$p, mod$s) - mod$h + 1, ncol(mod$Y), length(mod$lambdaPhi)))
     for (i in 1:length(mod$lambdaPhi)){
       mod_tmp <- mod
       mod_tmp$Phihat <- mod$Phihat[, , i]

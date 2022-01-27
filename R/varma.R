@@ -299,7 +299,6 @@ sparseVARMA <- function(Y, U=NULL,  VARp=NULL, VARpen="HLag", VARlseq=NULL,
   Phi <- if (is.null(dim(HVARXFIT$Phihat))) matrix(HVARXFIT$Phihat, nrow = 1) else HVARXFIT$Phihat
   phi0 <- HVARXFIT$phi0hat
   Theta <- HVARXFIT$Bhat
-  resid <- residuals(HVARXFIT)
   U <- matrix(U, ncol=ncol(U), nrow=nrow(U))
   k <- ncol(Y)
 

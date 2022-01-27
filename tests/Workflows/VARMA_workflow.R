@@ -88,3 +88,14 @@ try({plot_cv(mod)}) # Should give an error because not yet implemented
 diagnostics_plot(mod)
 dir_fcst <- directforecast(mod, h = 1)
 dir_fcst
+
+# Following test is from issue 4 on github
+# The original version was not including the residual call
+# but the error was in the residual funciton. Since the estimation
+# procedure does not actually need the residual call, it was removed
+# and instead the call was made explicit in the test.
+testdata <- matrix(rnorm(300, 1:300), 100)
+varmamod <- sparseVARMA(Y = scale(testdata), h=2)
+res <- residuals(varmamod)
+
+
