@@ -15,7 +15,7 @@ residuals.bigtime.VAR <- function(object, ...){
 
   # We must catch the special case in which no selection precedure was used
   if (mod$selection == "none"){
-    res <- array(dim = c(nrow(mod$Y)-mod$p, mod$k, length(mod$lambdas)))
+    res <- array(dim = c(nrow(mod$Y)-mod$p - mod$h + 1, mod$k, length(mod$lambdas)))
     for (i in 1:length(mod$lambdas)){
       mod_tmp <- mod
       mod_tmp$Phihat <- mod$Phihat[, , i]
