@@ -18,6 +18,7 @@
 #' @param VARXpen "HLag" (hierarchical sparse penalty) or "L1" (standard lasso penalty) penalization in VARX.
 #' @param selection Model selection method to be used. Default is none, which will return all values for all penalisations.
 #' @param check_std Check whether data is standardised. Default is TRUE and is not recommended to be changed
+#' @param verbose Logical to print value of information criteria for each lambda together with selection. Default is FALSE
 #' @export
 #' @return A list with the following components
 #' \item{Y}{\eqn{T} by \eqn{k} matrix of endogenous time series.}
@@ -49,7 +50,7 @@
 sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, VARXPhigran=NULL,
                        VARXlBseq=NULL,  VARXBgran=NULL, VARXalpha=0, h=1, cvcut=0.9, eps=10^-3,
                        selection = c("none", "cv", "bic", "aic", "hq"),
-                       check_std = TRUE){
+                       check_std = TRUE, verbose = FALSE){
 
   ######################################
   #### Check Inputs and Preparation ####
@@ -259,7 +260,7 @@ sparseVARX <- function(Y, X, p=NULL, s=NULL, VARXpen="HLag", VARXlPhiseq=NULL, V
   }
 
   class(out) <- "bigtime.VARX"
-  if (selection %in% c("bic", "aic", "hq")) out <- ic_selection(out, ic = selection, verbose = TRUE)
+  if (selection %in% c("bic", "aic", "hq")) out <- ic_selection(out, ic = selection, verbose = verbose)
   out
 }
 
