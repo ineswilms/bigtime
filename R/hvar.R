@@ -11,6 +11,7 @@
 #' @param VARpen "HLag" (hierarchical sparse penalty) or "L1" (standard lasso penalty) penalization.
 #' @param selection One of "none" (default), "cv" (Time Series Cross-Validation), "bic", "aic", "hq". Used to select the optimal penalization.
 #' @param check_std Check whether data is standardised. Default is TRUE and is not recommended to be changed
+#' @param verbose Logical to print value of information criteria for each lambda together with selection. Default is FALSE
 #' @export
 #' @return A list with the following components
 #' \item{Y}{\eqn{T} by \eqn{k} matrix of time series.}
@@ -34,7 +35,7 @@
 #' ARfit <- sparseVAR(Y=scale(Y.var[,2])) # sparse AR
 sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL,
                       selection = c("none", "cv", "bic", "aic", "hq"),
-                      cvcut=0.9, h=1,  eps=1e-3, check_std = TRUE){
+                      cvcut=0.9, h=1,  eps=1e-3, check_std = TRUE, verbose = FALSE){
 
   # Check Inputs
   if(!is.matrix(Y)){
@@ -186,7 +187,7 @@ sparseVAR <- function(Y, p=NULL, VARpen="HLag", VARlseq=NULL, VARgran=NULL,
 
   # If user wants to use IC for selection
   if (selection %in% c("bic", "aic", "hq")) {
-    out <- ic_selection(out, ic = selection, verbose = TRUE)
+    out <- ic_selection(out, ic = selection, verbose = verbose)
     Phihat <- if (ncol(Y) == 1) matrix(out$Phihat, nrow = 1) else out$Phihat
     out$Phihat <- Phihat
   }
