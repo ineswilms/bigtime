@@ -63,7 +63,7 @@
     beta <- array(0,dim=c(k,k*p+1,1))
   }
 
-  if (group == "HVARELEM" | group =="Basci"){
+  if (group == "HVARELEM" | group =="Basic"){
     estim <- ifelse(group == "Basic", 1, 2)
     gamstart <- LGSearch_cpp(gamstart, Y, Z, beta, estim, k, p)
   }
