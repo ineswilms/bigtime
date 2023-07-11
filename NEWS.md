@@ -1,5 +1,7 @@
 # bigtime 0.2.2
 * verbose arguments added to functions sparseVAR and sparseVARX
+* correction lambda grid to hvaralgorithms
+* removal SystemRequirements: C++11
 
 # bigtime 0.2.1
 * Dependency on Rcpp version >=1.0.7 added to the DESCRIPTION.
