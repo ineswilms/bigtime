@@ -14,7 +14,8 @@ sparseVAR(
   cvcut = 0.9,
   h = 1,
   eps = 0.001,
-  check_std = TRUE
+  check_std = TRUE,
+  verbose = FALSE
 )
 }
 \arguments{
@@ -39,6 +40,8 @@ how deep the grid should be constructed. Second element specifies how many value
 \item{eps}{a small positive numeric value giving the tolerance for convergence in the proximal gradient algorithm.}
 
 \item{check_std}{Check whether data is standardised. Default is TRUE and is not recommended to be changed}
+
+\item{verbose}{Logical to print value of information criteria for each lambda together with selection. Default is FALSE}
 }
 \value{
 A list with the following components
