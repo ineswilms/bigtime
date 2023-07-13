@@ -11,7 +11,7 @@ Authors@R: c(
     person("Enrico", "Wegner", email = "e.wegner@student.maastrichtuniversity.nl", role = "aut"))
 Maintainer: Ines Wilms <i.wilms@maastrichtuniversity.nl>
 Description: Estimation of large Vector AutoRegressive (VAR), Vector AutoRegressive with Exogenous Variables X (VARX) and Vector AutoRegressive Moving Average (VARMA) Models with Structured Lasso Penalties, see Nicholson, Wilms, Bien and Matteson (2020) <https://jmlr.org/papers/v21/19-777.html> and Wilms, Basu, Bien and Matteson (2021) <doi:10.1080/01621459.2021.1942013>.
-Depends: R (>= 3.5.0), methods
+Depends: R (>= 3.6.0), methods
 License: GPL (>= 2)
 Encoding: UTF-8
 LazyData: true
