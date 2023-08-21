@@ -1,3 +1,6 @@
+# bigtime 0.2.3
+* package documentation adjusted due to breaking change in roxygen2 7.0.0 
+
 # bigtime 0.2.2
 * verbose arguments added to functions sparseVAR and sparseVARX
 * correction lambda grid to hvaralgorithms

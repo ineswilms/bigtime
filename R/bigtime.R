@@ -11,7 +11,7 @@
 #' The function \link{directforecast} gives h-step ahead forecasts based on the estimated model.
 #' The function \link{recursiveforecast} can be used to recursively forecast a VAR model.
 #' The function \link{is.stable} returns whether an estimated VAR model is stable.
-#' The function \link{diagnostics_plot} returns a plot of the fitted vs. observed values as well as of the residuals. 
+#' The function \link{diagnostics_plot} returns a plot of the fitted vs. observed values as well as of the residuals.
 #' The functions \link{fitted} and \link{residuals} return the fitted, respectively the residuals of the estimated model.
 #' The function \link{simVAR} can be used to simulate a VAR model with various sparsity patterns.
 #'
@@ -21,8 +21,9 @@
 #' @references Wilms Ines, Sumanta Basu, Bien Jacob and Matteson David S. (2021), “Sparse Identification and
 #' Estimation of Large-Scale Vector AutoRegressive Moving Averages”, Journal of the American Statistical Association, doi: 10.1080/01621459.2021.1942013.
 
-#' @docType package
+
 #' @name bigtime
+#' @aliases bigtime bigtime-package
 #' @examples
 #' # Fit a sparse VAR model
 #' data(var.example)
